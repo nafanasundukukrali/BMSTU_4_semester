@@ -1,2 +1,3 @@
 # BMSTU_4_semester
-Л/р по КГ, ВА, МЗЯП, ООП
+![Насколько же ты в отчаянии](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
+Кто смог расшифровать эту буквы - тот 
