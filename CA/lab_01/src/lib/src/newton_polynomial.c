@@ -1,8 +1,6 @@
 #include "../inc/newton_polynomial.h"
 
-void find_start_and_end_of_approximation_cut(size_t *start, size_t *end, user_data_t *input_data);
-
-int calc_newton_approximation_coefficients(user_data_t *input_data, newton_polynomial_t *polynomial)
+int calc_newton_approximation_coefficients(user_data_t *input_data, polynomial_t *polynomial)
 {
     size_t start, end;
 
@@ -41,7 +39,7 @@ int calc_newton_approximation_coefficients(user_data_t *input_data, newton_polyn
     return EXIT_SUCCESS;
 }
 
-double get_function_value_newton(user_data_t *input_data, newton_polynomial_t *polynomial)
+double get_function_value_newton(user_data_t *input_data, polynomial_t *polynomial)
 {
     double result = 0, coefficient = 1;
 
@@ -63,28 +61,3 @@ double calc_reverse_newton_interpolation_coefficients(user_data_t *input_data, d
     double *real_y = input_data->y;
 }
 */
-
-void find_start_and_end_of_approximation_cut(size_t *start, size_t *end, user_data_t *input_data)
-{
-    size_t left = input_data->search_x_position;
-    size_t right = input_data->search_x_position + 1;
-
-    size_t i = 0;
-    while (i < input_data->n)
-    {
-        if (left > 0)
-        {
-            left--;
-            i++;
-        }
-
-        if (i < input_data->n && right < input_data->values_count)
-        {
-            right++; 
-            i++;
-        }
-    }
-
-    *start = left;
-    *end = right;
-}

@@ -11,7 +11,7 @@ START_TEST(test_x_not_in_input_data)
     double *p1 = (double *)coefficients;
     double *p2 = (double *)new_x;
 
-    newton_polynomial_t result = {p1, p2};
+    polynomial_t result = {p1, p2};
 
     double stamp[] = {1, -0.304, -1.128, 0.363, 0.149};
 
@@ -36,7 +36,7 @@ START_TEST(test_x_not_in_cut)
     double *p1 = (double *)coefficients;
     double *p2 = (double *)new_x;
 
-    newton_polynomial_t result = {p1, p2};
+    polynomial_t result = {p1, p2};
 
     double stamp[] = {1, 1};
 
@@ -60,7 +60,7 @@ START_TEST(test_x_after_cut)
     double *p1 = (double *)coefficients;
     double *p2 = (double *)new_x;
 
-    newton_polynomial_t result = {p1, p2};
+    polynomial_t result = {p1, p2};
 
     double stamp[] = {1, 1};
 
@@ -84,7 +84,7 @@ START_TEST(test_x_cut_value)
     double *p1 = (double *)coefficients;
     double *p2 = (double *)new_x;
 
-    newton_polynomial_t result = {p1, p2};
+    polynomial_t result = {p1, p2};
 
     double stamp[] = {1, 1};
 

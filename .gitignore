@@ -1,6 +1,10 @@
+# c
 *.exe
 *.out
 *.o
 *.pch
 *.gch
 *.so
+# python
+__pycache__/
+env/

@@ -1,22 +1,37 @@
-#include "../inc/newton_polynomial.h"
+#include "../inc/hermite_polynomial.h"
 
-int calc_herm
-/*
-void find_start_and_end_of_approximation_cut(size_t *start, size_t *end, user_data_t *input_data);
+void get_x_multiplicity(double *dst_x, user_data_t *input_data);
 
-int calc_newton_approximation_coefficients(user_data_t *input_data, newton_polynomial_t *polynomial)
+int calc_hermite_approximation_coefficients(user_data_t *input_data, polynomial_t *polynomial)
 {
-    size_t start, end;
+    double *buffer_x = malloc(sizeof(double) * input_data->values_count * 2);
 
-    find_start_and_end_of_approximation_cut(&start, &end, input_data);
-    
+    if (buffer_x == NULL)
+        return ERROR_DATA_ALLOCATE;
+
     double *buffer_coefficients = malloc(sizeof(double) * (input_data->n + 1));
 
     if (buffer_coefficients == NULL)
         return ERROR_DATA_ALLOCATE;
 
-    memmove(buffer_coefficients, input_data->y + start, sizeof(double) * (input_data->n + 1)); 
-    memmove(polynomial->x, input_data->x + start, sizeof(double) * (input_data->n + 1)); 
+    double *buffer_y = malloc(sizeof(double) * (input_data->n + 1));
+
+    if (buffer_coefficients == NULL)
+        return ERROR_DATA_ALLOCATE;
+    //memmove(buffer_coefficients, input_data->y + start, sizeof(double) * (input_data->n + 1));
+    get_x_multiplicity(buffer_x, input_data);
+    
+    if (buffer_coefficients == NULL)
+        return ERROR_DATA_ALLOCATE;
+
+    size_t start, end;
+
+    double *buffer_pointer = input_data->x;
+    input_data->x = buffer_x;
+
+    find_start_and_end_of_approximation_cut(&start, &end, input_data);
+    
+    // memmove(polynomial->x, input_data->x + start, sizeof(double) * (input_data->n + 1)); 
 
     size_t step = 1;
     double last_result, pre_last_result;
@@ -43,7 +58,7 @@ int calc_newton_approximation_coefficients(user_data_t *input_data, newton_polyn
     return EXIT_SUCCESS;
 }
 
-double get_function_value_newton(user_data_t *input_data, newton_polynomial_t *polynomial)
+double get_function_value_newton(user_data_t *input_data, polynomial_t *polynomial)
 {
     double result = 0, coefficient = 1;
 
@@ -58,28 +73,47 @@ double get_function_value_newton(user_data_t *input_data, newton_polynomial_t *p
     return result;
 }
 
-void find_start_and_end_of_approximation_cut(size_t *start, size_t *end, user_data_t *input_data)
+void get_x_multiplicity(double *dst_x, user_data_t *input_data)
 {
-    size_t left = input_data->search_x_position;
-    size_t right = input_data->search_x_position + 1;
+    size_t real_size = 0;
+    size_t size = input_data->values_count * 2;
 
-    size_t i = 0;
-    while (i < input_data->n)
+    for (size_t i = 0; i < input_data->values_count; i++)
     {
-        if (left > 0)
+        dst_x[real_size] = input_data->x[i];
+        real_size++;
+
+        size_t derivatives = 0;
+        node_t *buffer = input_data->y_derivative[i];
+
+        while (buffer != NULL) 
         {
-            left--;
-            i++;
+            derivatives++;
+            buffer = buffer->next;
         }
 
-        if (i < input_data->n && right < input_data->values_count)
+        if (real_size + derivatives < size)
         {
-            right++; 
-            i++;
+            dst_x = realloc(dst_x, size * 2 * sizeof(double));
+            
+            if (dst_x == NULL)
+            {
+                free(dst_x);
+
+                return;
+            }
+
+            size *= 2;
+        }
+
+
+        buffer = input_data->y_derivative[i];
+
+        while (buffer != NULL) 
+        {
+            dst_x[real_size] = buffer->node;
+            buffer = buffer->next;
+            real_size++;
         }
     }
-
-    *start = left;
-    *end = right;
 }
-*/
