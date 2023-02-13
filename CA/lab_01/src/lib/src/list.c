@@ -9,20 +9,31 @@ node_t *create_list_node()
     if (node == NULL)
         return NULL;
 
-    node->data = NULL;
     node->next = NULL;
 
     return node;
 }
 
-short insert_node_to_list(node_t **head, char *word)
+short insert_node_to_start(node_t **head, double data)
 {
     node_t *node = create_list_node();
 
     if (node == NULL)
         return ERROR_MALLOC_DATA;
 
-    node->data = word;
+    node->data = data;
+    
+    
+}
+
+short insert_node_to_end(node_t **head,  double data)
+{
+    node_t *node = create_list_node();
+
+    if (node == NULL)
+        return ERROR_MALLOC_DATA;
+
+    node->data = data;
 
     if (*head == NULL)
     {
@@ -55,6 +66,7 @@ short malloc_node(node_t **node)
 }
 */
 
+/*
 node_t *find(node_t *head, void *data, int (*comparator)(void*, void *), size_t *steps)
 {
     *steps = 0;
@@ -67,14 +79,14 @@ node_t *find(node_t *head, void *data, int (*comparator)(void*, void *), size_t 
 
     return head;
 }
+*/
 
-
-void *pop_front(node_t **head)
+double pop_front(node_t **head)
 {
     if (head == NULL || *head == NULL)
-        return NULL;
+        return -1;
 
-    void *buffer_data = (*head)->data;
+    double buffer_data = (*head)->data;
     node_t *buffer_node = (*head)->next;
 
     free(*head);
