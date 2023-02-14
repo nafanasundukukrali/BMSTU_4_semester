@@ -2,15 +2,15 @@ from math import factorial
 import pandas as pd
 import numpy as np
 
-def getInterpolationCoefficients(preparedData: list[list[float]]) -> list[float]:
-    result = [preparedData[_][1] for _ in range(len(preparedData))]
+def getInterpolationCoefficients(preparedData: list[list[float]], n) -> list[float]:
+    result = [preparedData[_][1] for _ in range(n)]
 
     step = 1
 
-    while step < len(preparedData):
+    while step < n:
         last_result = result[step-1];
 
-        for i in range (step, len(preparedData)):
+        for i in range (step, n):
             pre_last_result = result[i];
 
             if preparedData[i - step][0] == preparedData[i][0]:
@@ -28,7 +28,9 @@ def getInterpolationCoefficients(preparedData: list[list[float]]) -> list[float]
 
 
 def prepareHermiteData(data: list[list[float]], value: float, n: int) -> list[list[float]]:
+    data.sort(key=lambda x: x[0]) 
     result = []
+    
     
     position = searchApproximationPosition(data, value)
     
@@ -67,6 +69,7 @@ def prepareHermiteData(data: list[list[float]], value: float, n: int) -> list[li
     return result
 
 def prepareNewtonData(data: list[list[float]], value: float, n: int) -> list[list[float]]:
+    data.sort(key=lambda x: x[0]) 
     position = searchApproximationPosition(data, value)
     right = position
     left = position + 1
@@ -79,10 +82,9 @@ def prepareNewtonData(data: list[list[float]], value: float, n: int) -> list[lis
             left += 1
             n -= 1
     
-    if right < 0:
-        right += 1
+    right += 1
 
-    return data[right:left]
+    return data[right:left-1]
     
 
 def searchApproximationPosition(data: list[list[float]], value: float) -> int:
@@ -101,7 +103,7 @@ def getInterpolationResult(coefficients: list[float],
     result = coefficients[0]
     tmpCoefficient = 1
 
-    for i in range(1, n + 1):
+    for i in range(1, n):
         tmpCoefficient *= value - data[i - 1][0]
         result += tmpCoefficient * coefficients[i]
 
@@ -111,18 +113,18 @@ def getNewtonIntepolation(data: list[list[float]],
                           value: float,
                           n: int) -> float:
 
-    tmpData = prepareNewtonData(data, value, n)
-    coefficients = getInterpolationCoefficients(tmpData)
+    tmpData = prepareNewtonData(data, value, n + 1)
+    coefficients = getInterpolationCoefficients(tmpData, n + 1)
     
-    return getInterpolationResult(coefficients, tmpData, value, n)
+    return getInterpolationResult(coefficients, tmpData, value, n + 1)
 
 def getHermiteInterpolation(data: list[list[float]],
                             value: float,
                             n: int) -> float:
-    data2 = prepareHermiteData(data, value, n)
-    newcoefficients = getInterpolationCoefficients(data2)
+    data2 = prepareHermiteData(data, value, n + 1)
+    newcoefficients = getInterpolationCoefficients(data2, n + 1)
 
-    return getInterpolationResult(newcoefficients, data2, value, n)
+    return getInterpolationResult(newcoefficients, data2, value, n + 1)
 
 def getReverseIntepolationValue(data: list[list[float]], 
                                 value: float, 
@@ -134,7 +136,15 @@ def getReverseIntepolationValue(data: list[list[float]],
     return [xNewton, xHermite] 
 
 def swapColumnsXY(data):
-    newDatadf1 = [[data[i][1], data[i][0]] for i in range(len(data))]
+     # newDatadf1 = [[data[i][1], data[i][0]] for i in range(len(data))]
+    newDatadf1 = []
+
+    for i in range(len(data)):
+        newDatadf1.append([data[i][1], data[i][0]])
+    
+        for j in range(2, len(data[i])):
+            newDatadf1[i].append(1/data[i][j])
+
     newDatadf1.sort(key=lambda x: x[0])
 
     return newDatadf1
@@ -143,6 +153,7 @@ value = float(input("Введите аргумент, для которого в
 power = int(input("Введите степень аппроксимирующих полиномов: "))
 dataPath = input("Введите путь до файла с тестовыми данными: ")
 print()
+print("=== Задание 1 ===")
 
 df = pd.read_csv(dataPath, dtype=float)
 data = df.to_numpy().tolist()
@@ -167,15 +178,18 @@ df2 = pd.DataFrame(
 
 print(df2.to_string(index=False))
 print()
+print("=== Задание 2 ===")
 print("Обратная интерполяция:")
 
-resultReverse = getReverseIntepolationValue(data, value, power)
+resultReverse = getReverseIntepolationValue(data, 0, power)
 
 print(f'Значение с использованием полинома Ньютона: {"{:,.3f}".format(resultReverse[0])} \n'
       f'Значение с использованием полинома Эрмита: {"{:,.3f}".format(resultReverse[1])}')
 
-print() 
+print()
+print("=== Задание 3 ===") 
 
+power = int(input("Введите степень аппроксимирующих полиномов: "))
 path_1 = input("Введите путь до первой таблицы: ")
 path_2 = input("Введите путь до второй таблицы: ")
 
@@ -188,12 +202,14 @@ data2 = df2.to_numpy().tolist()
 newYColumnData = []
 
 for i in range(len(data2)):
-    newYColumnData .append(getReverseIntepolationValue(data1, data2[i][0],
+    newYColumnData.append(getReverseIntepolationValue(data1, data2[i][0],
                                                        power)[0])
 
 for i in range(len(newYColumnData)):
-    data2[i].append(newYColumnData[i] - data2[i][1])
-    del data2[i][1]
+    data2[i].insert(0, newYColumnData[i] - data2[i][1])
+    data2[i].pop(2)
 
-result = getReverseIntepolationValue(data2, 0.0, power)
-print(f'Искомое значение: {"{:,.3f}".format(result[0])}')
+resultx = getNewtonIntepolation(data2, 0.0, power)
+resulty = getReverseIntepolationValue(data1, resultx, power)
+
+print(f'Искомое значение: x={"{:,.3f}".format(resultx)}, y={"{:,.3f}".format(resulty[1])}')
