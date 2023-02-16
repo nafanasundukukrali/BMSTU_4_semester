@@ -5,8 +5,8 @@ from ResultWindow import ResultWindow
 from PySide6.QtWidgets import (QApplication,
                                QLabel,
                                QLineEdit,
-                               QListWidgetItem, 
-                               QMainWindow, 
+                               QListWidgetItem,
+                               QMainWindow,
                                QPushButton,
                                QGridLayout,
                                QVBoxLayout,
@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (QApplication,
                                )
 
 
-class InputCoordsWidget(QWidget):
+class InputCordsWidget(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -28,10 +28,10 @@ class InputCoordsWidget(QWidget):
         self._layout.addWidget(self._x)
         self._layout.addWidget(QLabel("y"))
         self._layout.addWidget(self._y)
-    
-    def checkInputData(self):
-        if (not self.checkNumberInString(self._x.text()) or not
-                self.checkNumberInString(self._y.text())):
+
+    def check_input_data(self):
+        if (not self.check_number_in_string(self._x.text()) or not
+        self.check_number_in_string(self._y.text())):
             MessageDisplay(self, INPUT_RULES, "Некорректный ввод")
 
             return []
@@ -39,58 +39,59 @@ class InputCoordsWidget(QWidget):
             return [self._x.text(), self._y.text()]
 
     @staticmethod
-    def checkNumberInString(string):
+    def check_number_in_string(string):
         try:
             float(string)
             return True
-        except:
+        except ():
             return False
 
+
 class DotWidget(QWidget):
-    plentlyNumber = 0
+    plentyNumber = 0
 
     def __init__(self):
         super().__init__()
 
-        DotWidget.plentlyNumber += 1
+        DotWidget.plentyNumber += 1
 
         self._listWidget = QListWidget()
 
         self._addButton = QPushButton("Добавить новую точку", self)
-        self._inputWidget = InputCoordsWidget()
+        self._inputWidget = InputCordsWidget()
         self._removeButton = QPushButton("Удалить выбранную точку", self)
 
-        self._addButton.clicked.connect(self._addItemByClick)
-        self._removeButton.clicked.connect(self._removeListItemByClick)
+        self._addButton.clicked.connect(self._add_item_by_click)
+        self._removeButton.clicked.connect(self._remove_list_item_by_click)
 
-        self._layout = QVBoxLayout(self) 
+        self._layout = QVBoxLayout(self)
 
-        self._layout.addWidget(QLabel(f'Список введённых точек множества номер {DotWidget.plentlyNumber}'))
+        self._layout.addWidget(QLabel(f'Список введённых точек множества номер {DotWidget.plentyNumber}'))
         self._layout.addWidget(self._listWidget)
         self._layout.addWidget(self._addButton)
         self._layout.addWidget(QLabel(f'Координаты новой точки. {INPUT_RULES}'))
         self._layout.addWidget(self._inputWidget)
         self._layout.addWidget(self._removeButton)
 
-    def _removeListItemByClick(self):
+    def _remove_list_item_by_click(self):
         if not self._listWidget.currentItem():
             MessageDisplay(self, "Не выбран ни один элемент из списка, или список пуст.", "Некорректный ввод")
         else:
             self._listWidget.takeItem(self._listWidget.row(self._listWidget.currentItem()))
 
-    def _addItemByClick(self):
-        value = self._inputWidget.checkInputData()
-        
-        if value == []:
+    def _add_item_by_click(self):
+        value = self._inputWidget.check_input_data()
+
+        if not value:
             return
 
-        newItem = QListWidgetItem()
-        newItem.setText(f'({value[0]};{value[1]})')
-        # newItem.setData(QtGui.QtRop, value)
+        new_item = QListWidgetItem()
+        new_item.setText(f'({value[0]};{value[1]})')
+        # new_item.setData(QtGui.QtRop, value)
 
-        self._listWidget.addItem(newItem)
-    
-    def getCoordsList(self):
+        self._listWidget.addItem(new_item)
+
+    def get_cords_list(self):
         items = []
 
         for i in range(self._listWidget.count()):
@@ -102,50 +103,63 @@ class DotWidget(QWidget):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, screen_params):
         super().__init__()
-
+        self._screenParams = screen_params.size()
         grid = QGridLayout()
         widget = QWidget()
         widget.setLayout(grid)
 
-        self._firstDotWiget = DotWidget()
-        grid.addWidget(self._firstDotWiget, 0, 0)
+        self._firstDotWidget = DotWidget()
+        grid.addWidget(self._firstDotWidget, 0, 0)
 
         self._solveTaskButton = QPushButton("Показать решение", self)
-        self._solveTaskButton.clicked.connect(self._displayResult)
+        self._solveTaskButton.clicked.connect(self._display_result)
         grid.addWidget(self._solveTaskButton, 1, 0, 1, 2)
 
-        self._secondDotWiget = DotWidget()
-        grid.addWidget(self._secondDotWiget, 0, 1)
+        self._secondDotWidget = DotWidget()
+        grid.addWidget(self._secondDotWidget, 0, 1)
 
         self.setCentralWidget(widget)
-        self.initGUI()
-    
-    
-    def initGUI(self):
+        self.init_gui()
+
+    def init_gui(self):
         self.setWindowTitle('Конкина Алина, ЛР1')
         self.setMinimumHeight(600)
-        self.moveToCenter()
+        self.move(self._screenParams.width() // 2, self._screenParams.height())
         self.show()
 
-    def moveToCenter(self):
+    def move_to_center(self):
         qr = self.frameGeometry()
         cp = self.screen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    def _displayResult(self):
-        firstData = self._firstDotWiget.getCoordsList()
-        secondData = self._firstDotWiget.getCoordsList()
+    def _display_result(self):
+        # firstData = self._firstDotWidget.get_cords_list()
+        # secondData = self._firstDotWidget.get_cords_list()
+
+        firstData = [
+            [0, 3], [-1, 5], [3, 5],
+            [4, 0], [3, 1], [5, 1],
+            [6, 7], [49, 5], [14, 3],
+            [5, -1], [7, -3], [5, -5],
+        ]
+
+        secondData = [
+            [9, 3], [7, 3], [11, 3],
+            [10, 4], [9, 5], [10, 6],
+            [14, 3], [11, 7], [14, 9],
+        ]
 
         if not firstData or not secondData:
             MessageDisplay(self, "В обоих множествах отсуствуют данные.")
             return
 
-        self._resultWindow = ResultWindow(firstData, secondData)
+        self._resultWindow = ResultWindow(firstData, secondData, self._screenParams)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = MainWindow(app.primaryScreen())
     app.exec()
