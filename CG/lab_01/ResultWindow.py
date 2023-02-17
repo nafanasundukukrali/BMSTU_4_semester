@@ -1,8 +1,8 @@
 from PySide6.QtCore import QPoint
-from PySide6.QtWidgets import QLabel, QStyle, QVBoxLayout, QWidget, QFrame, QSizePolicy
+from PySide6.QtWidgets import QLabel, QStyle, QVBoxLayout, QWidget, QFrame
 import copy
 import itertools
-from PySide6.QtGui import QPainter, QColor, QBrush, QPalette, Qt, QPen
+from PySide6.QtGui import QPainter, QColor, QBrush, QPalette, Qt, QPen, QFont
 from config import EPSILON, solve_ls_by_gaus_method
 
 class Circles:
@@ -13,8 +13,8 @@ class Circles:
 
     def __init__(self, array):
         self.answer = Circles.SUCCESS
-        self.array = []
-        self._removeDuplicates(array, self._comparatorSameCoords)
+        # self.array = []
+        self.array = self._removeDuplicates(array, self._comparatorSameCoords)
         self.circles_paires = []
         
         if not self.array and array:
@@ -40,35 +40,42 @@ class Circles:
             if i == j:
                 result.append(array[j])
 
-        self.array = copy.deepcopy(result)
+        array = copy.deepcopy(result)
 
-        if not self.array:
+        if not array:
             self.answer = Circles.LESS_DATA
 
+        return array
 
     @staticmethod
     def _comparatorSameCircles(circle1, circle2):
-        return (circle1[0][0] == circle2[0][0] and circle1[0][1] ==
-                circle2[0][1] and circle1[1] == circle2[1])
+        return (abs(circle1[0][0] - circle2[0][0]) < EPSILON and abs(circle1[0][1] - circle2[0][1]) < EPSILON and
+                abs(circle1[1] - circle2[1]) < EPSILON)
 
     def _analysData(self): 
         def get_compare_params(circle_data):
-            x_left = circle_data[i][0][0] - circle_data[1]
-            x_right = circle_data[i][0][0] + circle_data[1]
-            y = circle_data[i][0][1]
+            x_left = circle_data[0][0] - circle_data[1]
+            x_right = circle_data[0][0] + circle_data[1]
+            y = circle_data[0][1]
             
             return {'radius': circle_data[1], 
                     'x_left': x_left,
                     'x_right': x_right,
                     'y': y}
 
-        all_circles_coords_by_tree_dots = list(itertools.permutations(self.array, 3))
-        all_circles_by_center_and_r = [
-                self._getCirclesParamsFromThreeDots(*circle_data) for
-                                       circle_data in
-                                       all_circles_coords_by_tree_dots]
+        all_circles_coords_by_tree_dots = list(itertools.combinations(self.array, 3))
+        all_circles_by_center_and_r = []
 
-        self._removeDuplicates(all_circles_by_center_and_r, self._comparatorSameCircles)
+        for circle_data in all_circles_coords_by_tree_dots:
+            result = self._getCirclesParamsFromThreeDots(*circle_data)
+
+            if result:
+                all_circles_by_center_and_r.append(result)
+
+        if not all_circles_by_center_and_r:
+            self.answer = self.NO_RESULT
+
+        all_circles_by_center_and_r = self._removeDuplicates(all_circles_by_center_and_r, self._comparatorSameCircles)
 
         for i in range(len(all_circles_by_center_and_r)):
             circle1_data = get_compare_params(all_circles_by_center_and_r[i])
@@ -80,48 +87,30 @@ class Circles:
 
                 if ((centers_distance >= abs(circle1_data['radius'] + 
                                            circle2_data['radius'])) and 
-                    (circle1_data['x_left'] == circle2_data['x_right'] or
-                     circle1_data['x_right'] == circle2_data['x_left'])):
-                        self.circles_paires.append([all_circles_by_center_and_r[i],
-                                                    all_circles_by_center_and_r[j]])
+                    (abs(circle1_data['x_left'] - circle2_data['x_right']) < EPSILON or
+                     abs(circle1_data['x_right'] - circle2_data['x_left']) < EPSILON)):
+                    self.circles_paires.append([all_circles_by_center_and_r[i],
+                                                all_circles_by_center_and_r[j]])
     
     @staticmethod
     def _getCutLengthByCoords(dot1, dot2):
         return ((dot1[0] - dot2[0])**2 + (dot1[1] - dot2[1])**2)**0.5 
 
     def _getCirclesParamsFromThreeDots(self, dot1, dot2, dot3):
-        def getSbyHeronsFormula(a, b, c):
-            half_p = (a+b+c)/2
 
-            return (half_p * (half_p - a) * (half_p - b) * (half_p - c))**0.5
+        coord_matrix_for_center = [[2 * (dot2[0] - dot1[0]), 2 * (dot2[1] - dot1[1]),
+                                    dot2[0] ** 2 - dot1[0] ** 2 + dot2[1] ** 2 - dot1[1] ** 2],
+                                   [2 * (dot3[0] - dot2[0]), 2 * (dot3[1] - dot2[1]),
+                                    dot3[0] ** 2 - dot2[0] ** 2 + dot3[1] ** 2 - dot2[1] ** 2]]
 
+        result = solve_ls_by_gaus_method(coord_matrix_for_center)
 
-                
-        a = self._getCutLengthByCoords(dot1, dot2)
-        b = self._getCutLengthByCoords(dot2, dot3)
-        c = self._getCutLengthByCoords(dot1, dot3)
-
-        S_triangle_in_circle = getSbyHeronsFormula(a, b, c)
-        R_circle = (a * b * c) / 4 / S_triangle_in_circle
-
-        coord_x_of_middle_dot = (dot1[0] + dot2[0]) / 2
-        coord_y_of_middle_dot = (dot1[1] + dot2[1]) / 2
-        
-        coord_matrix_for_center = [[ dot2[0] - coord_x_of_middle_dot, dot2[1] - coord_y_of_middle_dot,
-                                    coord_x_of_middle_dot * dot2[0] -
-                                    coord_x_of_middle_dot ** 2 +
-                                    coord_y_of_middle_dot * dot2[1] -
-                                    coord_y_of_middle_dot ** 2],
-                                   [ dot1[0] - coord_x_of_middle_dot, dot1[1] - coord_y_of_middle_dot,
-                                    coord_x_of_middle_dot * dot1[0] -
-                                    coord_x_of_middle_dot ** 2 +
-                                    coord_y_of_middle_dot * dot1[1] -
-                                    coord_x_of_middle_dot ** 2]]
-
-        solve_ls_by_gaus_method(coord_matrix_for_center)
+        if not result:
+            return []
 
         return [[coord_matrix_for_center[0][-1],
-                 coord_matrix_for_center[1][-1]], R_circle]
+                 coord_matrix_for_center[1][-1]], self._getCutLengthByCoords(dot1, [coord_matrix_for_center[0][-1],
+                 coord_matrix_for_center[1][-1]]), dot1, dot2, dot3]
 
     @staticmethod
     def _comparatorSameCoords(coords1, coords2):
@@ -136,6 +125,7 @@ class PaintField(QFrame):
         self._ky = parent.ky
         self._xm = parent.xm
         self._ym = parent.ym
+        self._labelFont = QFont("Times", 15, QFont.Bold)
 
         self.setFixedSize(parent.width(), parent.height() * self.PAINT_FIELD_HEIGHT_COEF)
         self._firstColor = [QColor(200, 0, 0), QColor(255,105,180), QColor(0,191,255)]
@@ -149,6 +139,7 @@ class PaintField(QFrame):
     def paintEvent(self, event):
         super().paintEvent(event)
         self._painter = QPainter(self)
+        self._painter.setFont(self._labelFont)
         self._drawCircles(self._firstCirclesPairs, self._firstColor,
                           self._firstDrawStyle)
         self._drawCircles(self._secondCirclesPairs, self._secondColor)
@@ -171,12 +162,15 @@ class PaintField(QFrame):
                 self._painter.setPen(pen)
                 self._painter.drawEllipse(center, circle[1] * self._kx, circle[1] * self._ky)
 
+                for dot in circle[2:]:
+
+
             pen.setWidth(1)
             pen.setColor(QColor(color[2]))
             pen.setStyle(Qt.SolidLine)
             self._painter.setPen(pen)
 
-            if pair[0][0][0] + pair[0][1] == pair[1][0][0] - pair[1][1]:
+            if (abs(pair[0][0][0] + pair[0][1] - (pair[1][0][0] - pair[1][1]))) < EPSILON:
                 self._painter.drawLine(QPoint(self._zoom_and_move_cords(pair[0][0][0] + pair[0][1], 0)[0], 0),
                                        QPoint(self._zoom_and_move_cords(pair[1][0][0] - pair[1][1], 0)[0],
                                               self.height()))
@@ -202,6 +196,12 @@ class PaintField(QFrame):
 
         self._painter.drawLine(self.width(), self.height() - self._ym, self.width() - 10, self.height() - self._ym - 10)
         self._painter.drawLine(self.width(), self.height() - self._ym, self.width() - 10, self.height() - self._ym + 10)
+
+        x_pos = self._xm + 15 if self._xm + 15 < self.width() else self._xm - 15
+        y_pos = self._ym + 15 if self._ym + 15 < self.height() else self._ym - 15
+
+        self._painter.drawText(x_pos, 15, "y")
+        self._painter.drawText(self.width() - 15, self.height() - y_pos, "x")
 
     def _zoom_and_move_cords(self, x, y):
         x = self._kx * x + self._xm
@@ -229,7 +229,7 @@ class ResultWindow(QWidget):
         self._firstCirclesPairs = Circles(firstData).circles_paires
         self._secondCirclesPairs = Circles(secondData).circles_paires
         # self._firstCirclesPairs = [
-        #         [[[1, 5], 2], [[4, 1], 1]],
+        #         [[[1, 5], 2, ], [[4, 1], 1]],
         #         [[[1, 5], 2], [[5, -3], 2]],
         #         [[[5, -3], 2], [[9, 3], 2]],
         #         ]
@@ -237,7 +237,7 @@ class ResultWindow(QWidget):
         # self._secondCirclesPairs = [
         #         [[[9, 5], 1], [[14, 6], 3]],
         #         ]
-
+        #
         # self._firstCirclesPairs = [
         #     [[[1, 5], 2], [[4, 1], 1]],
         #     [[[1, 5], 2], [[5, -3], 2]],
@@ -248,15 +248,15 @@ class ResultWindow(QWidget):
         #     [[[9, 5], 1], [[14, 6], 3]],
         # ]
 
-        for i in range(len(self._firstCirclesPairs)):
-            for j in range(2):
-                self._firstCirclesPairs[i][j][0][0] += 0
-                self._firstCirclesPairs[i][j][1] *= 1
-
-        for i in range(len(self._secondCirclesPairs)):
-            for j in range(2):
-                self._secondCirclesPairs[i][j][0][0] -= 0
-                self._secondCirclesPairs[i][j][1] *= 1
+        # for i in range(len(self._firstCirclesPairs)):
+        #     for j in range(2):
+        #         self._firstCirclesPairs[i][j][0][0] += 0
+        #         self._firstCirclesPairs[i][j][1] *= 1
+        #
+        # for i in range(len(self._secondCirclesPairs)):
+        #     for j in range(2):
+        #         self._secondCirclesPairs[i][j][0][0] -= 0
+        #         self._secondCirclesPairs[i][j][1] *= 1
 
         self._get_zoom_coefficients()
 
