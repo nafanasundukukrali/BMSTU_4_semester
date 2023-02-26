@@ -76,8 +76,8 @@ figure_configuration_t get_figure_projection_width_height_params(figure_t figure
     if (figure.point_array_lenght > 0)
     {
         max_right = figure.points_array[0].x;
-        max_left = figure.points_array[0].x;
-        max_bottom = figure.points_array[0].y;
+        max_left = 0;
+        max_bottom = 0;
         max_top = figure.points_array[0].y;
     }
 

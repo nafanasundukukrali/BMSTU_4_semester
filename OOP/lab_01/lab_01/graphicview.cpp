@@ -36,19 +36,27 @@ static err_t get_drawing_coefficients(graphic_view_t *graphic_scene, figure_t *f
     figure_configuration_t figure_params = get_figure_projection_width_height_params(*figure);
     view_coefficients_t coefficients;
 
-    double kx = 0, ky = 0, border_k = graphic_scene->pen.width() + 1;
+    double kx = 0, ky = 0;
 
     if (figure_params.object_params.window_height != 0 &&
             figure_params.object_params.window_width != 0)
     {
-        ky = graphic_scene->window_params->window_height / (figure_params.object_params.window_height + border_k);
-        kx = graphic_scene->window_params->window_width / (figure_params.object_params.window_width + border_k);
+        ky = graphic_scene->window_params->window_height / (figure_params.object_params.window_height) / 2;
+        kx = graphic_scene->window_params->window_width / (figure_params.object_params.window_width) / 2;
 
+        coefficients.xm = - coefficients.k * (figure_params.min_left_cord) +
+                coefficients.k / coefficients.k * graphic_scene->window_params->window_width / 2;
+        coefficients.ym = - coefficients.k * (figure_params.min_bottum_cord) +
+                coefficients.k / coefficients.k * graphic_scene->window_params->window_height / 2;
+
+        coefficients.k = fmin(kx, ky);
     }
-
-    coefficients.k = fmin(kx, ky);
-    coefficients.xm = - coefficients.k * (figure_params.min_left_cord - border_k);
-    coefficients.ym = - coefficients.k * (figure_params.min_bottum_cord - border_k);
+    else
+    {
+        coefficients.k = 0;
+        coefficients.xm = 0;
+        coefficients.ym = 0;
+    }
 
     return set_graph_coefficients(graphic_scene, &coefficients);
 }
