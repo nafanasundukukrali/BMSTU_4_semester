@@ -1,7 +1,7 @@
 #ifndef GRAPHICVIEW_H
 #define GRAPHICVIEW_H
 
-#include "QGraphicsScene"
+#include <QGraphicsScene>
 #include "widthheightparams.h"
 #include "error.h"
 #include "figure.h"

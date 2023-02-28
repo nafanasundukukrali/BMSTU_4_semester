@@ -1,16 +1,6 @@
 #include "figure.h"
 #include "widthheightparams.h"
 
-void* allocate_memory_of_object_array(params_alocate_function_t params)
-{
-    void *buffer_pointer = malloc(params.one_object_mem_size * params.count);
-
-    if (buffer_pointer == NULL)
-        *(params.return_code) = ERROR_ALLOCATE_MEMORY;
-
-    return buffer_pointer;
-}
-
 figure_t init_figure()
 {
     err_t return_code = SUCCESS;
@@ -22,6 +12,16 @@ figure_t init_figure()
     figure.point_array_lenght = 0;
 
     return figure;
+}
+
+void* allocate_memory_of_object_array(params_alocate_function_t params)
+{
+    void *buffer_pointer = malloc(params.one_object_mem_size * params.count);
+
+    if (buffer_pointer == NULL)
+        *(params.return_code) = ERROR_ALLOCATE_MEMORY;
+
+    return buffer_pointer;
 }
 
 bool check_wether_figure_is_free(figure_t *figure)

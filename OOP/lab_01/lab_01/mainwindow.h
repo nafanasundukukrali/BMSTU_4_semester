@@ -23,12 +23,15 @@ public:
     width_height_params_t params;
 
     MainWindow(QWidget *parent = nullptr);
-    void on_select_file_button_click();
-    void on_load_button_click();
-    void on_scale_button_click();
-    void on_move_button_click();
-    void on_rotate_button_click();
-    ~MainWindow();
+
+    void on_select_file_button_click(void);
+    void on_load_button_click(void);
+    void on_scale_button_click(void);
+    void on_move_button_click(void);
+    void on_rotate_button_click(void);
+    void connect_buttons_to_ui(void);
+
+    ~MainWindow(void);
 
 private:
     Ui::MainWindow *ui;

@@ -1,19 +1,14 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "fileio.h"
+#include "handler.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    connect_buttons_to_ui();
     setFixedSize(width(), height());
-
-    connect(ui->choose_file_button, &QPushButton::released, this, &MainWindow::on_select_file_button_click);
-    connect(ui->load_button, &QPushButton::released, this, &MainWindow::on_load_button_click);
-    connect(ui->scale_button, &QPushButton::released, this, &MainWindow::on_scale_button_click);
-    connect(ui->move_button, &QPushButton::released, this, &MainWindow::on_move_button_click);
-    connect(ui->rotate_button, &QPushButton::released, this, &MainWindow::on_rotate_button_click);
 
     downloadFigureStatus = false;
     figure = init_figure();
@@ -34,7 +29,16 @@ MainWindow::MainWindow(QWidget *parent)
     graphicScene = init_graphic_view(ui->graphicsView->scene(), &params, pen);
 }
 
-void MainWindow::on_select_file_button_click()
+void MainWindow::connect_buttons_to_ui(void)
+{
+    connect(ui->choose_file_button, &QPushButton::released, this, &MainWindow::on_select_file_button_click);
+    connect(ui->load_button, &QPushButton::released, this, &MainWindow::on_load_button_click);
+    connect(ui->scale_button, &QPushButton::released, this, &MainWindow::on_scale_button_click);
+    connect(ui->move_button, &QPushButton::released, this, &MainWindow::on_move_button_click);
+    connect(ui->rotate_button, &QPushButton::released, this, &MainWindow::on_rotate_button_click);
+}
+
+void MainWindow::on_select_file_button_click(void)
 {
     err_t return_code = SUCCESS;
 
@@ -49,7 +53,7 @@ void MainWindow::on_select_file_button_click()
         displayErrorMessage(return_code);
 }
 
-void MainWindow::on_load_button_click()
+void MainWindow::on_load_button_click(void)
 {
     err_t return_code = SUCCESS;
     QString file_path = this->ui->path_line->text();
@@ -60,28 +64,8 @@ void MainWindow::on_load_button_click()
     }
     else
     {
-       FILE *file;
-       char *file_path_char_string = file_path.toLocal8Bit().data();
-       figure_t buffer_figure = init_figure();
-
-       return_code = open_file_by_path(file_path_char_string, &file);
-
-       if (return_code == SUCCESS)
-           return_code = read_data_from_file(file, &buffer_figure);
-
-       if (fclose(file))
-           return_code = ERROR_CLOSE_FILE;
-
-       if (return_code == SUCCESS)
-            return_code = check_figure_data_correctness(&buffer_figure);
-
-       if (return_code == SUCCESS)
-       {
-           if (!check_wether_figure_is_free(&figure))
-               free_figure_memory(&figure);
-
-           figure = buffer_figure;
-       }
+        read_action_coefficients_t read_coefficients = init_read_action_coefficients(&file_path, &figure, &graphicScene);
+        return_code = handler_action(READ, &read_coefficients);
     }
 
     if (return_code != SUCCESS)
@@ -95,7 +79,7 @@ void MainWindow::on_load_button_click()
     }
 }
 
-void MainWindow::on_scale_button_click()
+void MainWindow::on_scale_button_click(void)
 {
     err_t return_code = SUCCESS;
 
@@ -107,8 +91,9 @@ void MainWindow::on_scale_button_click()
         scale_coefficients_t scale_coefficients = init_scale_coefficients(ui->kx_box->value(),
                                                                           ui->ky_box->value(),
                                                                           ui->kz_box->value());
+        scale_action_coefficients_t action_coefficients = init_scale_action_coefficients(&figure, &scale_coefficients);
 
-        return_code = scale_figure(&figure, &scale_coefficients);
+        return_code = scale_action(&action_coefficients);
     }
 
     if (return_code == SUCCESS)
@@ -130,8 +115,9 @@ void MainWindow::on_move_button_click()
         move_coefficients_t move_coefficients = init_move_coefficients(ui->dx_box->value(),
                                                                        ui->dy_box->value(),
                                                                        ui->dz_box->value());
+        move_action_coefficients_t action_params = init_move_action_coefficients(&figure, &move_coefficients);
 
-        return_code = move_figure(&figure, &move_coefficients);
+        return_code = move_action(&action_params);
     }
 
     if (return_code == SUCCESS)
@@ -141,7 +127,7 @@ void MainWindow::on_move_button_click()
         displayErrorMessage(return_code);
 }
 
-void MainWindow::on_rotate_button_click()
+void MainWindow::on_rotate_button_click(void)
 {
     err_t return_code = SUCCESS;
 
@@ -154,7 +140,9 @@ void MainWindow::on_rotate_button_click()
                                                                              ui->oy_box->value(),
                                                                              ui->oz_box->value());
 
-        return_code = rotate_figure(&figure, &rotate_coefficients);
+        rotate_action_coefficients_t action_params = init_rotate_action_coefficients(&figure, &rotate_coefficients);
+
+        return_code = rotate_action(&action_params);
     }
 
     if (return_code == SUCCESS)
@@ -164,7 +152,7 @@ void MainWindow::on_rotate_button_click()
         displayErrorMessage(return_code);
 }
 
-MainWindow::~MainWindow()
+MainWindow::~MainWindow(void)
 {
     free_figure_memory(&figure);
     delete ui;

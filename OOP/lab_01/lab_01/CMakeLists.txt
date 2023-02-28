@@ -33,6 +33,10 @@ set(PROJECT_SOURCES
         widthheightparams.cpp
         coefficients.h
         coefficients.cpp
+        handler.h
+        handler.cpp
+        request.h
+        request.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

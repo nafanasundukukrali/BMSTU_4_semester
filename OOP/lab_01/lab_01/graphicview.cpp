@@ -89,7 +89,7 @@ static err_t modificate_point_for_graph_view_sizes(modificate_point_for_graph_vi
     return return_code;
 }
 
-static err_t draw_figure_line(graphic_view_t *graphic_scene,
+static err_t prepare_figure_for_drawing(graphic_view_t *graphic_scene,
                               figure_t *figure, size_t line_index)
 {
     if (graphic_scene == NULL ||
@@ -136,7 +136,7 @@ err_t draw_figure_orthogonal_projection(graphic_view_t *graphic_scene, figure_t 
 
         for (size_t i = 0; return_code == SUCCESS &&
              i < figure->edges_array_length; i++)
-            return_code = draw_figure_line(graphic_scene, figure, i);
+            return_code = prepare_figure_for_drawing(graphic_scene, figure, i);
     }
 
     return return_code;

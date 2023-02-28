@@ -1,5 +1,5 @@
-#ifndef SCALECOEFFICIENTS_H
-#define SCALECOEFFICIENTS_H
+#ifndef COEFFICIENTS_H
+#define COEFFICIENTS_H
 
 typedef struct
 {
@@ -22,8 +22,8 @@ typedef struct
     double angle_z;
 } rotate_coefficients_t;
 
-scale_coefficients_t init_scale_coefficients(double kx, double ky, double kz);
-move_coefficients_t init_move_coefficients(double dx, double dy, double dz);
-rotate_coefficients_t init_rotate_coefficients(double angle_x, double angle_y, double angle_z);
+scale_coefficients_t init_scale_coefficients(const double kx, const double ky, const double kz);
+move_coefficients_t init_move_coefficients(const double dx, const double dy, const double dz);
+rotate_coefficients_t init_rotate_coefficients(const double angle_x, const double angle_y, const double angle_z);
 
-#endif // SCALECOEFFICIENTS_H
+#endif // COEFFICIENTS_H

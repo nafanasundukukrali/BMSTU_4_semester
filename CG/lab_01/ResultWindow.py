@@ -1,9 +1,10 @@
 from PySide6.QtCore import QPoint
-from PySide6.QtWidgets import QLabel, QStyle, QVBoxLayout, QWidget, QFrame
+from PySide6.QtWidgets import QLabel, QStyle, QVBoxLayout, QWidget, QFrame, QTabWidget, QFileDialog
 import copy
 import itertools
 from PySide6.QtGui import QPainter, QColor, QBrush, QPalette, Qt, QPen, QFont
-from config import EPSILON, solve_ls_by_gaus_method
+from config import EPSILON, solve_ls_by_gaus_method, ThemeTemplate
+from PySide6 import QtWebEngineWidgets, QtCore
 
 class Circles:
     SUCCESS = 0
@@ -116,22 +117,24 @@ class Circles:
     def _comparatorSameCoords(coords1, coords2):
         return coords1[0] == coords2[0] and coords1[1] == coords2[1]
 
-class PaintField(QFrame):
-    PAINT_FIELD_HEIGHT_COEF = 0.8 
 
-    def __init__(self, parent, firstCirclesPairs, secondCirclesPairs):
+class PaintField(QFrame):
+    def __init__(self, parent, windowParams, firstCirclesPairs, secondCirclesPairs):
         super().__init__(parent)
         self._kx = parent.kx
         self._ky = parent.ky
         self._xm = parent.xm
         self._ym = parent.ym
         self._labelFont = QFont("Times", 15, QFont.Bold)
+        self.setFixedSize(*windowParams)
 
-        self.setFixedSize(parent.width(), parent.height() * self.PAINT_FIELD_HEIGHT_COEF)
-        self._firstColor = [QColor(200, 0, 0), QColor(255,105,180), QColor(0,191,255)]
-        self._firstDrawStyle = Qt.DashDotLine
-        self._secondColor = [QColor(255, 80, 0, 160), QColor(0,255,255), QColor(210,105,30)]
-        self.setStyleSheet("background-color: white;")
+        theme1 = ThemeTemplate(1)
+        theme2 = ThemeTemplate(2)
+
+        self._firstCirclesTheme = theme1
+        self._secondCirclesTheme = theme2
+
+        self.setStyleSheet(theme1.get_background_settings())
         self._firstCirclesPairs = firstCirclesPairs
         self._secondCirclesPairs = secondCirclesPairs
 
@@ -140,34 +143,44 @@ class PaintField(QFrame):
         super().paintEvent(event)
         self._painter = QPainter(self)
         self._painter.setFont(self._labelFont)
-        self._drawCircles(self._firstCirclesPairs, self._firstColor,
-                          self._firstDrawStyle)
-        self._drawCircles(self._secondCirclesPairs, self._secondColor)
         self._draw_coordinate_axes()
+        self._drawCircles(self._firstCirclesPairs, self._firstCirclesTheme)
+        self._drawCircles(self._secondCirclesPairs, self._secondCirclesTheme)
         self._painter.end()
 
-    def _drawCircles(self, array, color, paintStyle=Qt.SolidLine):
+    def _drawCircles(self, array, theme):
         pen = QPen()
 
         for pair in array:
-            pen.setStyle(paintStyle)
+            pen.setStyle(theme.get_line_styles())
+
             for circle in pair:
                 center = QPoint(*self._zoom_and_move_cords(*circle[0]))
+
                 pen.setWidth(5)
-                pen.setColor(color[1])
+                pen.setColor(theme.get_color_shame()['center'])
                 self._painter.setPen(pen)
+
                 self._painter.drawPoint(center)
+
                 pen.setWidth(2)
-                pen.setColor(color[0])
+                pen.setColor(theme.get_color_shame()['circle'])
                 self._painter.setPen(pen)
+
                 self._painter.drawEllipse(center, circle[1] * self._kx, circle[1] * self._ky)
 
-                for dot in circle[2:]:
+                pen.setWidth(5)
+                pen.setColor(theme.get_color_shame()['dot'])
+                self._painter.setPen(pen)
 
+                for dot in circle[2:]:
+                    cords = QPoint(*self._zoom_and_move_cords(*dot))
+                    self._painter.drawPoint(cords)
 
             pen.setWidth(1)
-            pen.setColor(QColor(color[2]))
+            pen.setColor(theme.get_color_shame()['tangent_line'])
             pen.setStyle(Qt.SolidLine)
+
             self._painter.setPen(pen)
 
             if (abs(pair[0][0][0] + pair[0][1] - (pair[1][0][0] - pair[1][1]))) < EPSILON:
@@ -184,6 +197,7 @@ class PaintField(QFrame):
         pen.setColor(QColor(0, 0, 0))
         pen.setStyle(Qt.SolidLine)
         pen.setWidth(2)
+
         self._painter.setPen(pen)
 
         self._painter.drawLine(QPoint(self._xm, 0),
@@ -210,6 +224,26 @@ class PaintField(QFrame):
         return [x, y]
 
 
+class InstructionWidget(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        self._textLabel_ = QLabel("")
+        self._textLabel_.setStyleSheet("color: pink")
+        self._layout = QVBoxLayout()
+        self._layout.addWidget(self._textLabel_)
+        self.setLayout(self._layout)
+        self.setFixedWidth(parent.width())
+        self.setFixedHeight(parent.height())
+        # filename, _ = QFileDialog.getOpenFileName(self, "./index.html")
+        #
+        # if filename:
+        #     with open(filename, 'r') as f:
+        #         html = f.read()
+        #
+        # self.w = QtWebEngineWidgets.QWebEngineView()
+        # self.w.load("./index.html")
+
 class ResultWindow(QWidget):
 
     WINDOW_SIZE_COEF = 0.9
@@ -228,47 +262,18 @@ class ResultWindow(QWidget):
         self._resultInfo = ""
         self._firstCirclesPairs = Circles(firstData).circles_paires
         self._secondCirclesPairs = Circles(secondData).circles_paires
-        # self._firstCirclesPairs = [
-        #         [[[1, 5], 2, ], [[4, 1], 1]],
-        #         [[[1, 5], 2], [[5, -3], 2]],
-        #         [[[5, -3], 2], [[9, 3], 2]],
-        #         ]
-        #
-        # self._secondCirclesPairs = [
-        #         [[[9, 5], 1], [[14, 6], 3]],
-        #         ]
-        #
-        # self._firstCirclesPairs = [
-        #     [[[1, 5], 2], [[4, 1], 1]],
-        #     [[[1, 5], 2], [[5, -3], 2]],
-        # ]
-        #
-        # self._secondCirclesPairs = [
-        #     [[[5, -3], 2], [[9, 3], 2]],
-        #     [[[9, 5], 1], [[14, 6], 3]],
-        # ]
-
-        # for i in range(len(self._firstCirclesPairs)):
-        #     for j in range(2):
-        #         self._firstCirclesPairs[i][j][0][0] += 0
-        #         self._firstCirclesPairs[i][j][1] *= 1
-        #
-        # for i in range(len(self._secondCirclesPairs)):
-        #     for j in range(2):
-        #         self._secondCirclesPairs[i][j][0][0] -= 0
-        #         self._secondCirclesPairs[i][j][1] *= 1
 
         self._get_zoom_coefficients()
+        self._paintField = PaintField(self,
+                                      [self.width(), self.height() * self.PAINT_FIELD_HEIGHT_COEF],
+                                      self._firstCirclesPairs, self._secondCirclesPairs)
 
-        self._resultLabel = QLabel(self._resultInfo)
-        self._paintField = PaintField(self, self._firstCirclesPairs,
-                                      self._secondCirclesPairs)
+        self._mainLayout = QTabWidget(self)
+        self._mainLayout.addTab(self._paintField, "Результат")
+        self._mainLayout.setFixedWidth(self.width())
+        self._mainLayout.setFixedHeight(self.height())
+        self._mainLayout.addTab(InstructionWidget(self), "Инструкция и ход решения")
 
-#        self._paintField.setFixedSize(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
-        # self._paintField.setFixedSize(self.width(), self.height())
-        self._mainLayout = QVBoxLayout()
-        self._mainLayout.addWidget(self._resultLabel) 
-        self._mainLayout.addWidget(self._paintField)
         self.initGUI()
     
     def _get_zoom_coefficients(self):
@@ -285,19 +290,20 @@ class ResultWindow(QWidget):
                 max_bottom = min(circle[0][1] - circle[1], max_bottom)
                 max_top = max(circle[0][1] + circle[1], max_top)
 
-        height = self.height() * self.PAINT_FIELD_HEIGHT_COEF
+        height = self.height() * self.PAINT_FIELD_HEIGHT_COEF - self.ARROW_WIDTH * 2
 
         real_width = abs(max_right - max_left)
         real_height = abs(max_top - max_bottom)
         
         self.ky = height / real_height
-        self.kx = self.width() / real_width
+        self.kx = (self.width() - 2 * self.ARROW_WIDTH) / real_width
 
         self.kx = min(self.kx, self.ky)
+
         self.ky = self.kx
 
-        self.xm = -self.kx * max_left
-        self.ym = -self.ky * max_bottom
+        self.xm = -self.kx * max_left + self.kx / self.kx * self.ARROW_WIDTH
+        self.ym = -self.ky * max_bottom + self.ky / self.ky * self.ARROW_WIDTH
 
 
     def initGUI(self):

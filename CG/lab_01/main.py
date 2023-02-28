@@ -142,8 +142,8 @@ class MainWindow(QMainWindow):
         firstData = [
             [1, 3], [-1, 5], [3, 5],
             [4, 0], [3, 1], [5, 1],
-            # [6, 7], [49, 5], [14, 3],
-            # [6, 7], [49, 5], [14, 3],
+            [6, 7], [49, 5], [14, 3],
+            [6, 7], [49, 5], [14, 3],
             [5, -1], [7, -3], [5, -5],
         ]
 
@@ -152,6 +152,14 @@ class MainWindow(QMainWindow):
             [10, 4], [9, 5], [10, 6],
             [14, 3], [11, 7], [14, 9],
         ]
+
+        # for i in range(len(firstData)):
+        #     firstData[i][0] *= -1/1000
+        #     firstData[i][1] *= 1/1000
+        #
+        # for i in range(len(secondData)):
+        #     secondData[i][0] *= -1/1000
+        #     secondData[i][1] *= 1/1000
 
         if not firstData or not secondData:
             MessageDisplay(self, "В обоих множествах отсуствуют данные.")

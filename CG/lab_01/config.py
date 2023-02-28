@@ -1,4 +1,36 @@
 from PySide6.QtWidgets import QMessageBox
+from PySide6.QtGui import QColor, Qt
+
+
+class ThemeTemplate:
+    def __init__(self, circle_type):
+        self._backgroundSettings = "background-color: white;"
+
+        if circle_type == 1:
+            self._lineStyle = Qt.DashDotLine
+            self._colorShame = {
+                    "center": QColor(200, 0, 0),
+                    "circle": QColor(255, 116, 0),
+                    "tangent_line": QColor(0, 153, 153),
+                    "dot": QColor(0, 204, 0)
+                }
+        else:
+            self._lineStyle = Qt.SolidLine
+            self._colorShame = {
+                "center": QColor(6, 34, 112),
+                "circle": QColor(181, 100, 212),
+                "tangent_line": QColor(156, 164, 0),
+                "dot": QColor(240, 252, 0)
+            }
+
+    def get_color_shame(self):
+        return self._colorShame
+
+    def get_background_settings(self):
+        return self._backgroundSettings
+
+    def get_line_styles(self):
+        return self._lineStyle
 
 
 def solve_ls_by_gaus_method(matrix):
