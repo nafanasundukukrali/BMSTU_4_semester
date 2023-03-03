@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (QApplication,
                                QWidget,
                                QListWidget,
                                QHBoxLayout,
+                               QAbstractItemView
                                )
 
 
@@ -43,7 +44,7 @@ class InputCordsWidget(QWidget):
         try:
             float(string)
             return True
-        except ():
+        except Exception:
             return False
 
 
@@ -55,13 +56,21 @@ class DotWidget(QWidget):
 
         DotWidget.plentyNumber += 1
 
+        self._actualChangeFlag = False
+        self._lastChangeBuffer = ""
+        self._defaultAddButtonName = "Добавить новую точку"
+        self._defaultChangeButtonName = "Изменить выбранную точку"
+        self._selectedItem = None
+
         self._listWidget = QListWidget()
 
         self._addButton = QPushButton("Добавить новую точку", self)
         self._inputWidget = InputCordsWidget()
+        self._changeButton = QPushButton("Изменить выбранную точку", self)
         self._removeButton = QPushButton("Удалить выбранную точку", self)
 
         self._addButton.clicked.connect(self._add_item_by_click)
+        self._changeButton.clicked.connect(self._change_item_by_click)
         self._removeButton.clicked.connect(self._remove_list_item_by_click)
 
         self._layout = QVBoxLayout(self)
@@ -71,10 +80,19 @@ class DotWidget(QWidget):
         self._layout.addWidget(self._addButton)
         self._layout.addWidget(QLabel(f'Координаты новой точки. {INPUT_RULES}'))
         self._layout.addWidget(self._inputWidget)
+        self._layout.addWidget(self._changeButton)
         self._layout.addWidget(self._removeButton)
 
+    def _change_item_selection_mode(self):
+        if self._actualChangeFlag:
+            self._listWidget.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
+        else:
+            self._listWidget.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+
     def _remove_list_item_by_click(self):
-        if not self._listWidget.currentItem():
+        if self._actualChangeFlag:
+            MessageDisplay(self, "Отмените или сохраните изменения, чтобы удалить кнопку.", "Изменение координаты точки")
+        elif not self._listWidget.currentItem():
             MessageDisplay(self, "Не выбран ни один элемент из списка, или список пуст.", "Некорректный ввод")
         else:
             self._listWidget.takeItem(self._listWidget.row(self._listWidget.currentItem()))
@@ -85,11 +103,37 @@ class DotWidget(QWidget):
         if not value:
             return
 
-        new_item = QListWidgetItem()
-        new_item.setText(f'({value[0]};{value[1]})')
-        # new_item.setData(QtGui.QtRop, value)
+        if self._actualChangeFlag:
+            self._changeButton.setText(self._defaultChangeButtonName)
+            self._addButton.setText(self._defaultAddButtonName)
+            self._selectedItem.setText(f'({value[0]};{value[1]})')
+            self._actualChangeFlag = not self._actualChangeFlag
+            self._change_item_selection_mode()
+        else:
+            new_item = QListWidgetItem()
+            new_item.setText(f'({value[0]};{value[1]})')
 
-        self._listWidget.addItem(new_item)
+            self._listWidget.addItem(new_item)
+
+    def _change_item_by_click(self):
+        if not self._listWidget.currentItem():
+            MessageDisplay(self, "Не выбран ни один элемент из списка, или список пуст.", "Некорректный ввод")
+            return
+
+        self._actualChangeFlag = not self._actualChangeFlag
+
+        if not self._actualChangeFlag:
+            self._changeButton.setText(self._defaultChangeButtonName)
+            self._addButton.setText(self._defaultAddButtonName)
+            self._selectedItem.setText(self._lastChangeBuffer)
+        else:
+            self._lastChangeBuffer = self._listWidget.currentItem().text()
+            self._listWidget.currentItem().setText("Введите новые координаты в полях ввода")
+            self._changeButton.setText("Отменить изменения без сохранения")
+            self._addButton.setText("Сохранить изменения")
+            self._selectedItem = self._listWidget.currentItem()
+
+        self._change_item_selection_mode()
 
     def get_cords_list(self):
         items = []
@@ -136,22 +180,22 @@ class MainWindow(QMainWindow):
         self.move(qr.topLeft())
 
     def _display_result(self):
-        # firstData = self._firstDotWidget.get_cords_list()
-        # secondData = self._firstDotWidget.get_cords_list()
+        firstData = self._firstDotWidget.get_cords_list()
+        secondData = self._secondDotWidget.get_cords_list()
 
-        firstData = [
-            [1, 3], [-1, 5], [3, 5],
-            [4, 0], [3, 1], [5, 1],
-            [6, 7], [49, 5], [14, 3],
-            [6, 7], [49, 5], [14, 3],
-            [5, -1], [7, -3], [5, -5],
-        ]
+        # firstData = [
+        #     [1, 3], [-1, 5], [3, 5],
+        #     [4, 0], [3, 1], [5, 1],
+        #     [6, 7], [49, 5], [14, 3],
+        #     [6, 7], [49, 5], [14, 3],
+        #     [5, -1], [7, -3], [5, -5],
+        # ]
 
-        secondData = [
-            [9, 3], [7, 3], [11, 3],
-            [10, 4], [9, 5], [10, 6],
-            [14, 3], [11, 7], [14, 9],
-        ]
+        # secondData = [
+        #     [9, 3], [7, 3], [11, 3],
+        #     [10, 4], [9, 5], [10, 6],
+        #     [14, 3], [11, 7], [14, 9],
+        # ]
 
         # for i in range(len(firstData)):
         #     firstData[i][0] *= -1/1000
@@ -161,11 +205,10 @@ class MainWindow(QMainWindow):
         #     secondData[i][0] *= -1/1000
         #     secondData[i][1] *= 1/1000
 
-        if not firstData or not secondData:
+        if not firstData and not secondData:
             MessageDisplay(self, "В обоих множествах отсуствуют данные.")
             return
-
-        self._resultWindow = ResultWindow(firstData, secondData, self._screenParams)
+        self._resultWindow = ResultWindow(self, firstData, secondData, self._screenParams)
 
 
 if __name__ == "__main__":

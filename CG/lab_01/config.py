@@ -1,6 +1,8 @@
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtGui import QColor, Qt
 
+HTMLPATH = "./index.html"
+
 
 class ThemeTemplate:
     def __init__(self, circle_type):
@@ -20,7 +22,7 @@ class ThemeTemplate:
                 "center": QColor(6, 34, 112),
                 "circle": QColor(181, 100, 212),
                 "tangent_line": QColor(156, 164, 0),
-                "dot": QColor(240, 252, 0)
+                "dot": QColor(255, 105, 180)
             }
 
     def get_color_shame(self):
@@ -34,40 +36,49 @@ class ThemeTemplate:
 
 
 def solve_ls_by_gaus_method(matrix):
-    def make_matrix_upper_triangular():
-        for k in range(len(matrix)):
-            for i in range(k, len(matrix)):
-                j = len(matrix[0]) - 1
+    def is_singular():
+        for i in range(len(matrix)):
+            if not matrix[i][i]:
+                return True
+        return False
 
-                while j + 1 > k and abs(matrix[i][k]) > EPSILON:
-                    matrix[i][j] /= matrix[i][k]
-                    j -= 1
+    def bubble_max_row(col):
+        max_element = matrix[col][col]
+        max_row = col
 
-            for i in range(k + 1, len(matrix)):
-                j = len(matrix[0]) - 1
+        for i in range(col + 1, len(matrix)):
+            if abs(matrix[i][col]) > abs(max_element) and matrix[i][col] != 0:
+                max_element = matrix[i][col]
+                max_row = i
 
-                while j >= k and abs(matrix[i][k]) > EPSILON:
-                    matrix[i][j] -= matrix[k][j]
-                    j -= 1
+        if max_row != col:
+            matrix[col], matrix[max_row] = matrix[max_row], matrix[col]
 
-                if abs(matrix[i][i]) < EPSILON:
-                    return None
+    def solve_gauss():
+        n = len(matrix)
 
-        return 1
+        for k in range(n - 1):
+            bubble_max_row(k)
 
-    result = make_matrix_upper_triangular()
+            for i in range(k + 1, n):
+                div = matrix[i][k] / matrix[k][k]
+                matrix[i][-1] -= div * matrix[k][-1]
 
-    if not result:
-        return None
+                for j in range(k, n):
+                    matrix[i][j] -= div * matrix[k][j]
 
-    for i in range(len(matrix), -1, -1):
-        for j in range(len(matrix[0]) - 2, i, -1):
-            matrix[i][len(matrix[0]) - 1] -= (matrix[j][len(matrix[0]) - 1]
-                                              * matrix[i][j])
+        if is_singular():
+            return None
 
-            matrix[i][j] = 0
+        x = [0 for i in range(n)]
 
-    return 1
+        for k in range(n - 1, -1, -1):
+            x[k] = (matrix[k][-1] - sum([matrix[k][j] * x[j] for j in range(k + 1, n)])) / matrix[k][k]
+
+        return x
+
+    return solve_gauss()
+
 
 EPSILON = 1e-4
 

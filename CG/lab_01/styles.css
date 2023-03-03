@@ -1,0 +1,9 @@
+body {
+    display: grid;
+    grid-template-columns: 1fr repeat(4fr, 5);
+    font-size: 18px;
+}
+
+.rules {
+}
+

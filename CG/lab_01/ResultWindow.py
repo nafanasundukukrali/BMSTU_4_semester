@@ -1,10 +1,9 @@
 from PySide6.QtCore import QPoint
-from PySide6.QtWidgets import QLabel, QStyle, QVBoxLayout, QWidget, QFrame, QTabWidget, QFileDialog
+from PySide6.QtWidgets import QVBoxLayout, QWidget, QFrame, QTabWidget, QTextBrowser
 import copy
 import itertools
-from PySide6.QtGui import QPainter, QColor, QBrush, QPalette, Qt, QPen, QFont
-from config import EPSILON, solve_ls_by_gaus_method, ThemeTemplate
-from PySide6 import QtWebEngineWidgets, QtCore
+from PySide6.QtGui import QPainter, QColor, Qt, QPen, QFont
+from config import EPSILON, solve_ls_by_gaus_method, ThemeTemplate, HTMLPATH, MessageDisplay
 
 class Circles:
     SUCCESS = 0
@@ -13,23 +12,27 @@ class Circles:
     NO_RESULT = 4
 
     def __init__(self, array):
-        self.answer = Circles.SUCCESS
-        # self.array = []
-        self.array = self._removeDuplicates(array, self._comparatorSameCoords)
-        self.circles_paires = []
+        self._answer = Circles.SUCCESS
+        self._array = self._remove_duplicates(array, self._comparatorSameCoords)
+        self._circles_paires = []
         
-        if not self.array and array:
-            self.answer = Circles.ALL_DOT_SAME
-        elif len(self.array) < 5:
-            self.answer = Circles.LESS_DATA
+        if not self._array and array:
+            self._answer = Circles.ALL_DOT_SAME
+        elif len(self._array) < 5:
+            self._answer = Circles.LESS_DATA
         else:
             self._analysData()
             
-            if not self.circles_paires:
-                self.answer = Circles.NO_RESULT
-        
+            if not self._circles_paires:
+                self._answer = Circles.NO_RESULT
 
-    def _removeDuplicates(self, array, compareFunction):
+    def get_answer(self):
+        return self._answer
+
+    def get_circles_pairs(self):
+        return self._circles_paires
+
+    def _remove_duplicates(self, array, compareFunction):
         result = []
 
         for i in range(len(array)):
@@ -44,7 +47,7 @@ class Circles:
         array = copy.deepcopy(result)
 
         if not array:
-            self.answer = Circles.LESS_DATA
+            self._answer = Circles.LESS_DATA
 
         return array
 
@@ -64,7 +67,7 @@ class Circles:
                     'x_right': x_right,
                     'y': y}
 
-        all_circles_coords_by_tree_dots = list(itertools.combinations(self.array, 3))
+        all_circles_coords_by_tree_dots = list(itertools.combinations(self._array, 3))
         all_circles_by_center_and_r = []
 
         for circle_data in all_circles_coords_by_tree_dots:
@@ -74,24 +77,28 @@ class Circles:
                 all_circles_by_center_and_r.append(result)
 
         if not all_circles_by_center_and_r:
-            self.answer = self.NO_RESULT
+            self._answer = self.NO_RESULT
+        else:
+            all_circles_by_center_and_r = self._remove_duplicates(all_circles_by_center_and_r, self._comparatorSameCircles)
 
-        all_circles_by_center_and_r = self._removeDuplicates(all_circles_by_center_and_r, self._comparatorSameCircles)
+        if not all_circles_by_center_and_r:
+            self._answer = self.NO_RESULT
 
-        for i in range(len(all_circles_by_center_and_r)):
-            circle1_data = get_compare_params(all_circles_by_center_and_r[i])
+        if all_circles_by_center_and_r:
+            for i in range(len(all_circles_by_center_and_r)):
+                circle1_data = get_compare_params(all_circles_by_center_and_r[i])
 
-            for j in range(i + 1, len(all_circles_by_center_and_r)):
-                circle2_data = get_compare_params(all_circles_by_center_and_r[j])
-                centers_distance = self._getCutLengthByCoords(all_circles_by_center_and_r[i][0],
-                                                              all_circles_by_center_and_r[j][0])
+                for j in range(i + 1, len(all_circles_by_center_and_r)):
+                    circle2_data = get_compare_params(all_circles_by_center_and_r[j])
+                    centers_distance = self._getCutLengthByCoords(all_circles_by_center_and_r[i][0],
+                                                                  all_circles_by_center_and_r[j][0])
 
-                if ((centers_distance >= abs(circle1_data['radius'] + 
-                                           circle2_data['radius'])) and 
-                    (abs(circle1_data['x_left'] - circle2_data['x_right']) < EPSILON or
-                     abs(circle1_data['x_right'] - circle2_data['x_left']) < EPSILON)):
-                    self.circles_paires.append([all_circles_by_center_and_r[i],
-                                                all_circles_by_center_and_r[j]])
+                    if ((centers_distance >= abs(circle1_data['radius'] +
+                                               circle2_data['radius'])) and
+                        (abs(circle1_data['x_left'] - circle2_data['x_right']) < EPSILON or
+                         abs(circle1_data['x_right'] - circle2_data['x_left']) < EPSILON)):
+                        self._circles_paires.append([all_circles_by_center_and_r[i],
+                                                     all_circles_by_center_and_r[j]])
     
     @staticmethod
     def _getCutLengthByCoords(dot1, dot2):
@@ -109,9 +116,7 @@ class Circles:
         if not result:
             return []
 
-        return [[coord_matrix_for_center[0][-1],
-                 coord_matrix_for_center[1][-1]], self._getCutLengthByCoords(dot1, [coord_matrix_for_center[0][-1],
-                 coord_matrix_for_center[1][-1]]), dot1, dot2, dot3]
+        return [[result[0], result[1]], self._getCutLengthByCoords(dot1, [result[0], result[1]]), dot1, dot2, dot3]
 
     @staticmethod
     def _comparatorSameCoords(coords1, coords2):
@@ -137,7 +142,6 @@ class PaintField(QFrame):
         self.setStyleSheet(theme1.get_background_settings())
         self._firstCirclesPairs = firstCirclesPairs
         self._secondCirclesPairs = secondCirclesPairs
-
     
     def paintEvent(self, event):
         super().paintEvent(event)
@@ -228,29 +232,27 @@ class InstructionWidget(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self._textLabel_ = QLabel("")
-        self._textLabel_.setStyleSheet("color: pink")
+        self.setFixedSize(parent.size())
+
+        htmlstring = ""
+
+        with open(HTMLPATH, "r") as file:
+            htmlstring = '\n'.join(file.readlines())
+
+        self._w = QTextBrowser()
+        self._w.setOpenExternalLinks(True)
+        self._w.setHtml(htmlstring)
         self._layout = QVBoxLayout()
-        self._layout.addWidget(self._textLabel_)
+        self._layout.addWidget(self._w)
         self.setLayout(self._layout)
-        self.setFixedWidth(parent.width())
-        self.setFixedHeight(parent.height())
-        # filename, _ = QFileDialog.getOpenFileName(self, "./index.html")
-        #
-        # if filename:
-        #     with open(filename, 'r') as f:
-        #         html = f.read()
-        #
-        # self.w = QtWebEngineWidgets.QWebEngineView()
-        # self.w.load("./index.html")
 
 class ResultWindow(QWidget):
 
     WINDOW_SIZE_COEF = 0.9
-    PAINT_FIELD_HEIGHT_COEF = 0.8
+    PAINT_FIELD_HEIGHT_COEF = 0.96
     ARROW_WIDTH = 10
 
-    def __init__(self, firstData, secondData, screenParams):
+    def __init__(self, parent, firstData, secondData, screenParams):
         super().__init__()
         self.setFixedSize(screenParams.width() * self.WINDOW_SIZE_COEF,
                           screenParams.height() * self.WINDOW_SIZE_COEF)
@@ -260,9 +262,29 @@ class ResultWindow(QWidget):
         self.ym = 0
 
         self._resultInfo = ""
-        self._firstCirclesPairs = Circles(firstData).circles_paires
-        self._secondCirclesPairs = Circles(secondData).circles_paires
 
+        first_circles = Circles(firstData)
+        second_circles = Circles(secondData)
+        self._firstCirclesPairs = []
+        self._secondCirclesPairs = []
+
+        if (first_circles.get_answer() == Circles.LESS_DATA and second_circles.get_answer() != Circles.SUCCESS or
+                second_circles.get_answer() == Circles.LESS_DATA and first_circles.get_answer() != Circles.SUCCESS):
+            MessageDisplay(parent, "Присутствуют только вырожденные случаи.")
+        elif (first_circles.get_answer() == Circles.NO_RESULT and second_circles.get_answer() != Circles.SUCCESS or
+              first_circles.get_answer() != Circles.SUCCESS and second_circles.get_answer() == Circles.NO_RESULT):
+            MessageDisplay(parent, "Нет решений.")
+        elif first_circles.get_answer() == Circles.SUCCESS or second_circles.get_answer() == Circles.SUCCESS:
+            if first_circles.get_answer() == Circles.SUCCESS:
+                self._firstCirclesPairs = first_circles.get_circles_pairs()
+            if second_circles.get_answer() == Circles.SUCCESS:
+                self._secondCirclesPairs = second_circles.get_circles_pairs()
+
+            self._display_result()
+        else:
+            MessageDisplay(parent, "Нет решений.")
+
+    def _display_result(self):
         self._get_zoom_coefficients()
         self._paintField = PaintField(self,
                                       [self.width(), self.height() * self.PAINT_FIELD_HEIGHT_COEF],
@@ -272,12 +294,12 @@ class ResultWindow(QWidget):
         self._mainLayout.addTab(self._paintField, "Результат")
         self._mainLayout.setFixedWidth(self.width())
         self._mainLayout.setFixedHeight(self.height())
-        self._mainLayout.addTab(InstructionWidget(self), "Инструкция и ход решения")
+        self._mainLayout.addTab(InstructionWidget(self), "Легенда к графику и ход решения")
 
         self.initGUI()
     
     def _get_zoom_coefficients(self):
-        circle1 = self._firstCirclesPairs[0][0]
+        circle1 = self._firstCirclesPairs[0][0] if self._firstCirclesPairs else self._secondCirclesPairs[0][0]
         max_right = circle1[0][0] + circle1[1]
         max_left = circle1[0][0] - circle1[1]
         max_bottom = circle1[0][1] - circle1[1]

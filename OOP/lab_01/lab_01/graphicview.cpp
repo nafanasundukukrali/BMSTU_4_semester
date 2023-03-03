@@ -102,6 +102,7 @@ static err_t prepare_figure_for_drawing(graphic_view_t *graphic_scene,
     move_coefficients_t move_coefficients = init_move_coefficients(graphic_scene->coefficient.xm,
                                                                    graphic_scene->coefficient.ym,
                                                                    0.0);
+    scale_action_coefficients_t scale_action_coefficients = init_scale_action_coefficients(figure,)
 
     point_t draw_point_start, draw_point_end;
 
