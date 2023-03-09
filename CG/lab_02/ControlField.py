@@ -85,4 +85,4 @@ class ControlField(QWidget):
 
     def _change_center_status(self):
         center = self._figure.get_center_cords()
-        self._center_label.setText(self.cords_text + f'({center[0]:.3f}; {center[1]:.3f})')
+        self._center_label.setText(self.cords_text + f'({center[0]:.1f}; {center[1]:.1f})')

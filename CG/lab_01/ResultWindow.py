@@ -171,19 +171,17 @@ class PaintField(QFrame):
         self._painter.drawEllipse(center, circle[1] * self._kx, circle[1] * self._ky)
 
         for dot in circle[2:]:
-            cords = QPoint(*self._zoom_and_move_cords(*dot))
-
-            pen.setWidth(2)
-            pen.setColor(QColor(0, 0, 0))
-            self._painter.setPen(pen)
-
-            self._painter.drawText(cords, f'({dot[0]};{dot[1]})')
+            cords = QPoint(*self._zoom_and_move_cords(*dot[:len(dot) - 1]))
 
             pen.setWidth(5)
             pen.setColor(theme.get_color_shame()['dot'])
             self._painter.setPen(pen)
-
             self._painter.drawPoint(cords)
+
+            pen.setWidth(2)
+            pen.setColor(QColor(0, 0, 0))
+            self._painter.setPen(pen)
+            self._painter.drawText(cords, f'{dot[2]}:({dot[0]};{dot[1]})')
 
     def _drawCircles(self):
         pen = QPen()

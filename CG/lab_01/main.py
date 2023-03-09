@@ -57,6 +57,7 @@ class DotWidget(QWidget):
         DotWidget.plentyNumber += 1
 
         self._actualChangeFlag = False
+        self._lastChangedBufferIndex = ""
         self._lastChangeBuffer = ""
         self._defaultAddButtonName = "Добавить новую точку"
         self._defaultChangeButtonName = "Изменить выбранную точку"
@@ -95,7 +96,12 @@ class DotWidget(QWidget):
         elif not self._listWidget.currentItem():
             MessageDisplay(self, "Не выбран ни один элемент из списка, или список пуст.", "Некорректный ввод")
         else:
+            for i in range(self._listWidget.row(self._listWidget.currentItem()) + 1, self._listWidget.count()):
+                self._listWidget.item(i).setText(f'{int(self._listWidget.item(i).text().split()[0]) - 1} ' +
+                                                 ' '.join(self._listWidget.item(i).text().split()[1:]))
             self._listWidget.takeItem(self._listWidget.row(self._listWidget.currentItem()))
+
+
 
     def _add_item_by_click(self):
         value = self._inputWidget.check_input_data()
@@ -106,12 +112,12 @@ class DotWidget(QWidget):
         if self._actualChangeFlag:
             self._changeButton.setText(self._defaultChangeButtonName)
             self._addButton.setText(self._defaultAddButtonName)
-            self._selectedItem.setText(f'({value[0]};{value[1]})')
+            self._selectedItem.setText(f'{self._lastChangedBufferIndex} ({value[0]};{value[1]})')
             self._actualChangeFlag = not self._actualChangeFlag
             self._change_item_selection_mode()
         else:
             new_item = QListWidgetItem()
-            new_item.setText(f'({value[0]};{value[1]})')
+            new_item.setText(f'{self._listWidget.count() + 1} ({value[0]};{value[1]})')
 
             self._listWidget.addItem(new_item)
 
@@ -128,6 +134,7 @@ class DotWidget(QWidget):
             self._selectedItem.setText(self._lastChangeBuffer)
         else:
             self._lastChangeBuffer = self._listWidget.currentItem().text()
+            self._lastChangedBufferIndex = self._listWidget.currentItem().text().split()[0]
             self._listWidget.currentItem().setText("Введите новые координаты в полях ввода")
             self._changeButton.setText("Отменить изменения без сохранения")
             self._addButton.setText("Сохранить изменения")
@@ -139,8 +146,10 @@ class DotWidget(QWidget):
         items = []
 
         for i in range(self._listWidget.count()):
-            value = self._listWidget.item(i).text()
+            index = self._listWidget.item(i).text().split()[0]
+            value = self._listWidget.item(i).text().split()[1]
             value = list(map(float, value[1:][:len(value) - 2].split(';')))
+            value.append(index)
             items.append(value)
 
         return items
@@ -185,27 +194,27 @@ class MainWindow(QMainWindow):
         firstData = self._firstDotWidget.get_cords_list()
         secondData = self._secondDotWidget.get_cords_list()
 
-        firstData = [
-            [1, 3], [-1, 5], [3, 5],
-            [9, 3], [7, 3], [11, 3],
-            [6, 7], [49, 5], [14, 3],
-            [6, 7], [49, 5], [14, 3],
-            [14, 3], [11, 7], [14, 9],
-        ]
+        # firstData = [
+        #     [1, 3], [-1, 5], [3, 5],
+        #     [9, 3], [7, 3], [11, 3],
+        #     [6, 7], [49, 5], [14, 3],
+        #     [6, 7], [49, 5], [14, 3],
+        #     [14, 3], [11, 7], [14, 9],
+        # ]
+        #
+        # secondData = [
+        #     [4, 0], [3, 1], [5, 1],
+        #     [10, 4], [9, 5], [10, 6],
+        #     [5, -1], [7, -3], [5, -5],
+        # ]
 
-        secondData = [
-            [4, 0], [3, 1], [5, 1],
-            [10, 4], [9, 5], [10, 6],
-            [5, -1], [7, -3], [5, -5],
-        ]
-
-        for i in range(len(firstData)):
-            firstData[i][0] *= 1000
-            firstData[i][1] *= 1000
-
-        for i in range(len(secondData)):
-            secondData[i][0] *= 1000
-            secondData[i][1] *= 1000
+        # for i in range(len(firstData)):
+        #     firstData[i][0] *= 1000
+        #     firstData[i][1] *= 1000
+        #
+        # for i in range(len(secondData)):
+        #     secondData[i][0] *= 1000
+        #     secondData[i][1] *= 1000
 
         if not firstData and not secondData:
             MessageDisplay(self, "В обоих множествах отсуствуют данные.")
