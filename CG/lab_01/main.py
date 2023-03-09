@@ -158,11 +158,13 @@ class MainWindow(QMainWindow):
         grid.addWidget(self._firstDotWidget, 0, 0)
 
         self._solveTaskButton = QPushButton("Показать решение", self)
+        self._task = QLabel(TASK_TEXT)
         self._solveTaskButton.clicked.connect(self._display_result)
         grid.addWidget(self._solveTaskButton, 1, 0, 1, 2)
 
         self._secondDotWidget = DotWidget()
         grid.addWidget(self._secondDotWidget, 0, 1)
+        grid.addWidget(self._task, 2, 0, 2, 2)
 
         self.setCentralWidget(widget)
         self.init_gui()
@@ -183,27 +185,27 @@ class MainWindow(QMainWindow):
         firstData = self._firstDotWidget.get_cords_list()
         secondData = self._secondDotWidget.get_cords_list()
 
-        # firstData = [
-        #     [1, 3], [-1, 5], [3, 5],
-        #     [4, 0], [3, 1], [5, 1],
-        #     [6, 7], [49, 5], [14, 3],
-        #     [6, 7], [49, 5], [14, 3],
-        #     [5, -1], [7, -3], [5, -5],
-        # ]
+        firstData = [
+            [1, 3], [-1, 5], [3, 5],
+            [9, 3], [7, 3], [11, 3],
+            [6, 7], [49, 5], [14, 3],
+            [6, 7], [49, 5], [14, 3],
+            [14, 3], [11, 7], [14, 9],
+        ]
 
-        # secondData = [
-        #     [9, 3], [7, 3], [11, 3],
-        #     [10, 4], [9, 5], [10, 6],
-        #     [14, 3], [11, 7], [14, 9],
-        # ]
+        secondData = [
+            [4, 0], [3, 1], [5, 1],
+            [10, 4], [9, 5], [10, 6],
+            [5, -1], [7, -3], [5, -5],
+        ]
 
-        # for i in range(len(firstData)):
-        #     firstData[i][0] *= -1/1000
-        #     firstData[i][1] *= 1/1000
-        #
-        # for i in range(len(secondData)):
-        #     secondData[i][0] *= -1/1000
-        #     secondData[i][1] *= 1/1000
+        for i in range(len(firstData)):
+            firstData[i][0] *= 1000
+            firstData[i][1] *= 1000
+
+        for i in range(len(secondData)):
+            secondData[i][0] *= 1000
+            secondData[i][1] *= 1000
 
         if not firstData and not secondData:
             MessageDisplay(self, "В обоих множествах отсуствуют данные.")
@@ -213,5 +215,6 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setStyleSheet("QWidget{font-size: 14pt;}")
     window = MainWindow(app.primaryScreen())
     app.exec()

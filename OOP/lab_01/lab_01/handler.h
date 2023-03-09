@@ -4,7 +4,6 @@
 #include "error.h"
 #include "request.h"
 
-err_t handler_action(request_t request, void *params);
-
+err_t handler_action(request_type_t request, action_params_t *params);
 
 #endif // HANDLER_H

@@ -10,23 +10,20 @@ MainWindow::MainWindow(QWidget *parent)
     connect_buttons_to_ui();
     setFixedSize(width(), height());
 
-    downloadFigureStatus = false;
-    figure = init_figure();
-
     QGraphicsScene *scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     scene->setSceneRect(0, 0, ui->graphicsView->width()-10, ui->graphicsView->height()-10);
     ui->graphicsView->setBackgroundBrush(QBrush(Qt::white));
+    downloadFigureStatus = false;
 
     QPen pen;
     pen.setColor(QColorConstants::Svg::pink);
     pen.setWidth(3);
 
-    params = init_width_height_params(ui->graphicsView->width(),
-                                      ui->graphicsView->height());
+    set_global_window_size_params(ui->graphicsView->width(), ui->graphicsView->height());
 
-    graphicScene = init_graphic_view(ui->graphicsView->scene(), &params, pen);
+    graphicScene = init_graphic_view(ui->graphicsView->scene(), pen);
 }
 
 void MainWindow::connect_buttons_to_ui(void)
@@ -64,7 +61,7 @@ void MainWindow::on_load_button_click(void)
     }
     else
     {
-        read_action_coefficients_t read_coefficients = init_read_action_coefficients(&file_path, &figure, &graphicScene);
+        read_action_coefficients_t read_coefficients = init_read_action_coefficients(&file_path);
         return_code = handler_action(READ, &read_coefficients);
     }
 

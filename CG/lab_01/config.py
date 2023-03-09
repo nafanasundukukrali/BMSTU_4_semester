@@ -3,7 +3,9 @@ from PySide6.QtGui import QColor, Qt
 
 HTMLPATH = "./index.html"
 
-
+TASK_TEXT = ("Задание: на плоскости заданы два множества точек. Найти все такие пары окружностей, каждая из которых \n"
+             "проходит хотя бы через три точки различные точки одного и того же множества , таких, что их касательная "
+             "\n ( внутренняя) параллельна оси ординат.")
 class ThemeTemplate:
     def __init__(self, circle_type):
         self._backgroundSettings = "background-color: white;"
@@ -50,6 +52,10 @@ def solve_ls_by_gaus_method(matrix):
             if abs(matrix[i][col]) > abs(max_element) and matrix[i][col] != 0:
                 max_element = matrix[i][col]
                 max_row = i
+            elif max_element == 0 and matrix[i][col] != 0:
+                max_element = matrix[i][col]
+                max_row = i
+
 
         if max_row != col:
             matrix[col], matrix[max_row] = matrix[max_row], matrix[col]
@@ -59,6 +65,9 @@ def solve_ls_by_gaus_method(matrix):
 
         for k in range(n - 1):
             bubble_max_row(k)
+
+            if matrix[k][k] == 0:
+                continue
 
             for i in range(k + 1, n):
                 div = matrix[i][k] / matrix[k][k]

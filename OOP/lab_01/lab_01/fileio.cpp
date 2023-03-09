@@ -74,9 +74,9 @@ static err_t read_point_data_from_file(void *point, FILE *file)
         return ERROR_UNCORRECT_PARAMS;
 
     err_t return_code = SUCCESS;
-    point_t buffer_point;
+    double x, y, z;
 
-    int result_of_reading = fscanf(file, "%lf%lf%lf", &(buffer_point.x), &(buffer_point.y), &(buffer_point.z));
+    int result_of_reading = fscanf(file, "%lf%lf%lf", &x, &y, &z);
 
     if (result_of_reading != READING_COORDS_SUCCESS_COUNT)
         return_code = ERROR_READ_DATA;
@@ -84,7 +84,7 @@ static err_t read_point_data_from_file(void *point, FILE *file)
     if (return_code == SUCCESS)
     {
         point_t *point_pointer = (point_t *)point;
-        *point_pointer = buffer_point;
+        *point_pointer = init_point(x, y, z);
     }
 
     return return_code;
@@ -96,17 +96,17 @@ static err_t read_edge_data_from_file(void *edge, FILE *file)
         return ERROR_UNCORRECT_PARAMS;
 
     err_t return_code = SUCCESS;
-    edge_t buffer_edge;
+    size_t start, end;
 
-    return_code = read_size_t_number_from_file(file, &(buffer_edge.start));
+    return_code = read_size_t_number_from_file(file, &start);
 
     if (return_code == SUCCESS)
-        return_code = read_size_t_number_from_file(file, &(buffer_edge.end));
+        return_code = read_size_t_number_from_file(file, &end);
 
     if (return_code == SUCCESS)
     {
-        edge_t *point_pointer = (edge_t *)edge;
-        *point_pointer = buffer_edge;
+        edge_t *edge_pointer = (edge_t *)edge;
+        *edge_pointer = init_edge(start, end);
     }
 
     return return_code;
@@ -114,20 +114,27 @@ static err_t read_edge_data_from_file(void *edge, FILE *file)
 
 static err_t read_information_about_points_from_file(figure_t *buffer_figure, FILE *file)
 {
-    if (file == NULL || buffer_figure == NULL)
+    if (file == NULL || buffer_figure == NULL || buffer_figure->points_array != NULL)
         return ERROR_UNCORRECT_PARAMS;
 
     err_t return_code = SUCCESS;
+    size_t array_size;
+    point_t *buffer_point_array;
 
-    return_code = read_size_t_number_from_file(file, &(buffer_figure->point_array_lenght));
-
-    if (return_code == SUCCESS)
-        buffer_figure->points_array = (point_t *)allocate_memory_of_object_array({&return_code, sizeof(point_t),
-                                                                                buffer_figure->point_array_lenght});
+    return_code = read_size_t_number_from_file(file, &array_size);
 
     if (return_code == SUCCESS)
-        return_code = read_array_data_from_file({(void *)buffer_figure->points_array, file, read_point_data_from_file,
-                                                    buffer_figure->point_array_lenght, sizeof(point_t)});
+        buffer_point_array = (point_t *)allocate_memory_of_object_array({&return_code, sizeof(point_t), array_size});
+
+    if (return_code == SUCCESS)
+        return_code = read_array_data_from_file({(void *)buffer_point_array, file, read_point_data_from_file,
+                                                    array_size, sizeof(point_t)});
+
+    if (return_code == SUCCESS)
+        return_code = set_figure_points_count(buffer_figure, array_size);
+
+    if (return_code == SUCCESS)
+        return_code = set_figure_points_array(buffer_figure, buffer_point_array);
 
     return return_code;
 }
@@ -138,16 +145,24 @@ static err_t read_information_about_edges_from_file(figure_t *buffer_figure, FIL
         return ERROR_UNCORRECT_PARAMS;
 
     err_t return_code = SUCCESS;
+    size_t array_size;
+    edge_t *buffer_edge_array;
 
-    return_code = read_size_t_number_from_file(file, &(buffer_figure->edges_array_length));
-
-    if (return_code == SUCCESS)
-        buffer_figure->edges_array = (edge_t *)allocate_memory_of_object_array({&return_code, sizeof(edge_t),
-                                                                                buffer_figure->edges_array_length});
+    return_code = read_size_t_number_from_file(file, &array_size);
 
     if (return_code == SUCCESS)
-        return_code = read_array_data_from_file({(void *)buffer_figure->edges_array, file, read_edge_data_from_file,
-                                                    buffer_figure->edges_array_length, sizeof(edge_t)});
+        buffer_edge_array = (edge_t *)allocate_memory_of_object_array({&return_code, sizeof(edge_t),
+                                                                                array_size});
+
+    if (return_code == SUCCESS)
+        return_code = read_array_data_from_file({(void *)buffer_edge_array, file, read_edge_data_from_file,
+                                                    array_size, sizeof(edge_t)});
+
+    if (return_code == SUCCESS)
+        return_code = set_figure_edges_count(buffer_figure, array_size);
+
+    if (return_code == SUCCESS)
+        return_code = set_figure_edges_array(buffer_figure, buffer_edge_array);
 
     return return_code;
 }

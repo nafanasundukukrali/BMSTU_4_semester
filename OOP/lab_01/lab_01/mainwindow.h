@@ -5,7 +5,6 @@
 #include <QString>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "figure.h"
 #include "graphicview.h"
 
 QT_BEGIN_NAMESPACE
@@ -17,12 +16,9 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    figure_t figure;
-    bool downloadFigureStatus;
-    graphic_view_t graphicScene;
-    width_height_params_t params;
-
     MainWindow(QWidget *parent = nullptr);
+    graphic_view_t graphicScene;
+    downloadFigureStatus = false;
 
     void on_select_file_button_click(void);
     void on_load_button_click(void);

@@ -29,14 +29,22 @@ set(PROJECT_SOURCES
         edge.h
         graphicview.h
         graphicview.cpp
-        widthheightparams.h
-        widthheightparams.cpp
+        objectsizeparams.h
+        objectsizeparams.cpp
         coefficients.h
         coefficients.cpp
         handler.h
         handler.cpp
         request.h
         request.cpp
+        graphicscene.h
+        graphicscene.cpp
+        figureconfiguration.h
+        figureconfiguration.cpp
+        viewcoefficients.h
+        viewcoefficients.cpp
+        memoryallocate.h
+        memoryallocate.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

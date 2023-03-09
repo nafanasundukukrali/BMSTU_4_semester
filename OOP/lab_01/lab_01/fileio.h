@@ -3,6 +3,7 @@
 
 #include "error.h"
 #include "figure.h"
+#include "memoryallocate.h"
 
 #define ONE_CORRECT_READ_DATA 1
 

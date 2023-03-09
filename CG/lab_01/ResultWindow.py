@@ -11,14 +11,15 @@ class Circles:
     LESS_DATA = 3
     NO_RESULT = 4
 
-    def __init__(self, array):
+    def __init__(self, first_data_array, second_data_array):
         self._answer = Circles.SUCCESS
-        self._array = self._remove_duplicates(array, self._comparatorSameCoords)
+        self._first_data_array = self._remove_duplicates(first_data_array, self._comparatorSameCoords)
+        self._second_data_array = self._remove_duplicates(second_data_array, self._comparatorSameCoords)
         self._circles_paires = []
         
-        if not self._array and array:
+        if not self._first_data_array or not second_data_array and first_data_array and second_data_array:
             self._answer = Circles.ALL_DOT_SAME
-        elif len(self._array) < 5:
+        elif len(self._first_data_array) + len(self._second_data_array) < 5:
             self._answer = Circles.LESS_DATA
         else:
             self._analysData()
@@ -56,6 +57,21 @@ class Circles:
         return (abs(circle1[0][0] - circle2[0][0]) < EPSILON and abs(circle1[0][1] - circle2[0][1]) < EPSILON and
                 abs(circle1[1] - circle2[1]) < EPSILON)
 
+    def _get_circles_from_three_dot(self, array):
+        circles_coords_by_tree_dots = list(itertools.combinations(array, 3))
+        circles_by_center_and_r = []
+
+        for circle_data in circles_coords_by_tree_dots:
+            result = self._getCirclesParamsFromThreeDots(*circle_data)
+
+            if result:
+                circles_by_center_and_r.append(result)
+
+        if circles_by_center_and_r:
+            circles_by_center_and_r = self._remove_duplicates(circles_by_center_and_r, self._comparatorSameCircles)
+
+        return circles_by_center_and_r
+
     def _analysData(self): 
         def get_compare_params(circle_data):
             x_left = circle_data[0][0] - circle_data[1]
@@ -67,38 +83,27 @@ class Circles:
                     'x_right': x_right,
                     'y': y}
 
-        all_circles_coords_by_tree_dots = list(itertools.combinations(self._array, 3))
-        all_circles_by_center_and_r = []
+        first_circles_by_center_and_r = self._get_circles_from_three_dot(self._first_data_array)
+        second_circles_by_center_and_r = self._get_circles_from_three_dot(self._second_data_array)
 
-        for circle_data in all_circles_coords_by_tree_dots:
-            result = self._getCirclesParamsFromThreeDots(*circle_data)
-
-            if result:
-                all_circles_by_center_and_r.append(result)
-
-        if not all_circles_by_center_and_r:
-            self._answer = self.NO_RESULT
-        else:
-            all_circles_by_center_and_r = self._remove_duplicates(all_circles_by_center_and_r, self._comparatorSameCircles)
-
-        if not all_circles_by_center_and_r:
+        if not first_circles_by_center_and_r or not second_circles_by_center_and_r:
             self._answer = self.NO_RESULT
 
-        if all_circles_by_center_and_r:
-            for i in range(len(all_circles_by_center_and_r)):
-                circle1_data = get_compare_params(all_circles_by_center_and_r[i])
+        if first_circles_by_center_and_r and second_circles_by_center_and_r:
+            for i in range(len(first_circles_by_center_and_r)):
+                circle1_data = get_compare_params(first_circles_by_center_and_r[i])
 
-                for j in range(i + 1, len(all_circles_by_center_and_r)):
-                    circle2_data = get_compare_params(all_circles_by_center_and_r[j])
-                    centers_distance = self._getCutLengthByCoords(all_circles_by_center_and_r[i][0],
-                                                                  all_circles_by_center_and_r[j][0])
+                for j in range(len(second_circles_by_center_and_r)):
+                    circle2_data = get_compare_params(second_circles_by_center_and_r[j])
+                    centers_distance = self._getCutLengthByCoords(first_circles_by_center_and_r[i][0],
+                                                                  second_circles_by_center_and_r[j][0])
 
                     if ((centers_distance >= abs(circle1_data['radius'] +
                                                circle2_data['radius'])) and
                         (abs(circle1_data['x_left'] - circle2_data['x_right']) < EPSILON or
                          abs(circle1_data['x_right'] - circle2_data['x_left']) < EPSILON)):
-                        self._circles_paires.append([all_circles_by_center_and_r[i],
-                                                     all_circles_by_center_and_r[j]])
+                        self._circles_paires.append([first_circles_by_center_and_r[i],
+                                                     second_circles_by_center_and_r[j]])
     
     @staticmethod
     def _getCutLengthByCoords(dot1, dot2):
@@ -124,7 +129,7 @@ class Circles:
 
 
 class PaintField(QFrame):
-    def __init__(self, parent, windowParams, firstCirclesPairs, secondCirclesPairs):
+    def __init__(self, parent, windowParams, circlesPairs):
         super().__init__(parent)
         self._kx = parent.kx
         self._ky = parent.ky
@@ -140,50 +145,55 @@ class PaintField(QFrame):
         self._secondCirclesTheme = theme2
 
         self.setStyleSheet(theme1.get_background_settings())
-        self._firstCirclesPairs = firstCirclesPairs
-        self._secondCirclesPairs = secondCirclesPairs
+        self._circlesPairs = circlesPairs
     
     def paintEvent(self, event):
         super().paintEvent(event)
         self._painter = QPainter(self)
         self._painter.setFont(self._labelFont)
-        self._draw_coordinate_axes()
-        self._drawCircles(self._firstCirclesPairs, self._firstCirclesTheme)
-        self._drawCircles(self._secondCirclesPairs, self._secondCirclesTheme)
+        # self._draw_coordinate_axes()
+        self._drawCircles()
         self._painter.end()
 
-    def _drawCircles(self, array, theme):
+    def _drawOneCircle(self, theme, circle, pen):
+        center = QPoint(*self._zoom_and_move_cords(*circle[0]))
+
+        pen.setWidth(5)
+        pen.setColor(theme.get_color_shame()['center'])
+        self._painter.setPen(pen)
+
+        self._painter.drawPoint(center)
+
+        pen.setWidth(2)
+        pen.setColor(theme.get_color_shame()['circle'])
+        self._painter.setPen(pen)
+
+        self._painter.drawEllipse(center, circle[1] * self._kx, circle[1] * self._ky)
+
+        for dot in circle[2:]:
+            cords = QPoint(*self._zoom_and_move_cords(*dot))
+
+            pen.setWidth(2)
+            pen.setColor(QColor(0, 0, 0))
+            self._painter.setPen(pen)
+
+            self._painter.drawText(cords, f'({dot[0]};{dot[1]})')
+
+            pen.setWidth(5)
+            pen.setColor(theme.get_color_shame()['dot'])
+            self._painter.setPen(pen)
+
+            self._painter.drawPoint(cords)
+
+    def _drawCircles(self):
         pen = QPen()
 
-        for pair in array:
-            pen.setStyle(theme.get_line_styles())
+        for pair in self._circlesPairs:
+            self._drawOneCircle(self._firstCirclesTheme, pair[0], pen)
+            self._drawOneCircle(self._secondCirclesTheme, pair[1], pen)
 
-            for circle in pair:
-                center = QPoint(*self._zoom_and_move_cords(*circle[0]))
-
-                pen.setWidth(5)
-                pen.setColor(theme.get_color_shame()['center'])
-                self._painter.setPen(pen)
-
-                self._painter.drawPoint(center)
-
-                pen.setWidth(2)
-                pen.setColor(theme.get_color_shame()['circle'])
-                self._painter.setPen(pen)
-
-                self._painter.drawEllipse(center, circle[1] * self._kx, circle[1] * self._ky)
-
-                pen.setWidth(5)
-                pen.setColor(theme.get_color_shame()['dot'])
-                self._painter.setPen(pen)
-
-                for dot in circle[2:]:
-                    cords = QPoint(*self._zoom_and_move_cords(*dot))
-                    self._painter.drawPoint(cords)
-
-            pen.setWidth(1)
-            pen.setColor(theme.get_color_shame()['tangent_line'])
-            pen.setStyle(Qt.SolidLine)
+            pen.setWidth(2)
+            pen.setColor(self._firstCirclesTheme.get_color_shame()['tangent_line'])
 
             self._painter.setPen(pen)
 
@@ -195,31 +205,6 @@ class PaintField(QFrame):
                 self._painter.drawLine(QPoint(self._zoom_and_move_cords(pair[0][0][0] - pair[0][1], 0)[0], 0),
                                        QPoint(self._zoom_and_move_cords(pair[1][0][0] + pair[1][1], 0)[0],
                                               self.height()))
-
-    def _draw_coordinate_axes(self):
-        pen = QPen()
-        pen.setColor(QColor(0, 0, 0))
-        pen.setStyle(Qt.SolidLine)
-        pen.setWidth(2)
-
-        self._painter.setPen(pen)
-
-        self._painter.drawLine(QPoint(self._xm, 0),
-                               QPoint(self._xm, self.height()))
-        self._painter.drawLine(QPoint(0, self.height() - self._ym),
-                               QPoint(self.width(), self.height() - self._ym))
-
-        self._painter.drawLine(self._xm, 0, self._xm + 10, 10)
-        self._painter.drawLine(self._xm, 0, self._xm - 10, 10)
-
-        self._painter.drawLine(self.width(), self.height() - self._ym, self.width() - 10, self.height() - self._ym - 10)
-        self._painter.drawLine(self.width(), self.height() - self._ym, self.width() - 10, self.height() - self._ym + 10)
-
-        x_pos = self._xm + 15 if self._xm + 15 < self.width() else self._xm - 15
-        y_pos = self._ym + 15 if self._ym + 15 < self.height() else self._ym - 15
-
-        self._painter.drawText(x_pos, 15, "y")
-        self._painter.drawText(self.width() - 15, self.height() - y_pos, "x")
 
     def _zoom_and_move_cords(self, x, y):
         x = self._kx * x + self._xm
@@ -246,11 +231,12 @@ class InstructionWidget(QWidget):
         self._layout.addWidget(self._w)
         self.setLayout(self._layout)
 
+
 class ResultWindow(QWidget):
 
     WINDOW_SIZE_COEF = 0.9
     PAINT_FIELD_HEIGHT_COEF = 0.96
-    ARROW_WIDTH = 10
+    ARROW_WIDTH = 30
 
     def __init__(self, parent, firstData, secondData, screenParams):
         super().__init__()
@@ -262,24 +248,15 @@ class ResultWindow(QWidget):
         self.ym = 0
 
         self._resultInfo = ""
+        circles = Circles(firstData, secondData)
+        self._circlesPairs = []
 
-        first_circles = Circles(firstData)
-        second_circles = Circles(secondData)
-        self._firstCirclesPairs = []
-        self._secondCirclesPairs = []
-
-        if (first_circles.get_answer() == Circles.LESS_DATA and second_circles.get_answer() != Circles.SUCCESS or
-                second_circles.get_answer() == Circles.LESS_DATA and first_circles.get_answer() != Circles.SUCCESS):
+        if circles.get_answer() == Circles.LESS_DATA:
             MessageDisplay(parent, "Присутствуют только вырожденные случаи.")
-        elif (first_circles.get_answer() == Circles.NO_RESULT and second_circles.get_answer() != Circles.SUCCESS or
-              first_circles.get_answer() != Circles.SUCCESS and second_circles.get_answer() == Circles.NO_RESULT):
+        elif circles.get_answer() == Circles.NO_RESULT:
             MessageDisplay(parent, "Нет решений.")
-        elif first_circles.get_answer() == Circles.SUCCESS or second_circles.get_answer() == Circles.SUCCESS:
-            if first_circles.get_answer() == Circles.SUCCESS:
-                self._firstCirclesPairs = first_circles.get_circles_pairs()
-            if second_circles.get_answer() == Circles.SUCCESS:
-                self._secondCirclesPairs = second_circles.get_circles_pairs()
-
+        elif circles.get_answer() == Circles.SUCCESS:
+            self._circlesPairs = circles.get_circles_pairs()
             self._display_result()
         else:
             MessageDisplay(parent, "Нет решений.")
@@ -288,7 +265,7 @@ class ResultWindow(QWidget):
         self._get_zoom_coefficients()
         self._paintField = PaintField(self,
                                       [self.width(), self.height() * self.PAINT_FIELD_HEIGHT_COEF],
-                                      self._firstCirclesPairs, self._secondCirclesPairs)
+                                      self._circlesPairs)
 
         self._mainLayout = QTabWidget(self)
         self._mainLayout.addTab(self._paintField, "Результат")
@@ -299,13 +276,13 @@ class ResultWindow(QWidget):
         self.initGUI()
     
     def _get_zoom_coefficients(self):
-        circle1 = self._firstCirclesPairs[0][0] if self._firstCirclesPairs else self._secondCirclesPairs[0][0]
+        circle1 = self._circlesPairs[0][0]
         max_right = circle1[0][0] + circle1[1]
         max_left = circle1[0][0] - circle1[1]
         max_bottom = circle1[0][1] - circle1[1]
         max_top = circle1[0][1] + circle1[1]
 
-        for circlesPair in self._firstCirclesPairs + self._secondCirclesPairs:
+        for circlesPair in self._circlesPairs:
             for circle in circlesPair:
                 max_right = max(circle[0][0] + circle[1], max_right)
                 max_left = min(circle[0][0] - circle[1], max_left)
@@ -326,7 +303,6 @@ class ResultWindow(QWidget):
 
         self.xm = -self.kx * max_left + self.kx / self.kx * self.ARROW_WIDTH
         self.ym = -self.ky * max_bottom + self.ky / self.ky * self.ARROW_WIDTH
-
 
     def initGUI(self):
         self.show()

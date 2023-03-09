@@ -1,13 +1,13 @@
 #include "point.h"
 #include <cmath>
 
-point_t init_point()
+point_t init_point(const double x, const double y, const double z)
 {
     point_t point;
 
-    point.x = 0;
-    point.y = 0;
-    point.z = 0;
+    point.x = x;
+    point.y = y;
+    point.z = z;
 
     return point;
 }
@@ -22,11 +22,23 @@ err_t scale_point_coords(point_t *dest_point, point_t *src_point, scale_coeffici
     if (dest_point == NULL || src_point == NULL || scale_coefficients == NULL)
         return ERROR_UNCORRECT_PARAMS;
 
-    dest_point->x = src_point->x * scale_coefficients->kx;
-    dest_point->y = src_point->y * scale_coefficients->ky;
-    dest_point->z = src_point->z * scale_coefficients->kz;
+    double kx = 1, ky = 1, kz = 1;
 
-    return SUCCESS;
+    err_t return_code = get_scale_coefficients({
+                                                   scale_coefficients,
+                                                   &kx,
+                                                   &ky,
+                                                   &kz
+                                               });
+
+    if (return_code == SUCCESS)
+    {
+        dest_point->x = src_point->x * kx;
+        dest_point->y = src_point->y * ky;
+        dest_point->z = src_point->z * kz;
+    }
+
+    return return_code;
 }
 
 err_t move_point_coords(point_t *dest_point, point_t *src_point, move_coefficients_t* move_coefficients)
@@ -34,11 +46,23 @@ err_t move_point_coords(point_t *dest_point, point_t *src_point, move_coefficien
     if (dest_point == NULL || src_point == NULL || move_coefficients == NULL)
         return ERROR_UNCORRECT_PARAMS;
 
-    dest_point->x = src_point->x + move_coefficients->dx;
-    dest_point->y = src_point->y + move_coefficients->dy;
-    dest_point->z = src_point->z + move_coefficients->dz;
+    double dx = 0, dy = 0, dz = 0;
 
-    return SUCCESS;
+    err_t return_code = get_move_coefficients({
+                                                  move_coefficients,
+                                                  &dx,
+                                                  &dy,
+                                                  &dz
+                                              });
+
+    if (return_code == SUCCESS)
+    {
+        dest_point->x = src_point->x + dx;
+        dest_point->y = src_point->y + dy;
+        dest_point->z = src_point->z + dz;
+    }
+
+    return return_code;
 }
 
 double convert_to_radians(double (*angle_function)(double), const double angle)
@@ -46,7 +70,7 @@ double convert_to_radians(double (*angle_function)(double), const double angle)
     return (*angle_function)(angle * M_PI / 180);
 }
 
-static err_t turn_x_cord(point_t *point, const double angle)
+static err_t rotate_x_cord(point_t *point, const double angle)
 {
     if (point == NULL)
         return ERROR_UNCORRECT_PARAMS;
@@ -61,7 +85,7 @@ static err_t turn_x_cord(point_t *point, const double angle)
     return SUCCESS;
 }
 
-static err_t turn_y_cord(point_t *point, const double angle)
+static err_t rotate_y_cord(point_t *point, const double angle)
 {
     if (point == NULL)
         return ERROR_UNCORRECT_PARAMS;
@@ -76,7 +100,7 @@ static err_t turn_y_cord(point_t *point, const double angle)
     return SUCCESS;
 }
 
-static err_t turn_z_cord(point_t *point, const double angle)
+static err_t rotate_z_cord(point_t *point, const double angle)
 {
     if (point == NULL)
         return ERROR_UNCORRECT_PARAMS;
@@ -91,19 +115,88 @@ static err_t turn_z_cord(point_t *point, const double angle)
     return SUCCESS;
 }
 
-err_t turn_point_coords(point_t *point, rotate_coefficients_t *coefficients)
+err_t rotate_point_coords(point_t *point, rotate_coefficients_t *coefficients)
 {
     if (point == NULL || coefficients == NULL)
         return ERROR_UNCORRECT_PARAMS;
 
-    err_t return_code = turn_x_cord(point, coefficients->angle_x);
+    double angle_x = 0, angle_y = 0, angle_z = 0;
+
+    err_t return_code = get_rotate_coefficients({
+                                                    coefficients,
+                                                    &angle_x,
+                                                    &angle_y,
+                                                    &angle_z
+                                                });
 
     if (return_code == SUCCESS)
-        return_code = turn_y_cord(point, coefficients->angle_y);
+        return_code = rotate_x_cord(point, angle_x);
 
     if (return_code == SUCCESS)
-        return_code = turn_z_cord(point, coefficients->angle_z);
+        return_code = rotate_y_cord(point, angle_y);
+
+    if (return_code == SUCCESS)
+        return_code = rotate_z_cord(point, angle_z);
 
     return return_code;
 }
 
+err_t get_x_of_point(point_t *point, double *dst_value)
+{
+    if (point == NULL || dst_value == NULL)
+        return ERROR_UNCORRECT_PARAMS;
+
+    *dst_value = point->x;
+
+    return SUCCESS;
+}
+
+err_t set_x_of_point(point_t *point, const double src_value)
+{
+    if (point == NULL)
+        return ERROR_UNCORRECT_PARAMS;
+
+    point->x = src_value;
+
+    return SUCCESS;
+}
+
+err_t get_y_of_point(point_t *point, double *dst_value)
+{
+    if (point == NULL || dst_value == NULL)
+        return ERROR_UNCORRECT_PARAMS;
+
+    *dst_value = point->y;
+
+    return SUCCESS;
+}
+
+err_t set_y_of_point(point_t *point, const double src_value)
+{
+    if (point == NULL)
+        return ERROR_UNCORRECT_PARAMS;
+
+    point->y = src_value;
+
+    return SUCCESS;
+}
+
+err_t get_z_of_point(point_t *point, double *dst_value)
+{
+    if (point == NULL || dst_value == NULL)
+        return ERROR_UNCORRECT_PARAMS;
+
+    *dst_value = point->z;
+
+    return SUCCESS;
+}
+
+err_t set_z_of_point(point_t *point, const double src_value)
+{
+    if (point == NULL)
+        return ERROR_UNCORRECT_PARAMS;
+
+    point->z = src_value;
+
+    return SUCCESS;
+}
