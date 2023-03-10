@@ -19,11 +19,12 @@ class Circles:
         
         if not self._first_data_array or not second_data_array and first_data_array and second_data_array:
             self._answer = Circles.ALL_DOT_SAME
-        elif len(self._first_data_array) + len(self._second_data_array) < 5:
+        elif len(self._first_data_array) < 3 or len(self._second_data_array) < 3:
             self._answer = Circles.LESS_DATA
         else:
             self._analysData()
-            
+            self._analysData()
+
             if not self._circles_paires:
                 self._answer = Circles.NO_RESULT
 
