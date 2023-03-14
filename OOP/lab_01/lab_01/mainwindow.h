@@ -18,7 +18,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     graphic_view_t graphicScene;
-    downloadFigureStatus = false;
+    bool downloadFigureStatus = false;
+    object_size_params_t window_params;
 
     void on_select_file_button_click(void);
     void on_load_button_click(void);

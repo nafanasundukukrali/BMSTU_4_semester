@@ -158,67 +158,6 @@ err_t rotate_figure(figure_t *figure, rotate_coefficients_t *coefficients)
     return return_code;
 }
 
-err_t prepare_figure(figure_t *figure, move_coefficients_t *move_coefficients, scale_coefficients_t *scale_coefficients)
-{
-    if (figure == NULL || figure->points_array == NULL || move_coefficients == NULL || scale_coefficients == NULL)
-        return ERROR_UNCORRECT_PARAMS;
-
-    err_t return_code = move_figure(figure, move_coefficients);
-
-    if (return_code == SUCCESS)
-        return_code = scale_figure(figure, scale_coefficients);
-
-    return return_code;
-}
-
-err_t copy_figure_with_memory(figure_t *src_figure, figure_t *dst_figure)
-{
-    if (src_figure == NULL || check_figure_data_uncorrectness(src_figure) ||
-            dst_figure == NULL || !check_wether_figure_is_free(dst_figure))
-        return ERROR_NO_LOADED_FIGURE;
-
-    err_t return_code = SUCCESS;
-    figure_t buffer;
-
-    buffer.points_array = (point_t *)allocate_memory_of_object_array({
-                                                                   &return_code,
-                                                                   sizeof(point_t),
-                                                                   src_figure->point_array_lenght,
-                                                               });
-
-    if (return_code == SUCCESS)
-        buffer.edges_array = (edge_t *)allocate_memory_of_object_array({
-                                                                       &return_code,
-                                                                       sizeof(edge_t),
-                                                                       src_figure->edges_array_length,
-                                                                   });
-
-    if (return_code == SUCCESS)
-        memmove(buffer.points_array, src_figure->points_array, sizeof(point_t) * src_figure->point_array_lenght);
-
-    if (return_code == SUCCESS && buffer.points_array == NULL)
-        return_code = ERROR_COPY_FIGURE;
-
-    if (return_code == SUCCESS)
-        memmove(buffer.edges_array, src_figure->edges_array, sizeof(edge_t) * src_figure->edges_array_length);
-
-    if (return_code == SUCCESS && buffer.edges_array == NULL)
-        return_code = ERROR_COPY_FIGURE;
-
-    if (return_code != SUCCESS)
-    {
-        free_figure_memory(&buffer);
-    }
-    else
-    {
-        *dst_figure = buffer;
-        dst_figure->point_array_lenght = src_figure->point_array_lenght;
-        dst_figure->edges_array_length = src_figure->edges_array_length;
-    }
-
-    return return_code;
-}
-
 err_t get_figure_edges_count(figure_t *figure, size_t *dst_value)
 {
     if (figure == NULL || dst_value == NULL)
@@ -287,4 +226,55 @@ err_t set_figure_edges_array(figure_t *figure, edge_t *src_value)
     figure->edges_array = src_value;
 
     return SUCCESS;
+}
+
+err_t set_figure_points_into_another_size_params(figure_t *figure, object_size_params_t *size_params)
+{
+    if (figure == NULL || figure->points_array == NULL || size_params == NULL)
+        return ERROR_UNCORRECT_PARAMS;
+
+    double global_object_height, global_object_width;
+
+    err_t return_code = get_object_size_height(size_params, &global_object_height);
+
+    if (return_code == SUCCESS)
+        return_code = get_object_size_width(size_params, &global_object_width);
+
+    figure_configuration_t figure_params;
+
+    if (return_code == SUCCESS)
+        return_code = get_figure_projection_width_height_params(&figure_params, figure);
+
+    double kx = 0, ky = 0, figure_height, figure_width, figure_min_bottum_cord, figure_min_left_cord, k = 0, xm = 0, ym = 0;
+
+    if (return_code == SUCCESS)
+        return_code = get_figure_height(&figure_params, &figure_height);
+
+    if (return_code == SUCCESS)
+        return_code = get_figure_width(&figure_params, &figure_width);
+
+    if (return_code == SUCCESS)
+        return_code = get_figure_min_bottum_cord(&figure_params, &figure_min_bottum_cord);
+
+    if (return_code == SUCCESS)
+        return_code = get_figure_min_left_cord(&figure_params, &figure_min_left_cord);
+
+    if (return_code == SUCCESS)
+    {
+        ky = global_object_height / figure_height / 2;
+        kx = global_object_width / figure_width / 2;
+        k = fmin(kx, ky);
+        xm = - k * figure_min_left_cord + k / k * global_object_width / 2;
+        ym = - k * figure_min_bottum_cord + k / k * global_object_height / 2;
+
+        scale_coefficients_t scale_coefficiens = init_scale_coefficients(k, -k, k);
+        move_coefficients_t move_coefficients = init_move_coefficients(xm, ym, 0.0);
+
+        return_code = scale_figure(figure, &scale_coefficiens);
+
+        if (return_code == SUCCESS)
+           return_code = move_figure(figure, &move_coefficients);
+    }
+
+    return return_code;
 }

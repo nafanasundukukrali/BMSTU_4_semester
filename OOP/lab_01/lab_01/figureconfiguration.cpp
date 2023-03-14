@@ -5,7 +5,7 @@ figure_configuration_t init_figure_configuration(object_size_params_t *params,
 {
     figure_configuration_t config;
 
-    config.object_params = params;
+    config.object_params = *params;
     config.min_bottum_cord = max_bottom;
     config.min_left_cord = min_left;
 
@@ -39,7 +39,7 @@ err_t get_figure_width(figure_configuration_t *config, double *dst_value)
 
     double buffer;
 
-    err_t return_code = get_object_size_width(config->object_params, &buffer);
+    err_t return_code = get_object_size_width(&(config->object_params), &buffer);
 
     if (return_code == SUCCESS)
         *dst_value = buffer;
@@ -54,7 +54,7 @@ err_t get_figure_height(figure_configuration_t *config, double *dst_value)
 
     double buffer;
 
-    err_t return_code = get_object_size_height(config->object_params, &buffer);
+    err_t return_code = get_object_size_height(&(config->object_params), &buffer);
 
     if (return_code == SUCCESS)
         *dst_value = buffer;

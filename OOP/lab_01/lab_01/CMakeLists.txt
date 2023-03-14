@@ -41,8 +41,6 @@ set(PROJECT_SOURCES
         graphicscene.cpp
         figureconfiguration.h
         figureconfiguration.cpp
-        viewcoefficients.h
-        viewcoefficients.cpp
         memoryallocate.h
         memoryallocate.cpp
 )

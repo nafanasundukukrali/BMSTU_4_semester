@@ -11,7 +11,6 @@
 typedef struct
 {
     QGraphicsScene *scene;
-    view_coefficients_t coefficient;
     QPen pen;
 } graphic_view_t;
 

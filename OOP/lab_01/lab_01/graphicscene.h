@@ -4,7 +4,6 @@
 #include <QGraphicsScene>
 #include "error.h"
 #include "point.h"
-#include "objectsizeparams.h"
 
 typedef struct
 {

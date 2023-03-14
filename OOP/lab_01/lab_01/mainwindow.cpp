@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect_buttons_to_ui();
     setFixedSize(width(), height());
 
+    init_object_size_params(&window_params, width(), height());
+
     QGraphicsScene *scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
@@ -20,8 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
     QPen pen;
     pen.setColor(QColorConstants::Svg::pink);
     pen.setWidth(3);
-
-    set_global_window_size_params(ui->graphicsView->width(), ui->graphicsView->height());
 
     graphicScene = init_graphic_view(ui->graphicsView->scene(), pen);
 }
@@ -61,7 +61,11 @@ void MainWindow::on_load_button_click(void)
     }
     else
     {
-        read_action_coefficients_t read_coefficients = init_read_action_coefficients(&file_path);
+        action_params_t read_coefficients = init_action_params({
+                                                                   .path = file_path.toLocal8Bit().data(),
+                                                                   .window_params = &window_params
+                                                               });
+
         return_code = handler_action(READ, &read_coefficients);
     }
 
@@ -71,9 +75,15 @@ void MainWindow::on_load_button_click(void)
     }
     else
     {
-        draw_figure_orthogonal_projection(&graphicScene, &figure);
-        downloadFigureStatus = true;
+        action_params_t params = init_action_params({
+                                                        .grapgic_view = &graphicScene,
+                                                    });
+
+        return_code = handler_action(DRAW, &params);
     }
+
+    if (return_code == SUCCESS)
+        downloadFigureStatus = true;
 }
 
 void MainWindow::on_scale_button_click(void)
@@ -88,13 +98,19 @@ void MainWindow::on_scale_button_click(void)
         scale_coefficients_t scale_coefficients = init_scale_coefficients(ui->kx_box->value(),
                                                                           ui->ky_box->value(),
                                                                           ui->kz_box->value());
-        scale_action_coefficients_t action_coefficients = init_scale_action_coefficients(&figure, &scale_coefficients);
+        action_params_t action_coefficients = init_action_params({.scale_coefficients = &scale_coefficients});
 
-        return_code = scale_action(&action_coefficients);
+        return_code = handler_action(SCALE, &action_coefficients);
     }
 
     if (return_code == SUCCESS)
-        return_code = draw_figure_orthogonal_projection(&graphicScene, &figure);
+    {
+        action_params_t params = init_action_params({
+                                                        .grapgic_view = &graphicScene,
+                                                    });
+
+        return_code = handler_action(DRAW, &params);
+    }
 
     if (return_code != SUCCESS)
         displayErrorMessage(return_code);
@@ -112,13 +128,19 @@ void MainWindow::on_move_button_click()
         move_coefficients_t move_coefficients = init_move_coefficients(ui->dx_box->value(),
                                                                        ui->dy_box->value(),
                                                                        ui->dz_box->value());
-        move_action_coefficients_t action_params = init_move_action_coefficients(&figure, &move_coefficients);
+        action_params_t action_params = init_action_params({.move_coefficients = &move_coefficients});
 
-        return_code = move_action(&action_params);
+        return_code = handler_action(MOVE, &action_params);
     }
 
     if (return_code == SUCCESS)
-        return_code = draw_figure_orthogonal_projection(&graphicScene, &figure);
+    {
+        action_params_t params = init_action_params({
+                                                        .grapgic_view = &graphicScene,
+                                                    });
+
+        return_code = handler_action(DRAW, &params);
+    }
 
     if (return_code != SUCCESS)
         displayErrorMessage(return_code);
@@ -137,13 +159,19 @@ void MainWindow::on_rotate_button_click(void)
                                                                              ui->oy_box->value(),
                                                                              ui->oz_box->value());
 
-        rotate_action_coefficients_t action_params = init_rotate_action_coefficients(&figure, &rotate_coefficients);
+        action_params_t action_params = init_action_params({.rotate_coefficients =  &rotate_coefficients});
 
-        return_code = rotate_action(&action_params);
+        return_code = handler_action(ROTATE, &action_params);
     }
 
     if (return_code == SUCCESS)
-        return_code = draw_figure_orthogonal_projection(&graphicScene, &figure);
+    {
+        action_params_t params = init_action_params({
+                                                        .grapgic_view = &graphicScene,
+                                                    });
+
+        return_code = handler_action(DRAW, &params);
+    }
 
     if (return_code != SUCCESS)
         displayErrorMessage(return_code);
@@ -151,6 +179,6 @@ void MainWindow::on_rotate_button_click(void)
 
 MainWindow::~MainWindow(void)
 {
-    free_figure_memory(&figure);
+    handler_action(FREE, NULL);
     delete ui;
 }

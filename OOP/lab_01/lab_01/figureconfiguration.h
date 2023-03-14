@@ -7,7 +7,7 @@ typedef struct
 {
     double min_left_cord;
     double min_bottum_cord;
-    object_size_params_t *object_params;
+    object_size_params_t object_params;
 } figure_configuration_t;
 
 

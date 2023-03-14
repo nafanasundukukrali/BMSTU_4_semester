@@ -26,6 +26,9 @@ err_t handler_action(request_type_t request, action_params_t *params)
         case DRAW:
             return_code = draw_action(&figure, params);
             break;
+        case FREE:
+            free_figure_memory(&figure);
+            break;
         default:
             return_code = ERROR_UNCORRECT_PARAMS;
     }

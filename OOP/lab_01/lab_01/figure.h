@@ -25,9 +25,7 @@ err_t get_figure_projection_width_height_params(figure_configuration_t *config, 
 err_t scale_figure(figure_t *figure, scale_coefficients_t *coefficients);
 err_t move_figure(figure_t *figure, move_coefficients_t *coefficients);
 err_t rotate_figure(figure_t *figure, rotate_coefficients_t *coefficients);
-err_t prepare_figure(figure_t *figure, move_coefficients_t *move_coefficients, scale_coefficients_t *scale_coefficients);
 
-err_t copy_figure_with_memory(figure_t *src_figure, figure_t *dst_figure);
 err_t get_figure_edges_count(figure_t *figure, size_t *dst_value);
 err_t get_figure_edge_by_index(figure_t *figure, edge_t **edge, const size_t index);
 err_t get_figure_point_by_index(figure_t *figure, point_t **point, const size_t index);
@@ -36,5 +34,7 @@ err_t set_figure_points_count(figure_t *figure, const size_t src_value);
 err_t set_figure_edges_count(figure_t *figure, const size_t src_value);
 err_t set_figure_points_array(figure_t *figure, point_t *src_value);
 err_t set_figure_edges_array(figure_t *figure, edge_t *src_value);
+
+err_t set_figure_points_into_another_size_params(figure_t *figure, object_size_params_t *size_params);
 
 #endif // FIGURE_H

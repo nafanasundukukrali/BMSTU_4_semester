@@ -12,10 +12,6 @@ typedef struct
     double object_width;
 } object_size_params_t;
 
-err_t get_global_window_size_params_width(double *dst_value_height,
-                                          double *dst_value_width);
-err_t set_global_window_size_params(const double width, const double height);
-
 err_t init_object_size_params(object_size_params_t *params, const double width, const double height);
 
 err_t get_object_size_width(object_size_params_t *width_height_params, double *dst_value);
