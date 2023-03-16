@@ -15,16 +15,9 @@ err_t read_action(figure_t *figure, action_params_t *params)
     if (params == NULL || params->path == NULL || params->window_params == NULL)
         return ERROR_UNCORRECT_PARAMS;
 
-    FILE *file;
     figure_t buffer_figure = init_figure();
 
-    err_t return_code = open_file_by_path(params->path, &file);
-
-    if (return_code == SUCCESS)
-       return_code = read_data_from_file(file, &buffer_figure);
-
-    if (fclose(file))
-       return_code = ERROR_CLOSE_FILE;
+    err_t return_code = read_data_from_file(&buffer_figure, params->path);
 
     if (return_code == SUCCESS)
         return_code = check_figure_data_uncorrectness(&buffer_figure);
@@ -39,6 +32,9 @@ err_t read_action(figure_t *figure, action_params_t *params)
 
        *(figure) = buffer_figure;
     }
+
+    if (return_code != SUCCESS && !check_wether_figure_is_free(&buffer_figure))
+        free_figure_memory(&buffer_figure);
 
     return return_code;
 }
@@ -80,3 +76,14 @@ err_t draw_action(figure_t *figure, action_params_t *params)
 
     return draw_figure_orthogonal_projection(params->grapgic_view, figure);
 }
+
+err_t free_action(figure_t *figure)
+{
+    if (figure == NULL)
+        return ERROR_UNCORRECT_PARAMS;
+
+    free_figure_memory(figure);
+
+    return SUCCESS;
+}
+

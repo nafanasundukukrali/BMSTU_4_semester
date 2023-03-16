@@ -33,13 +33,20 @@ spline_2 = SplineInterpolation(data, newton_end_condition=False)
 spline_3 = SplineInterpolation(data)
 
 print("=== Интерполяция ===")
-print("Значение интерполяции Ньютона: ", "%.3E" % Decimal(newtonValue))
-print("Значение сплайн-интерполяции, естественные краевые условия: ", "%.3E" % Decimal(spline_1.get_result_by_value(
+print("Значение интерполяции Ньютона: ", "%.6E" % Decimal(newtonValue))
+print("Значение сплайн-интерполяции, естественные краевые условия: ", "%.6E" % Decimal(spline_1.get_result_by_value(
     value)))
 print("Значение сплайн-интерполяции, на одной границе при x = x0 вторая производная сплайна равна второй производ"
-      "ной полинома Ньютона третьей степени: ", "%.3E" % Decimal(spline_2.get_result_by_value(value)))
+      "ной полинома Ньютона третьей степени: ", "%.6E" % Decimal(spline_2.get_result_by_value(value)))
 print("Значение сплайн-интерполяции, на обеих границах при x = x0 и x = xN вторая производная сплайна равна второй "
-      "производной полинома Ньютона третьей степени: ", "%.3E" % Decimal(spline_3.get_result_by_value(value)))
+      "производной полинома Ньютона третьей степени: ", "%.6E" % Decimal(spline_3.get_result_by_value(value)))
+print("=== Сравнение результатов интерполяции ===")
+print("Ньютон/Естественные краевые условия: ", "%.3E" % Decimal(newtonValue / spline_1.get_result_by_value(
+    value)))
+print("Ньютон/На одной из границ производная: ", "%.3E" % Decimal(newtonValue / spline_2.get_result_by_value(
+    value)))
+print("Ньютон/На обеих границах производные: ", "%.3E" % Decimal(newtonValue / spline_3.get_result_by_value(
+    value)))
 
 data = data[data[:, 0].argsort(-1)]
 x_spline = np.arange(data[0][0], data[-1][0], 0.01)
@@ -47,11 +54,13 @@ y_spline_1 = np.zeros(x_spline.size)
 y_spline_2 = np.zeros(x_spline.size)
 y_spline_3 = np.zeros(x_spline.size)
 y_newton = np.zeros(x_spline.size)
+# newton = NewtonInterpolation(data, x_spline[x_spline.size // 2], 3)
 
 for i in range(x_spline.size):
     y_spline_1[i] = spline_1.get_result_by_value(x_spline[i])
     y_spline_2[i] = spline_2.get_result_by_value(x_spline[i])
     y_spline_3[i] = spline_3.get_result_by_value(x_spline[i])
+    # y_newton[i] = newton.get_interpolation_result_2(x_spline[i])
     y_newton[i] = NewtonInterpolation(data, x_spline[i], 3).get_interpolation_result()
 
 plt.plot(data[:, 0], data[:, 1], 'o')

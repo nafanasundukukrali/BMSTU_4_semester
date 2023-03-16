@@ -16,7 +16,7 @@ err_t init_object_size_params(object_size_params_t *params, const double width, 
     return SUCCESS;
 }
 
-err_t get_object_size_width(object_size_params_t *width_height_params, double *dst_value)
+err_t get_object_size_width(double *dst_value, object_size_params_t *width_height_params)
 {
     if (width_height_params == NULL || dst_value == NULL)
         return ERROR_UNCORRECT_PARAMS;
@@ -26,7 +26,7 @@ err_t get_object_size_width(object_size_params_t *width_height_params, double *d
     return SUCCESS;
 }
 
-err_t get_object_size_height(object_size_params_t *width_height_params, double *dst_value)
+err_t get_object_size_height(double *dst_value, object_size_params_t *width_height_params)
 {
     if (width_height_params == NULL || dst_value == NULL)
         return ERROR_UNCORRECT_PARAMS;

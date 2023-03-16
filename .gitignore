@@ -9,6 +9,8 @@
 __pycache__/
 env/
 .idea/
+bin/
+lib/
 #cpp qt
 # C++ objects and libs
 *.slo

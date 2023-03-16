@@ -41,8 +41,8 @@ set(PROJECT_SOURCES
         graphicscene.cpp
         figureconfiguration.h
         figureconfiguration.cpp
-        memoryallocate.h
-        memoryallocate.cpp
+#        memoryallocate.h
+#        memoryallocate.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

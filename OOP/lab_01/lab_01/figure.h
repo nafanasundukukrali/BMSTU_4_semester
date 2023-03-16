@@ -6,7 +6,6 @@
 #include "point.h"
 #include "edge.h"
 #include "figureconfiguration.h"
-#include "memoryallocate.h"
 
 typedef struct
 {
@@ -26,8 +25,9 @@ err_t scale_figure(figure_t *figure, scale_coefficients_t *coefficients);
 err_t move_figure(figure_t *figure, move_coefficients_t *coefficients);
 err_t rotate_figure(figure_t *figure, rotate_coefficients_t *coefficients);
 
-err_t get_figure_edges_count(figure_t *figure, size_t *dst_value);
-err_t get_figure_edge_by_index(figure_t *figure, edge_t **edge, const size_t index);
+err_t get_figure_edges_count(size_t *dst_value, figure_t *figure);
+err_t get_point_info_by_index(point_t **dst_point, figure_t *figure, const size_t index);
+err_t get_figure_edge_by_index(edge_t **edge, figure_t *figure, const size_t index);
 err_t get_figure_point_by_index(figure_t *figure, point_t **point, const size_t index);
 
 err_t set_figure_points_count(figure_t *figure, const size_t src_value);

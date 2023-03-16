@@ -34,5 +34,6 @@ err_t scale_action(figure_t *figure, action_params_t *params);
 err_t move_action(figure_t *figure, action_params_t *params);
 err_t rotate_action(figure_t *figure, action_params_t *params);
 err_t draw_action(figure_t *figure, action_params_t *params);
+err_t free_action(figure_t *figure);
 
 #endif // REQUEST_H

@@ -60,6 +60,16 @@ class NewtonInterpolation:
 
         return result
 
+    def get_interpolation_result_2(self, value) -> float:
+        result = self.coefficients[0]
+        tmpCoefficient = 1
+
+        for i in range(1, self._n):
+            tmpCoefficient *= value - self._data[i - 1][0]
+            result += tmpCoefficient * self.coefficients[i]
+
+        return result
+
     def get_second_derivative_result(self) -> float | None:
         if self._n != 4:
             return None

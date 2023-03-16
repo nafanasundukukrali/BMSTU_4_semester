@@ -12,7 +12,7 @@ figure_configuration_t init_figure_configuration(object_size_params_t *params,
     return config;
 }
 
-err_t get_figure_min_left_cord(figure_configuration_t *config, double *dst_value)
+err_t get_figure_min_left_cord(double *dst_value, figure_configuration_t *config)
 {
     if (config == NULL || dst_value == NULL)
         return ERROR_UNCORRECT_PARAMS;
@@ -22,7 +22,7 @@ err_t get_figure_min_left_cord(figure_configuration_t *config, double *dst_value
     return SUCCESS;
 }
 
-err_t get_figure_min_bottum_cord(figure_configuration_t *config, double *dst_value)
+err_t get_figure_min_bottum_cord(double *dst_value, figure_configuration_t *config)
 {
     if (config == NULL || dst_value == NULL)
         return ERROR_UNCORRECT_PARAMS;
@@ -32,14 +32,14 @@ err_t get_figure_min_bottum_cord(figure_configuration_t *config, double *dst_val
     return SUCCESS;
 }
 
-err_t get_figure_width(figure_configuration_t *config, double *dst_value)
+err_t get_figure_width(double *dst_value, figure_configuration_t *config)
 {
     if (config == NULL || dst_value == NULL)
         return ERROR_UNCORRECT_PARAMS;
 
     double buffer;
 
-    err_t return_code = get_object_size_width(&(config->object_params), &buffer);
+    err_t return_code = get_object_size_width(&buffer, &(config->object_params));
 
     if (return_code == SUCCESS)
         *dst_value = buffer;
@@ -47,14 +47,14 @@ err_t get_figure_width(figure_configuration_t *config, double *dst_value)
     return SUCCESS;
 }
 
-err_t get_figure_height(figure_configuration_t *config, double *dst_value)
+err_t get_figure_height(double *dst_value, figure_configuration_t *config)
 {
     if (config == NULL || dst_value == NULL)
         return ERROR_UNCORRECT_PARAMS;
 
     double buffer;
 
-    err_t return_code = get_object_size_height(&(config->object_params), &buffer);
+    err_t return_code = get_object_size_height(&buffer, &(config->object_params));
 
     if (return_code == SUCCESS)
         *dst_value = buffer;

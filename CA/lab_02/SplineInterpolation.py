@@ -37,16 +37,14 @@ class SplineInterpolation:
 
     def _calc_running_coefficients(self):
         length = len(self.data)
-        self.system[0, 2] = self._start
-        self.system[1, 2] = self._end
+        self.system[0, 2] = self._start / 2
+        self.system[-1, 2] = self._end
 
-        self._xee = np.zeros(len(self.data))
         self._etha = np.zeros(len(self.data))
+        self._xee = np.zeros(len(self.data))
 
-        self._xee[0] = self._start
-        self._xee[1] = self._end
-        self._etha[0] = self._start
-        self._etha[1] = self._end
+        self._etha[1] = self._start / 2
+        self._xee[1] = 0
 
         for i in range(2, length):
             hi = self.data[i, 0] - self.data[i - 1, 0]
@@ -58,17 +56,15 @@ class SplineInterpolation:
             fi = 3 * ((self.data[i, 1] - self.data[i - 1, 1]) / di -
                       (self.data[i - 1, 1] - self.data[i - 2, 1]) / ai)
 
-            self._xee[i] = - ai / (di * self._xee[i - 1] + bi)
-            self._etha[i] = (fi - ai * self._etha[i - 1]) / (ai * self._xee[i - 1] + bi)
-
-        print()
+            self._etha[i] = - ai / (di * self._etha[i - 1] + bi)
+            self._xee[i] = (fi - ai * self._xee[i - 1]) / (ai * self._etha[i - 1] + bi)
 
     def _calc_system_coefficients_by_running_coefficients(self):
 
-        self.system[-1, 2] = self._etha[-1]
+        self.system[-1, 2] = self._xee[-1]
 
         for i in range(len(self.system) - 1, 0, -1):
-            self.system[i - 1, 2] = self._xee[i] * self.system[i, 2] + self._etha[i]
+            self.system[i - 1, 2] = self._etha[i] * self.system[i, 2] + self._xee[i]
 
         for i in range(0, len(self.system) - 1):
             self.system[i, 0] = self.data[i, 1]

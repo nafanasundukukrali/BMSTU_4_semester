@@ -67,12 +67,32 @@ err_t check_figure_data_uncorrectness(figure_t *figure)
     return return_code;
 }
 
-err_t get_figure_projection_width_height_params(figure_configuration_t *config, figure_t *figure)
+typedef struct
 {
-    if (config == NULL || figure == NULL || check_figure_data_uncorrectness(figure) ||figure->point_array_lenght <= 0)
+    double max_bottom;
+    double max_right;
+    double max_left;
+    double max_top;
+} max_figure_params_t;
+
+max_figure_params_t init_max_figure_params()
+{
+    max_figure_params_t params;
+
+    params.max_bottom = 0;
+    params.max_left = 0;
+    params.max_right = 0;
+    params.max_top = 0;
+
+    return params;
+}
+
+static err_t get_figure_max_params(max_figure_params_t *params,  figure_t *figure)
+{
+    if (figure == NULL || check_wether_figure_is_free(figure) || params == NULL)
         return ERROR_UNCORRECT_PARAMS;
 
-    double max_right = 0, max_left = 0, max_bottom = 0, max_top = 0, buffer_x, buffer_y;
+    double buffer_x = 0, buffer_y = 0;
 
     err_t return_code = SUCCESS;
 
@@ -82,12 +102,7 @@ err_t get_figure_projection_width_height_params(figure_configuration_t *config, 
         return_code = get_y_of_point(&(figure->points_array[0]), &buffer_y);
 
     if (return_code == SUCCESS)
-    {
-        max_right = buffer_x;
-        max_left = 0;
-        max_bottom = 0;
-        max_top = buffer_y;
-    }
+        params->max_right = buffer_x, params->max_top = buffer_y;
 
     for (size_t i = 1; return_code == SUCCESS && i < figure->point_array_lenght; i++)
     {
@@ -98,22 +113,34 @@ err_t get_figure_projection_width_height_params(figure_configuration_t *config, 
 
         if (return_code == SUCCESS)
         {
-            max_right = fmax(buffer_x, max_right);
-            max_left = fmin(buffer_x, max_left);
-            max_bottom = fmin(buffer_y, max_bottom);
-            max_top = fmax(buffer_y, max_top);
+            params->max_right = fmax(buffer_x, params->max_right), params->max_left = fmin(buffer_x, params->max_left);
+            params->max_bottom = fmin(buffer_y, params->max_bottom), params->max_top = fmax(buffer_y, params->max_top);
         }
     }
 
+    return return_code;
+}
+
+err_t get_figure_projection_width_height_params(figure_configuration_t *config, figure_t *figure)
+{
+    if (config == NULL || figure == NULL || check_figure_data_uncorrectness(figure) ||figure->point_array_lenght <= 0)
+        return ERROR_UNCORRECT_PARAMS;
+
+    max_figure_params_t params = init_max_figure_params();
+
+    err_t return_code = get_figure_max_params(&params, figure);
+
     if (return_code == SUCCESS)
     {
-        double real_width = fabs(max_right - max_left) + 1;
-        double real_height = fabs(max_top - max_bottom) + 1;
+        double real_width = fabs(params.max_right - params.max_left) + 1;
+        double real_height = fabs(params.max_top - params.max_bottom) + 1;
 
-        object_size_params_t params;
+        object_size_params_t return_params;
 
-        init_object_size_params(&params, real_width, real_height);
-        *config = init_figure_configuration(&params, max_left, max_bottom);
+        return_code = init_object_size_params(&return_params, real_width, real_height);
+
+        if (return_code == SUCCESS)
+            *config = init_figure_configuration(&return_params, params.max_left, params.max_bottom);
     }
 
     return return_code;
@@ -158,7 +185,7 @@ err_t rotate_figure(figure_t *figure, rotate_coefficients_t *coefficients)
     return return_code;
 }
 
-err_t get_figure_edges_count(figure_t *figure, size_t *dst_value)
+err_t get_figure_edges_count(size_t *dst_value, figure_t *figure)
 {
     if (figure == NULL || dst_value == NULL)
         return ERROR_UNCORRECT_PARAMS;
@@ -168,7 +195,7 @@ err_t get_figure_edges_count(figure_t *figure, size_t *dst_value)
     return SUCCESS;
 }
 
-err_t get_figure_edge_by_index(figure_t *figure, edge_t **edge, const size_t index)
+err_t get_figure_edge_by_index(edge_t **edge, figure_t *figure, const size_t index)
 {
     if (figure == NULL || edge == NULL || *edge == NULL || index > figure->edges_array_length)
         return ERROR_UNCORRECT_PARAMS;
@@ -233,37 +260,37 @@ err_t set_figure_points_into_another_size_params(figure_t *figure, object_size_p
     if (figure == NULL || figure->points_array == NULL || size_params == NULL)
         return ERROR_UNCORRECT_PARAMS;
 
-    double global_object_height, global_object_width;
+    double global_object_height = 0, global_object_width = 0;
 
-    err_t return_code = get_object_size_height(size_params, &global_object_height);
+    err_t return_code = get_object_size_height(&global_object_height, size_params);
 
     if (return_code == SUCCESS)
-        return_code = get_object_size_width(size_params, &global_object_width);
+        return_code = get_object_size_width(&global_object_width, size_params);
 
     figure_configuration_t figure_params;
 
     if (return_code == SUCCESS)
         return_code = get_figure_projection_width_height_params(&figure_params, figure);
 
-    double kx = 0, ky = 0, figure_height, figure_width, figure_min_bottum_cord, figure_min_left_cord, k = 0, xm = 0, ym = 0;
+    double figure_height = 0, figure_width = 0, figure_min_bottum_cord = 0, figure_min_left_cord = 0;
 
     if (return_code == SUCCESS)
-        return_code = get_figure_height(&figure_params, &figure_height);
+        return_code = get_figure_height(&figure_height, &figure_params);
 
     if (return_code == SUCCESS)
-        return_code = get_figure_width(&figure_params, &figure_width);
+        return_code = get_figure_width(&figure_width, &figure_params);
 
     if (return_code == SUCCESS)
-        return_code = get_figure_min_bottum_cord(&figure_params, &figure_min_bottum_cord);
+        return_code = get_figure_min_bottum_cord(&figure_min_bottum_cord, &figure_params);
 
     if (return_code == SUCCESS)
-        return_code = get_figure_min_left_cord(&figure_params, &figure_min_left_cord);
+        return_code = get_figure_min_left_cord(&figure_min_left_cord, &figure_params);
 
     if (return_code == SUCCESS)
     {
-        ky = global_object_height / figure_height / 2;
-        kx = global_object_width / figure_width / 2;
-        k = fmin(kx, ky);
+        double k = 0, xm = 0, ym = 0;
+
+        k = fmin(global_object_height / figure_height / 2, global_object_width / figure_width / 2);
         xm = - k * figure_min_left_cord + k / k * global_object_width / 2;
         ym = - k * figure_min_bottum_cord + k / k * global_object_height / 2;
 

@@ -11,6 +11,6 @@ typedef struct
     size_t count;
 } params_alocate_function_t;
 
-void* allocate_memory_of_object_array(params_alocate_function_t params);
+void* allocate_memory_of_object_array(err_t *return_code, );
 
 #endif // MEMORYALLOCATE_H

@@ -53,9 +53,9 @@ class ControlField(QWidget):
             return
 
         if widget_type == 'move':
-            if data[0] < 0.5 and data[1] < 0.5:
-                MessageDisplay(self, "Смещение меньше 0.5, перенос не будет осуществлен.")
-                return
+        #     if data[0] < 0.5 and data[1] < 0.5:
+        #         MessageDisplay(self, "Смещение меньше 0.5, перенос не будет осуществлен.")
+        #         return
 
             self._figure.move_figure(*data)
         elif widget_type == 'scale':

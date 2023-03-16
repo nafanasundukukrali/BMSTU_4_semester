@@ -6,7 +6,6 @@
 #include "error.h"
 #include "figure.h"
 #include "graphicscene.h"
-#include "viewcoefficients.h"
 
 typedef struct
 {

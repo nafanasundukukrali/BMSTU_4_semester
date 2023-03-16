@@ -2,7 +2,7 @@
 
 err_t handler_action(request_type_t request, action_params_t *params)
 {
-    static figure_t figure;
+    static figure_t figure = init_figure();
 
     if (params == NULL)
         return ERROR_UNCORRECT_PARAMS;
@@ -27,7 +27,7 @@ err_t handler_action(request_type_t request, action_params_t *params)
             return_code = draw_action(&figure, params);
             break;
         case FREE:
-            free_figure_memory(&figure);
+            return_code = free_action(&figure);
             break;
         default:
             return_code = ERROR_UNCORRECT_PARAMS;
