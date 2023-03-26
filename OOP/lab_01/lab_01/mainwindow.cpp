@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "handler.h"
+#include "errormessagedialoge.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

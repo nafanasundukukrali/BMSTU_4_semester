@@ -1,8 +1,6 @@
 #ifndef COEFFICIENTS_H
 #define COEFFICIENTS_H
 
-#include "error.h"
-
 typedef struct
 {
     double kx;
@@ -35,9 +33,5 @@ typedef struct
 scale_coefficients_t init_scale_coefficients(const double kx, const double ky, const double kz);
 move_coefficients_t init_move_coefficients(const double dx, const double dy, const double dz);
 rotate_coefficients_t init_rotate_coefficients(const double angle_x, const double angle_y, const double angle_z);
-
-err_t get_scale_coefficients(get_coefficients_function_params_t params);
-err_t get_move_coefficients(get_coefficients_function_params_t params);
-err_t get_rotate_coefficients(get_coefficients_function_params_t params);
 
 #endif // COEFFICIENTS_H

@@ -22,7 +22,6 @@ set(PROJECT_SOURCES
         point.h
         point.cpp
         error.h
-        error.cpp
         figure.cpp
         figure.h
         edge.cpp
@@ -39,10 +38,12 @@ set(PROJECT_SOURCES
         request.cpp
         graphicscene.h
         graphicscene.cpp
-        figureconfiguration.h
-        figureconfiguration.cpp
-#        memoryallocate.h
-#        memoryallocate.cpp
+        errormessagedialoge.h
+        errormessagedialoge.cpp
+        filebasemanipulations.h
+        filebasemanipulations.cpp
+        graphicviewstruct.h
+        graphicviewstruct.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

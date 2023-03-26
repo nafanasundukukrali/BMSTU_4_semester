@@ -1,27 +1,28 @@
 #include "graphicscene.h"
 
-err_t add_line_to_graphic_scene(add_line_to_graphic_scene_params params)
+err_t add_line_to_graphic_view(graphic_view_t *graphic_view, point_t *start, point_t *end)
 {
-    if (params.scene== NULL || params.start == NULL || params.end == NULL)
+    if (graphic_view == NULL || start == NULL || end == NULL)
+    {
         return ERROR_UNCORRECT_PARAMS;
+    }
 
-    double buffer_start_x, buffer_start_y;
-    double buffer_end_x, buffer_end_y;
-    double window_height, window_width;
+    double buffer_start_x = 0, buffer_start_y = 0;
+    double buffer_end_x = 0, buffer_end_y = 0;
 
-    err_t return_code = get_x_of_point(params.start, &buffer_start_x);
-
-    if (return_code == SUCCESS)
-        return_code = get_y_of_point(params.start, &buffer_start_y);
+    err_t return_code = get_drawing_cords_of_point(&buffer_start_x, &buffer_start_y, start);
 
     if (return_code == SUCCESS)
-        return_code = get_x_of_point(params.end, &buffer_end_x);
+    {
+        return_code =  get_drawing_cords_of_point(&buffer_end_x, &buffer_end_y, end);
 
-    if (return_code == SUCCESS)
-        return_code = get_y_of_point(params.end, &buffer_end_y);
+        if (return_code == SUCCESS)
+        {
+            QLineF line = QLineF(buffer_start_x, buffer_start_y, buffer_end_x, buffer_end_y);
 
-    if (return_code == SUCCESS)
-        params.scene->addLine(buffer_start_x, buffer_start_y, buffer_end_x, buffer_end_y, params.pen);
+            return_code = add_line_to_scene(graphic_view->scene, line, graphic_view->pen);
+        }
+    }
 
     return return_code;
 }
@@ -29,7 +30,9 @@ err_t add_line_to_graphic_scene(add_line_to_graphic_scene_params params)
 err_t clean_graphic_scene(QGraphicsScene *scene)
 {
     if (scene == NULL)
+    {
         return ERROR_UNCORRECT_PARAMS;
+    }
 
     scene->clear();
 

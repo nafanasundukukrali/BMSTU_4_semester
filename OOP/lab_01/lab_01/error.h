@@ -15,11 +15,11 @@ enum error_codes {
     ERROR_INCORRECT_EDGE_INFO,
     ERROR_NO_LOADED_FIGURE,
     ERROR_GLOBAL_WINDOW_PARAMS_NOT_SET,
-    ERROR_COPY_FIGURE
+    ERROR_COPY_FIGURE,
+    ERROR_INCORRECT_SIZE_PARAMS,
+    ERROR_NO_ARRAY_DATA,
 };
 
 typedef enum error_codes err_t;
-
-void displayErrorMessage(const int error_type);
 
 #endif // ERROR_H

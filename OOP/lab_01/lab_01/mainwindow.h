@@ -5,7 +5,8 @@
 #include <QString>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "graphicview.h"
+#include "graphicviewstruct.h"
+#include "objectsizeparams.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
