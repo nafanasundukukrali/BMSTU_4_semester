@@ -1,0 +1,1 @@
+/usr/bin/cc  -Wall -Werror -Wextra -m32 -ansi -g -g3 -Wall -Werror -Wextra -m32 -ansi CMakeFiles/lab_07.dir/main.c.o CMakeFiles/lab_07.dir/string_functions.c.o CMakeFiles/lab_07.dir/strncpy.s.o -o lab_07 

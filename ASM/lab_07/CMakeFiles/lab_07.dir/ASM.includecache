@@ -1,0 +1,10 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_07/strncpy.s
+
