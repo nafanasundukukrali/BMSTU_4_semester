@@ -4,7 +4,7 @@ size_t my_strlen(const char *string)
 {
     size_t len = 0 ;
 
-    __asm__ volatile (
+    asm (
         ".intel_syntax noprefix;"
         "mov ecx, -1;"
         "mov edi, %1;"
