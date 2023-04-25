@@ -18,8 +18,9 @@ Matrix<T>::Matrix(const Matrix&Matrix): MatrixBase(Matrix._rows, Matrix._columns
     this->_reallocate_data();
 
     for (size_t i = 0; i < this->_rows; i++)
-        for (size_t j = 0; j < this->_columns; j++)
-            this->_data[i][j] = Matrix._data[i][j];
+        std::ranges::copy(Matrix._data[i], this->_data[i].begin());
+        //for (size_t j = 0; j < this->_columns; j++)
+        //    this->_data[i][j] = Matrix._data[i][j];
 }
 
 template<typename T>
@@ -37,83 +38,88 @@ Matrix<T>::Matrix(std::initializer_list<std::initializer_list<T>> list): MatrixB
 
     for (auto &iter: list)
         if (this->_columns != iter.size())
+        {
             ExceptionIndex(__FILE__, typeid(*this).name(), __LINE__, "Error of list element.");
+        }
         else
+        {
             std::ranges::copy(iter, this->_data[i].begin());
+            i++;
+        }
 }
 
 
 template <typename T>
-Iterator<T> Matrix<T>::begin()
+Iterator<MatrixRow<T>, Matrix> Matrix<T>::begin()
 {
-    return Iterator<T>(*this, 0);
+    return Iterator<MatrixRow<T>, Matrix>(*this, 0);
 }
 
 template <typename T>
-Iterator<T> Matrix<T>::end()
+Iterator<MatrixRow<T>, Matrix> Matrix<T>::end()
 {
-    return Iterator<T>(*this, this->_collums * this->_rows);
+    return Iterator<MatrixRow<T>, Matrix>(*this, this->_collums * this->_rows);
 }
 
 template <typename T>
-IteratorConst<T> Matrix<T>::begin() const
+IteratorConst<MatrixRow<T>, Matrix> Matrix<T>::begin() const
 {
-    return IteratorConst<T>(*this, 0);
+    return IteratorConst<MatrixRow<T>, Matrix>(*this, 0);
 }
 
 template <typename T>
-IteratorConst<T> Matrix<T>::end() const
+IteratorConst<MatrixRow<T>, Matrix>  Matrix<T>::end() const
 {
-    return IteratorConst<T>(*this, this->_columns * this->_rows);
+    return IteratorConst<MatrixRow<T>, Matrix>(*this, this->_columns * this->_rows);
 }
 
 template <typename T>
-IteratorConst<T> Matrix<T>::cbegin() const
+IteratorConst<MatrixRow<T>, Matrix>  Matrix<T>::cbegin() const
 {
-    return IteratorConst<T>(*this, 0);
+    return IteratorConst<MatrixRow<T>, Matrix>(*this, 0);
 }
 
 template <typename T>
-IteratorConst<T> Matrix<T>::cend() const
+IteratorConst<MatrixRow<T>, Matrix> Matrix<T>::cend() const
 {
-    return IteratorConst<T>(*this, this->_columns * this->_rows);
+    return IteratorConst<MatrixRow<T>, Matrix>(*this, this->_columns * this->_rows);
 }
 
 
 template <typename T>
-Iterator<T> Matrix<T>::rbegin()
+Iterator<MatrixRow<T>, Matrix> Matrix<T>::rbegin()
 {
-    return Iterator<T>(*this, this->_collums * this->_rows - 1);
+    return Iterator<MatrixRow<T>, Matrix>(*this, this->_collums * this->_rows - 1);
 }
 
 template <typename T>
-Iterator<T> Matrix<T>::rend()
+Iterator<MatrixRow<T>, Matrix> Matrix<T>::rend()
 {
-    return Iterator<T>(*this, -1);
+    return Iterator<MatrixRow<T>, Matrix>(*this, -1);
 }
 
 template <typename T>
-IteratorConst<T> Matrix<T>::rbegin() const
+IteratorConst<MatrixRow<T>, Matrix> Matrix<T>::rbegin() const
 {
-    return IteratorConst<T>(*this, this->_collums * this->_rows - 1);
+    return IteratorConst<MatrixRow<T>, Matrix>(*this, this->_collums * this->_rows - 1);
 }
 
 template <typename T>
-IteratorConst<T> Matrix<T>::rend() const
+IteratorConst<MatrixRow<T>, Matrix> Matrix<T>::rend() const
 {
-    return IteratorConst<T>(*this, -1);
+    return IteratorConst<MatrixRow<T>, Matrix>(*this, -1);
 }
 
 template <typename T>
-IteratorConst<T> Matrix<T>::crbegin() const
+IteratorConst<MatrixRow<T>, Matrix> Matrix<T>::crbegin() const
 {
-    return IteratorConst<T>(*this, this->_collums * this->_rows - 1);
+    return IteratorConst<MatrixRow<T>, Matrix>(*this, this->_collums * this->_rows - 1);
 }
 
 template <typename T>
-IteratorConst<T> Matrix<T>::crend() const
+IteratorConst<MatrixRow<T>, Matrix> Matrix<T>::crend() const
 {
-    return IteratorConst<T>(*this, -1);
+    return IteratorConst<MatrixRow<T>, Matrix>(*this, -1);
 }
 
 template <typename T>

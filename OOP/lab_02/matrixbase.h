@@ -6,7 +6,7 @@
 class MatrixBase
 {
 public:
-    MatrixBase(size_t rows = 0, size_t columns = 0) noexcept: _rows(rows), _columns(columns) {};
+    explicit MatrixBase(size_t rows = 0, size_t columns = 0): _rows(rows), _columns(columns) {};
 
     virtual ~MatrixBase() = default;
 

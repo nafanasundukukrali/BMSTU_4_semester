@@ -12,9 +12,8 @@
 template<typename T>
 class Matrix: public MatrixBase
 {
-    friend Iterator<T>;
-    friend IteratorConst<T>;
-    friend MatrixRow<T>;
+    friend Iterator<T, Matrix>;
+    friend IteratorConst<T, Matrix>;
 public:
     Matrix() = default;
     Matrix(const size_t rows, const size_t columns);
@@ -22,6 +21,8 @@ public:
     explicit Matrix(Matrix &&matrix);
     explicit Matrix(std::initializer_list<std::initializer_list<T>> list);
     ~Matrix() noexcept = default;
+
+    using iterator_t = decltype(std::ranges::begin(std::declval<MatrixRow<T>&>()));
 
     Matrix<T>& operator = (const Matrix<T>& mtr);
     Matrix<T>& operator = (Matrix<T>&& mtr);
@@ -53,21 +54,21 @@ public:
 
     Matrix &transpose();
 
-    Iterator<T> begin();
-    Iterator<T> end();
-    IteratorConst<T> begin() const;
-    IteratorConst<T> end() const;
-    IteratorConst<T> cbegin() const;
-    IteratorConst<T> cend() const;
-    Iterator<T> rbegin();
-    Iterator<T> rend();
-    IteratorConst<T> rbegin() const;
-    IteratorConst<T> rend() const;
-    IteratorConst<T> crbegin() const;
-    IteratorConst<T> crend() const;
+    Iterator<MatrixRow<T>, Matrix> begin();
+    Iterator<MatrixRow<T>, Matrix> end();
+    IteratorConst<MatrixRow<T>, Matrix> begin() const;
+    IteratorConst<MatrixRow<T>, Matrix> end() const;
+    IteratorConst<MatrixRow<T>, Matrix> cbegin() const;
+    IteratorConst<MatrixRow<T>, Matrix> cend() const;
+    Iterator<MatrixRow<T>, Matrix> rbegin();
+    Iterator<MatrixRow<T>, Matrix> rend();
+    IteratorConst<MatrixRow<T>, Matrix> rbegin() const;
+    IteratorConst<MatrixRow<T>, Matrix> rend() const;
+    IteratorConst<MatrixRow<T>, Matrix> crbegin() const;
+    IteratorConst<MatrixRow<T>, Matrix> crend() const;
 
-    void fill(Iterator<T> start, const Iterator<T> &end, const T &value);
-    void fill(Iterator<T> start, Iterator<T> source_start, const Iterator<T> &source_end);
+    void fill(Iterator<T, Matrix> start, const Iterator<T, Matrix> &end, const T &value);
+    void fill(Iterator<T, Matrix> start, Iterator<T, Matrix> source_start, const Iterator<T, Matrix> &source_end);
 
     // friend std::ostream& operator << (std::ostream& os, const Matrix<T>& mtrx);
 
@@ -81,6 +82,8 @@ private:
     void summarize(Matrix &);
     void multipy(Matrix &);
 };
+
+//static_assert(std::ranges::bidirectional_range<Matrix<int>>);
 
 #include "matrix.hpp"
 

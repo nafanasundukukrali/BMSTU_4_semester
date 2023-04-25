@@ -11,13 +11,11 @@ template <typename T>
 class Matrix;
 
 template<typename T, template <typename> class Container>
-concept ContainerRequires = requires(Container<T> cl) {cl._data; cl._rows; cl._columns;} ||
-    requires(Container<T> cl) {cl._data; cl._size;};
+concept ConstContainerRequires = std::is_same_v<Container<T>, Matrix<T>> || std::is_same_v<Container<T>, MatrixRow<T>>;
 
-template<typename T, template <typename> class Container> requires ContainerRequires<T, Container>
+template<typename T, template <typename> class Container> requires ConstContainerRequires<T, Container>
 class IteratorConst
 {
-private:
 public:
     using iterator_concept = std::bidirectional_iterator_tag;
     using difference_type = std::ptrdiff_t;
@@ -50,7 +48,7 @@ public:
     const T* operator ->() const;
 
 private:
-    std::weak_ptr<T[]> _data = nullptr;
+    std::weak_ptr<T[]> _data;
     size_t _index = 0;
     size_t _rows = 0;
     size_t _columns = 0;

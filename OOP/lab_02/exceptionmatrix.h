@@ -14,7 +14,7 @@ public:
         time_t error_time = time(nullptr);
 
         _error_message = "File name: " + file + " in line " + std::to_string(line) + " in class " + class_name
-                          + "\nTime: " + std::to_string(error_time) + "Info: ";
+                          + "\nTime: " + std::to_string(error_time) + "\n Info: ";
     }
 
     virtual ~Exception() {};
