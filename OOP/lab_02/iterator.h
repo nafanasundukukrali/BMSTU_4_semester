@@ -5,16 +5,9 @@
 #include <memory>
 #include <concepts>
 
-template <typename T>
-class MatrixRow;
+#include "concepts.h"
 
-template <typename T>
-class Matrix;
-
-template<typename T, template <typename> class Container>
-concept ContainerRequires = std::is_same_v<Container<T>, Matrix<T>> || std::is_same_v<Container<T>, MatrixRow<T>>;
-
-template<typename T = bool, template <typename> class Container = Matrix> requires ContainerRequires<T, Container>
+template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
 class Iterator
 {
 public:
@@ -26,7 +19,7 @@ public:
 
     Iterator() = default;
     Iterator(const Container<T> &matrix, const size_t index = 0);
-    Iterator(const Iterator<T, Container>& iterator) = default;
+    Iterator(const Iterator<Container, T>& iterator) = default;
 
     ~Iterator() noexcept = default;
 
@@ -34,21 +27,21 @@ public:
     bool operator == (Iterator const& iterator) const;
     bool operator < (Iterator const& iterator) const;
 
-    Iterator<T, Container> operator + (const int value) const;
-    Iterator<T, Container> operator - (const int value) const;
-    Iterator<T, Container> &operator += (const int value);
-    Iterator<T, Container> &operator -= (const int value);
-    Iterator<T, Container> &operator = (const Iterator<T, Container> &iterator);
+    Iterator<Container, T> operator + (const int value);
+    Iterator<Container, T> operator - (const int value);
+    Iterator<Container, T> &operator += (const int value);
+    Iterator<Container, T> &operator -= (const int value);
+    Iterator<Container, T> &operator = (const Iterator<Container, T> &iterator);
 
-    Iterator<T, Container>& operator++();
-    Iterator<T, Container> operator++(int);
-    Iterator<T, Container>& operator--();
-    Iterator<T, Container> operator--(int);
+    Iterator<Container, T>& operator++();
+    Iterator<Container, T> operator++(int);
+    Iterator<Container, T>& operator--();
+    Iterator<Container, T> operator--(int);
 
     T& operator *();
-    const T& operator *() const;
+    T& operator *() const;
     T* operator->();
-    const T* operator->() const;
+    T* operator->() const;
 
 private:
     std::weak_ptr<T[]> _data;

@@ -68,6 +68,7 @@ class AlgorithmFunctions:
 
         sqr_ra = a * a
         sqr_rb = b * b
+
         border_x = round(x0 + a / ((1 + sqr_rb / sqr_ra) ** 0.5))
         border_y = round(y0 + b / ((1 + sqr_ra / sqr_rb) ** 0.5))
 
@@ -75,7 +76,7 @@ class AlgorithmFunctions:
             y = round((sqr_ra * sqr_rb - (x - x0) ** 2 * sqr_rb) ** 0.5 / a) + y0
             get_symmetrical_pixes(result, x, y, x0, y0)
 
-        for y in range(border_y, round(y0), -1):
+        for y in range(border_y, round(y0) - 1, -1):
             x = round((sqr_ra * sqr_rb - (y - y0) ** 2 * sqr_ra) ** 0.5 / b) + x0
             get_symmetrical_pixes(result, x, y, x0, y0)
 
@@ -156,36 +157,36 @@ class AlgorithmFunctions:
         y0 = round(start_cords.y())
         x = 0
         y = round(b)
-        step = b ** 2 - a ** 2 * (b - 1/4)
+        d = b ** 2 - a ** 2 * (b - 1/4)
 
         get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
 
         while 2 * (b ** 2) * x < 2 * (a ** 2) * y:
-            if step < 0:
+            if d < 0:
                 x += 1
-                step += b ** 2 * 2 * x + b ** 2
+                d += b ** 2 * 2 * x + b ** 2
             else:
                 x += 1
                 y -= 1
-                step += b ** 2 * 2 * x - a ** 2 * 2 * y + b ** 2
+                d += b ** 2 * 2 * x - a ** 2 * 2 * y + b ** 2
 
             get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
 
         x = round(a)
         y = 0
 
-        step = a ** 2 - b ** 2 * (a - 1/4)
+        d = a ** 2 - b ** 2 * (a - 1/4)
 
         get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
 
         while 2 * (b ** 2) * x > 2 * (a ** 2) * y:
-            if step < 0:
+            if d < 0:
                 y += 1
-                step += a ** 2 * 2 * y + a ** 2
+                d += a ** 2 * 2 * y + a ** 2
             else:
                 y += 1
                 x -= 1
-                step += a ** 2 * 2 * y - b ** 2 * 2 * x + a ** 2
+                d += a ** 2 * 2 * y - b ** 2 * 2 * x + a ** 2
 
             get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
 
@@ -259,6 +260,42 @@ class AlgorithmFunctions:
             get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
 
         return result
+    #
+    # @staticmethod
+    # @analyzer
+    # def paint_ellipse_by_brethenhem(start_cords: QPoint, a, b):
+    #     result = []
+    #     x0 = round(start_cords.x())
+    #     y0 = round(start_cords.y())
+    #     x = 0
+    #     y = round(b)
+    #     sqr_ra = a * a
+    #     sqr_rb = b * b
+    #     d = 4 * sqr_rb * ((x + 1) * (x + 1)) + sqr_ra * ((2 * y - 1) * (2 * y - 1)) - 4 * sqr_rb * sqr_ra
+    #
+    #     while sqr_ra * (2 * y - 1) >= 2 * sqr_rb * (x + 1):
+    #         get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
+    #          x += 1
+    #         if d >= 0:
+    #             d += 4 * sqr_rb * (2 * x + 3) - 8 * sqr_ra * (y - 1)
+    #             y -= 1
+    #         else:
+    #             d += 4 * sqr_rb * (2 * x + 3)
+    #
+    #     # d = sqr_rb * ((2 * x + 1) ** 2) + 4 * sqr_ra * ((y - 1) ** 2) - 4 * sqr_rb * sqr_ra
+    #
+    #     while (y >= 0):
+    #         y -= 1
+    #
+    #         if d < 0:
+    #             d += 4 * sqr_ra * (2 * y + 3)
+    #         else:
+    #             d += 4 * sqr_ra * (2 * y + 3) - 8 * sqr_rb * (1 + x)
+    #             x += 1
+    #
+    #         get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
+    #
+    #     return result
 
     @staticmethod
     @analyzer

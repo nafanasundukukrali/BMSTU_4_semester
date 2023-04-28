@@ -33,7 +33,7 @@ class TimePlot(QDialog):
         ax_1 = self.figure.add_subplot(121)
         ax_1.clear()
         ax_1.set_title(f'Исследование временных характеристик построения окружности \n (начальный радиус = {start_a}, '
-                       f'шаг изменения радиуса = {step},\n количество фигур = {step_count})')
+                       f'шаг изменения радиуса = {step},\n количество фигур в спектре = {step_count})')
         ax_1.set_xlabel("Радиус окружности")
         ax_1.set_ylabel("Время (ns)")
 
@@ -46,7 +46,7 @@ class TimePlot(QDialog):
         ax_2.clear()
         ax_2.set_title(f'Исследование временных характеристик построения эллипса \n'
                        f'(начальная длина большей полуоси = {start_a}, шаг изменения длины полуоси = {step},\n'
-                       f' количество фигур = {step_count})')
+                       f' количество фигур в спектре = {step_count})')
         ax_2.set_xlabel("Длина большей полуоси")
         ax_2.set_ylabel("Время (ns)")
         for key in results_ellipse.keys():

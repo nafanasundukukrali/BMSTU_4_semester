@@ -1,4 +1,14 @@
 #include "matrixrow.h"
+#include "concepts.h"
+#include <ranges>
+
+template<typename T>
+MatrixRow<T>::MatrixRow(std::initializer_list<std::initializer_list<T>> list): MatrixBase(1, list.size())
+{
+    this->_reallocate_data();
+
+    std::ranges::copy(list, this->_data.begin());
+}
 
 template<typename T>
 T& MatrixRow<T>::operator[](size_t column)
@@ -25,76 +35,51 @@ void MatrixRow<T>::reset_data(T *data, size_t new_size)
     this->_data.reset(data);
 }
 
-
-template <typename T>
-Iterator<T, MatrixRow> MatrixRow<T>::begin()
+template<typename T>
+template<typename U> requires FloatingType<U> && std::same_as<T, U>
+MatrixRow<T> MatrixRow<T>::operator + (const MatrixRow<U>& row) const
 {
-    return Iterator<T, MatrixRow>(*this, 0);
+    if (row.empty() || this->empty())
+       ExceptionEmptyObject(__FILE__, typeid(this).name(), __LINE__);
+
+    if (!validate_another_matrix_row_params(row._rows, row._columns))
+       ExceptionIncorrectSrcParams(__FILE__, typeid(this).name(), __LINE__);
+
+    std::for_each(row.begin(), row.end(), this->begin(), std::plus<T>());
 }
 
 template <typename T>
-Iterator<T, MatrixRow> MatrixRow<T>::end()
+Iterator<MatrixRow, T> MatrixRow<T>::begin()
 {
-    return Iterator<T, MatrixRow>(*this, this->_columns);
+    return Iterator<MatrixRow, T>(*this, 0);
 }
 
 template <typename T>
-IteratorConst<T, MatrixRow> MatrixRow<T>::begin() const
+Iterator<MatrixRow, T> MatrixRow<T>::end()
 {
-    return IteratorConst<T, MatrixRow>(*this, 0);
+    return Iterator<MatrixRow, T>(*this, this->_columns);
 }
 
 template <typename T>
-IteratorConst<T, MatrixRow> MatrixRow<T>::end() const
+IteratorConst<MatrixRow, T> MatrixRow<T>::begin() const
 {
-    return IteratorConst<T, MatrixRow>(*this, this->_columns);
+    return IteratorConst<MatrixRow, T>(*this, 0);
 }
 
 template <typename T>
-IteratorConst<T, MatrixRow> MatrixRow<T>::cbegin() const
+IteratorConst<MatrixRow, T> MatrixRow<T>::end() const
 {
-    return IteratorConst<T, MatrixRow>(*this, 0);
+    return IteratorConst<MatrixRow, T>(*this, this->_columns);
 }
 
 template <typename T>
-IteratorConst<T, MatrixRow> MatrixRow<T>::cend() const
+IteratorConst<MatrixRow, T> MatrixRow<T>::cbegin() const
 {
-    return IteratorConst<T, MatrixRow>(*this, this->_columns);
+    return IteratorConst<MatrixRow, T>(*this, 0);
 }
 
-
-//template <typename T>
-//Iterator<T, MatrixRow> MatrixRow<T>::rbegin()
-//{
-//    return Iterator<T, MatrixRow>(*this, this->_collums - 1);
-//}
-
-//template <typename T>
-//Iterator<T, MatrixRow> MatrixRow<T>::rend()
-//{
-//    return Iterator<T, MatrixRow>(*this, -1);
-//}
-
-//template <typename T>
-//IteratorConst<T, MatrixRow> MatrixRow<T>::rbegin() const
-//{
-//    return IteratorConst<T, MatrixRow>(*this, this->_collums * this->_rows - 1);
-//}
-
-//template <typename T>
-//IteratorConst<T, MatrixRow> MatrixRow<T>::rend() const
-//{
-//    return IteratorConst<MatrixRow<T>, Matrix>(*this, -1);
-//}
-
-//template <typename T>
-//IteratorConst<T, MatrixRow> MatrixRow<T>::crbegin() const
-//{
-//    return IteratorConst<T, MatrixRow>(*this, this->_collums * this->_rows - 1);
-//}
-
-//template <typename T>
-//IteratorConst<T, MatrixRow> MatrixRow<T>::crend() const
-//{
-//    return IteratorConst<T, MatrixRow>(*this, -1);
-//}
+template <typename T>
+IteratorConst<MatrixRow, T> MatrixRow<T>::cend() const
+{
+    return IteratorConst<MatrixRow, T>(*this, this->_columns);
+}

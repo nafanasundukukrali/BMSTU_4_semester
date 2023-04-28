@@ -176,8 +176,8 @@ class ControlField(QWidget):
         results_circle = {}
         results_ellipse = {}
         all_algorithms = AlgorithmFunctions().get_algorithms_list()
-        count = 10
-        step_count = 10
+        count = 7
+        step_count = 7
         start_a = 100
         start_b = 50
         step = 100

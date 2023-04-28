@@ -56,14 +56,24 @@ class MainWindow(QMainWindow):
         y0 = field_params.height()
         center = QPoint(x0 // 2, y0 // 2)
 
+        if a > b:
+            e = (a ** 2 - b ** 2) ** 0.5 / b
+        else:
+            e = (b ** 2 - a ** 2) ** 0.5 / a
+
         values = []
 
         for i in range(count):
             values.append(self._draw_circle_or_ellipse(algorithm, center, a, b, pen_color=pen_color,
                                                        background_color=background_color,
                                                        time_analyze=time_analyze, is_circle=is_circle))
-            a += step
-            b += step
+
+            if a > b:
+                b += step
+                a = ((e * b) ** 2 + b ** 2) ** 0.5
+            else:
+                a += step
+                b = ((e * a) ** 2 + a ** 2) ** 0.5
 
         if time_analyze:
             return values

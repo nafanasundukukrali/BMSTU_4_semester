@@ -7,11 +7,11 @@ ASM_DEFINES =
 
 ASM_INCLUDES = 
 
-ASM_FLAGS =  -Wall -Werror -Wextra -m32 -ansi -x assembler-with-cpp -g
+ASM_FLAGS =  -Wall -Werror -Wextra -m32 -x assembler-with-cpp -O3 -DNDEBUG
 
 C_DEFINES = 
 
 C_INCLUDES = 
 
-C_FLAGS =  -Wall -Werror -Wextra -m32 -ansi -g -g3 -Wall -Werror -Wextra -m32 -ansi
+C_FLAGS =  -Wall -Werror -Wextra -m32 -O3 -DNDEBUG
 

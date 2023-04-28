@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "string_functions.h"
 
-int32_t my_strncpy(char *, const char *, const int32_t);
+int32_t my_strncpy(const int16_t, char *, const char *);
 
 int main()
 {
@@ -25,8 +25,9 @@ int main()
     const char *string_2 = "bvbaa";
     printf("Входная строка: %s\n", string_2);
     int32_t value = 5;
-    my_strncpy(&(string_out[0]), string_2, value);
+    my_strncpy(value, &(string_out[0]), string_2);
     printf("Количество копируемых символов: %u, выходная строка: %s\n", value, string_out);
+    /*
 
     printf("Входная строка: %s\n", string_2);
     value = 1;
@@ -36,7 +37,7 @@ int main()
     printf("Входная строка: %s\n", string_2);
     value = 0;
     my_strncpy(&(string_out[0]), string_2, value);
-    printf("Количество копируемых символов: %u, выходная строка: %s\n", value, string_out);
+    printf("Количество копируемых символов: %u, выходная строка: %s\n", value, string_out);*/
 
     return 0;
 }

@@ -4,16 +4,9 @@
 #include <concepts>
 #include <memory>
 
-template <typename T>
-class MatrixRow;
+#include "concepts.h"
 
-template <typename T>
-class Matrix;
-
-template<typename T, template <typename> class Container>
-concept ConstContainerRequires = std::is_same_v<Container<T>, Matrix<T>> || std::is_same_v<Container<T>, MatrixRow<T>>;
-
-template<typename T, template <typename> class Container> requires ConstContainerRequires<T, Container>
+template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
 class IteratorConst
 {
 public:
@@ -33,19 +26,19 @@ public:
     bool operator == (IteratorConst const& iterator) const;
     bool operator < (IteratorConst const& iterator) const;
 
-    IteratorConst<T, Container> operator + (const int value);
-    IteratorConst<T, Container> operator - (const int value);
-    IteratorConst<T, Container> &operator += (const int value);
-    IteratorConst<T, Container> &operator -= (const int value);
-    IteratorConst<T, Container> &operator = (const IteratorConst<T, Container> &iterator);
+    IteratorConst<Container, T> operator + (const int value);
+    IteratorConst<Container, T> operator - (const int value);
+    IteratorConst<Container, T> &operator += (const int value);
+    IteratorConst<Container, T> &operator -= (const int value);
+    IteratorConst<Container, T> &operator = (const IteratorConst<Container, T> &iterator);
 
-    IteratorConst<T, Container>& operator++();
-    IteratorConst<T, Container> operator++(int) const;
-    IteratorConst<T, Container>& operator--();
-    IteratorConst<T, Container> operator--(int) const;
+    IteratorConst<Container, T>& operator++();
+    IteratorConst<Container, T> operator++(int) const;
+    IteratorConst<Container, T>& operator--();
+    IteratorConst<Container, T> operator--(int) const;
 
-    const T& operator *() const;
-    const T* operator ->() const;
+    T& operator *() const;
+    T* operator ->() const;
 
 private:
     std::weak_ptr<T[]> _data;

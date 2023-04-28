@@ -1,0 +1,822 @@
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags:  
+
+The output was:
+1
+/usr/bin/ld: невозможно найти /DCOUNT=10: Нет такого файла или каталога
+collect2: error: ld returned 1 exit status
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: -c 
+
+The output was:
+1
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --c++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--c++’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --ec++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--ec++’; did you mean ‘-Weffc++’?
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+
+The output was:
+1
+c++: warning: ‘-mcpu=’ is deprecated; use ‘-mtune=’ or ‘-march=’ instead
+c++: error: unrecognized command-line option ‘--target=arm-arm-none-eabi’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: -c;-I__does_not_exist__ 
+
+The output was:
+1
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_66ec6/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_66ec6.dir/build.make CMakeFiles/cmTC_66ec6.dir/build
+gmake[1]: Entering directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_66ec6.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++   /DCOUNT=10    -v -o CMakeFiles/cmTC_66ec6.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp
+Using built-in specs.
+COLLECT_GCC=/usr/bin/c++
+OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 11.3.0-1ubuntu1~22.04' --with-bugurl=file:///usr/share/doc/gcc-11/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,m2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-11 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-nvptx/usr,amdgcn-amdhsa=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-gcn/usr --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=2
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 11.3.0 (Ubuntu 11.3.0-1ubuntu1~22.04) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_66ec6.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_66ec6.dir/'
+ /usr/lib/gcc/x86_64-linux-gnu/11/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_66ec6.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -fasynchronous-unwind-tables -fstack-protector-strong -Wformat -Wformat-security -fstack-clash-protection -fcf-protection -o /tmp/ccWL96ii.s
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring duplicate directory "/usr/include/x86_64-linux-gnu/c++/11"
+ignoring nonexistent directory "/usr/local/include/x86_64-linux-gnu"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/include-fixed"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/include/c++/11
+ /usr/include/x86_64-linux-gnu/c++/11
+ /usr/include/c++/11/backward
+ /usr/lib/gcc/x86_64-linux-gnu/11/include
+ /usr/local/include
+ /usr/include/x86_64-linux-gnu
+ /usr/include
+End of search list.
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: 449548cbb29044828dc7ea158b577b98
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_66ec6.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_66ec6.dir/'
+ as -v --64 -o CMakeFiles/cmTC_66ec6.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccWL96ii.s
+GNU assembler version 2.38 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.38
+COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_66ec6.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_66ec6.dir/CMakeCXXCompilerABI.cpp.'
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_66ec6.dir/build.make:78: CMakeFiles/cmTC_66ec6.dir/CMakeCXXCompilerABI.cpp.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_66ec6.dir/CMakeCXXCompilerABI.cpp.o'
+gmake[1]: Leaving directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_66ec6/fast] Error 2
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_1adee/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_1adee.dir/build.make CMakeFiles/cmTC_1adee.dir/build
+gmake[1]: вход в каталог «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+Building CXX object CMakeFiles/cmTC_1adee.dir/testCXXCompiler.cxx.o
+/usr/bin/c++   /DCOUNT=10  -o CMakeFiles/cmTC_1adee.dir/testCXXCompiler.cxx.o -c /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+gmake[1]: *** [CMakeFiles/cmTC_1adee.dir/build.make:78: CMakeFiles/cmTC_1adee.dir/testCXXCompiler.cxx.o] Ошибка 1
+gmake[1]: *** Удаляется файл «CMakeFiles/cmTC_1adee.dir/testCXXCompiler.cxx.o»
+gmake[1]: выход из каталога «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+gmake: *** [Makefile:127: cmTC_1adee/fast] Ошибка 2
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags:  
+
+The output was:
+1
+/usr/bin/ld: невозможно найти /DCOUNT=10: Нет такого файла или каталога
+collect2: error: ld returned 1 exit status
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: -c 
+
+The output was:
+1
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --c++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--c++’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --ec++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--ec++’; did you mean ‘-Weffc++’?
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+
+The output was:
+1
+c++: warning: ‘-mcpu=’ is deprecated; use ‘-mtune=’ or ‘-march=’ instead
+c++: error: unrecognized command-line option ‘--target=arm-arm-none-eabi’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: -c;-I__does_not_exist__ 
+
+The output was:
+1
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_99ecf/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_99ecf.dir/build.make CMakeFiles/cmTC_99ecf.dir/build
+gmake[1]: Entering directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_99ecf.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++   /DCOUNT=10    -v -o CMakeFiles/cmTC_99ecf.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp
+Using built-in specs.
+COLLECT_GCC=/usr/bin/c++
+OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 11.3.0-1ubuntu1~22.04' --with-bugurl=file:///usr/share/doc/gcc-11/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,m2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-11 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-nvptx/usr,amdgcn-amdhsa=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-gcn/usr --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=2
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 11.3.0 (Ubuntu 11.3.0-1ubuntu1~22.04) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_99ecf.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_99ecf.dir/'
+ /usr/lib/gcc/x86_64-linux-gnu/11/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_99ecf.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -fasynchronous-unwind-tables -fstack-protector-strong -Wformat -Wformat-security -fstack-clash-protection -fcf-protection -o /tmp/ccHtgGTy.s
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring duplicate directory "/usr/include/x86_64-linux-gnu/c++/11"
+ignoring nonexistent directory "/usr/local/include/x86_64-linux-gnu"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/include-fixed"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/include/c++/11
+ /usr/include/x86_64-linux-gnu/c++/11
+ /usr/include/c++/11/backward
+ /usr/lib/gcc/x86_64-linux-gnu/11/include
+ /usr/local/include
+ /usr/include/x86_64-linux-gnu
+ /usr/include
+End of search list.
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: 449548cbb29044828dc7ea158b577b98
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_99ecf.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_99ecf.dir/'
+ as -v --64 -o CMakeFiles/cmTC_99ecf.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccHtgGTy.s
+GNU assembler version 2.38 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.38
+COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_99ecf.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_99ecf.dir/CMakeCXXCompilerABI.cpp.'
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_99ecf.dir/build.make:78: CMakeFiles/cmTC_99ecf.dir/CMakeCXXCompilerABI.cpp.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_99ecf.dir/CMakeCXXCompilerABI.cpp.o'
+gmake[1]: Leaving directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_99ecf/fast] Error 2
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_e7baf/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_e7baf.dir/build.make CMakeFiles/cmTC_e7baf.dir/build
+gmake[1]: вход в каталог «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+Building CXX object CMakeFiles/cmTC_e7baf.dir/testCXXCompiler.cxx.o
+/usr/bin/c++   /DCOUNT=10  -o CMakeFiles/cmTC_e7baf.dir/testCXXCompiler.cxx.o -c /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+gmake[1]: *** [CMakeFiles/cmTC_e7baf.dir/build.make:78: CMakeFiles/cmTC_e7baf.dir/testCXXCompiler.cxx.o] Ошибка 1
+gmake[1]: *** Удаляется файл «CMakeFiles/cmTC_e7baf.dir/testCXXCompiler.cxx.o»
+gmake[1]: выход из каталога «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+gmake: *** [Makefile:127: cmTC_e7baf/fast] Ошибка 2
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags:  
+
+The output was:
+1
+/usr/bin/ld: невозможно найти DCOUNT=10: Нет такого файла или каталога
+collect2: error: ld returned 1 exit status
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags: -c 
+
+The output was:
+1
+c++: warning: DCOUNT=10: linker input file unused because linking not done
+c++: error: DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags: --c++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--c++’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags: --ec++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--ec++’; did you mean ‘-Weffc++’?
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+
+The output was:
+1
+c++: warning: ‘-mcpu=’ is deprecated; use ‘-mtune=’ or ‘-march=’ instead
+c++: error: unrecognized command-line option ‘--target=arm-arm-none-eabi’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags: -c;-I__does_not_exist__ 
+
+The output was:
+1
+c++: warning: DCOUNT=10: linker input file unused because linking not done
+c++: error: DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_cb1f6/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_cb1f6.dir/build.make CMakeFiles/cmTC_cb1f6.dir/build
+gmake[1]: Entering directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_cb1f6.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++   DCOUNT=10    -v -o CMakeFiles/cmTC_cb1f6.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp
+Using built-in specs.
+COLLECT_GCC=/usr/bin/c++
+OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 11.3.0-1ubuntu1~22.04' --with-bugurl=file:///usr/share/doc/gcc-11/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,m2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-11 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-nvptx/usr,amdgcn-amdhsa=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-gcn/usr --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=2
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 11.3.0 (Ubuntu 11.3.0-1ubuntu1~22.04) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_cb1f6.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_cb1f6.dir/'
+ /usr/lib/gcc/x86_64-linux-gnu/11/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_cb1f6.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -fasynchronous-unwind-tables -fstack-protector-strong -Wformat -Wformat-security -fstack-clash-protection -fcf-protection -o /tmp/ccujwr7m.s
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring duplicate directory "/usr/include/x86_64-linux-gnu/c++/11"
+ignoring nonexistent directory "/usr/local/include/x86_64-linux-gnu"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/include-fixed"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/include/c++/11
+ /usr/include/x86_64-linux-gnu/c++/11
+ /usr/include/c++/11/backward
+ /usr/lib/gcc/x86_64-linux-gnu/11/include
+ /usr/local/include
+ /usr/include/x86_64-linux-gnu
+ /usr/include
+End of search list.
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: 449548cbb29044828dc7ea158b577b98
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_cb1f6.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_cb1f6.dir/'
+ as -v --64 -o CMakeFiles/cmTC_cb1f6.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccujwr7m.s
+GNU assembler version 2.38 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.38
+COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_cb1f6.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_cb1f6.dir/CMakeCXXCompilerABI.cpp.'
+c++: warning: DCOUNT=10: linker input file unused because linking not done
+c++: error: DCOUNT=10: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_cb1f6.dir/build.make:78: CMakeFiles/cmTC_cb1f6.dir/CMakeCXXCompilerABI.cpp.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_cb1f6.dir/CMakeCXXCompilerABI.cpp.o'
+gmake[1]: Leaving directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_cb1f6/fast] Error 2
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_6f08f/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_6f08f.dir/build.make CMakeFiles/cmTC_6f08f.dir/build
+gmake[1]: вход в каталог «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+Building CXX object CMakeFiles/cmTC_6f08f.dir/testCXXCompiler.cxx.o
+/usr/bin/c++   DCOUNT=10  -o CMakeFiles/cmTC_6f08f.dir/testCXXCompiler.cxx.o -c /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+c++: warning: DCOUNT=10: linker input file unused because linking not done
+c++: error: DCOUNT=10: linker input file not found: Нет такого файла или каталога
+gmake[1]: *** [CMakeFiles/cmTC_6f08f.dir/build.make:78: CMakeFiles/cmTC_6f08f.dir/testCXXCompiler.cxx.o] Ошибка 1
+gmake[1]: *** Удаляется файл «CMakeFiles/cmTC_6f08f.dir/testCXXCompiler.cxx.o»
+gmake[1]: выход из каталога «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+gmake: *** [Makefile:127: cmTC_6f08f/fast] Ошибка 2
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags:  
+
+The output was:
+1
+/usr/bin/ld: невозможно найти /DCOUNT=10: Нет такого файла или каталога
+collect2: error: ld returned 1 exit status
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: -c 
+
+The output was:
+1
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --c++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--c++’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --ec++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--ec++’; did you mean ‘-Weffc++’?
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+
+The output was:
+1
+c++: warning: ‘-mcpu=’ is deprecated; use ‘-mtune=’ or ‘-march=’ instead
+c++: error: unrecognized command-line option ‘--target=arm-arm-none-eabi’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: -c;-I__does_not_exist__ 
+
+The output was:
+1
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_6d4d2/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_6d4d2.dir/build.make CMakeFiles/cmTC_6d4d2.dir/build
+gmake[1]: Entering directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_6d4d2.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++   /DCOUNT=10    -v -o CMakeFiles/cmTC_6d4d2.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp
+Using built-in specs.
+COLLECT_GCC=/usr/bin/c++
+OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 11.3.0-1ubuntu1~22.04' --with-bugurl=file:///usr/share/doc/gcc-11/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,m2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-11 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-nvptx/usr,amdgcn-amdhsa=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-gcn/usr --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=2
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 11.3.0 (Ubuntu 11.3.0-1ubuntu1~22.04) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_6d4d2.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_6d4d2.dir/'
+ /usr/lib/gcc/x86_64-linux-gnu/11/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_6d4d2.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -fasynchronous-unwind-tables -fstack-protector-strong -Wformat -Wformat-security -fstack-clash-protection -fcf-protection -o /tmp/cc5ok4Xl.s
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring duplicate directory "/usr/include/x86_64-linux-gnu/c++/11"
+ignoring nonexistent directory "/usr/local/include/x86_64-linux-gnu"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/include-fixed"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/include/c++/11
+ /usr/include/x86_64-linux-gnu/c++/11
+ /usr/include/c++/11/backward
+ /usr/lib/gcc/x86_64-linux-gnu/11/include
+ /usr/local/include
+ /usr/include/x86_64-linux-gnu
+ /usr/include
+End of search list.
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: 449548cbb29044828dc7ea158b577b98
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_6d4d2.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_6d4d2.dir/'
+ as -v --64 -o CMakeFiles/cmTC_6d4d2.dir/CMakeCXXCompilerABI.cpp.o /tmp/cc5ok4Xl.s
+GNU assembler version 2.38 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.38
+COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_6d4d2.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_6d4d2.dir/CMakeCXXCompilerABI.cpp.'
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_6d4d2.dir/build.make:78: CMakeFiles/cmTC_6d4d2.dir/CMakeCXXCompilerABI.cpp.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_6d4d2.dir/CMakeCXXCompilerABI.cpp.o'
+gmake[1]: Leaving directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_6d4d2/fast] Error 2
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_11cad/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_11cad.dir/build.make CMakeFiles/cmTC_11cad.dir/build
+gmake[1]: вход в каталог «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+Building CXX object CMakeFiles/cmTC_11cad.dir/testCXXCompiler.cxx.o
+/usr/bin/c++   /DCOUNT=10  -o CMakeFiles/cmTC_11cad.dir/testCXXCompiler.cxx.o -c /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+gmake[1]: *** [CMakeFiles/cmTC_11cad.dir/build.make:78: CMakeFiles/cmTC_11cad.dir/testCXXCompiler.cxx.o] Ошибка 1
+gmake[1]: *** Удаляется файл «CMakeFiles/cmTC_11cad.dir/testCXXCompiler.cxx.o»
+gmake[1]: выход из каталога «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+gmake: *** [Makefile:127: cmTC_11cad/fast] Ошибка 2
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags:  
+
+The output was:
+1
+/usr/bin/ld: невозможно найти /DCOUNT=10: Нет такого файла или каталога
+collect2: error: ld returned 1 exit status
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: -c 
+
+The output was:
+1
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --c++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--c++’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --ec++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--ec++’; did you mean ‘-Weffc++’?
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+
+The output was:
+1
+c++: warning: ‘-mcpu=’ is deprecated; use ‘-mtune=’ or ‘-march=’ instead
+c++: error: unrecognized command-line option ‘--target=arm-arm-none-eabi’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: /DCOUNT=10
+Id flags: -c;-I__does_not_exist__ 
+
+The output was:
+1
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_160be/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_160be.dir/build.make CMakeFiles/cmTC_160be.dir/build
+gmake[1]: Entering directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_160be.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++   /DCOUNT=10    -v -o CMakeFiles/cmTC_160be.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp
+Using built-in specs.
+COLLECT_GCC=/usr/bin/c++
+OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 11.3.0-1ubuntu1~22.04' --with-bugurl=file:///usr/share/doc/gcc-11/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,m2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-11 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-nvptx/usr,amdgcn-amdhsa=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-gcn/usr --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=2
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 11.3.0 (Ubuntu 11.3.0-1ubuntu1~22.04) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_160be.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_160be.dir/'
+ /usr/lib/gcc/x86_64-linux-gnu/11/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_160be.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -fasynchronous-unwind-tables -fstack-protector-strong -Wformat -Wformat-security -fstack-clash-protection -fcf-protection -o /tmp/ccFSUbN3.s
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring duplicate directory "/usr/include/x86_64-linux-gnu/c++/11"
+ignoring nonexistent directory "/usr/local/include/x86_64-linux-gnu"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/include-fixed"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/include/c++/11
+ /usr/include/x86_64-linux-gnu/c++/11
+ /usr/include/c++/11/backward
+ /usr/lib/gcc/x86_64-linux-gnu/11/include
+ /usr/local/include
+ /usr/include/x86_64-linux-gnu
+ /usr/include
+End of search list.
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: 449548cbb29044828dc7ea158b577b98
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_160be.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_160be.dir/'
+ as -v --64 -o CMakeFiles/cmTC_160be.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccFSUbN3.s
+GNU assembler version 2.38 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.38
+COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_160be.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_160be.dir/CMakeCXXCompilerABI.cpp.'
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_160be.dir/build.make:78: CMakeFiles/cmTC_160be.dir/CMakeCXXCompilerABI.cpp.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_160be.dir/CMakeCXXCompilerABI.cpp.o'
+gmake[1]: Leaving directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_160be/fast] Error 2
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_0cdb6/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_0cdb6.dir/build.make CMakeFiles/cmTC_0cdb6.dir/build
+gmake[1]: вход в каталог «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+Building CXX object CMakeFiles/cmTC_0cdb6.dir/testCXXCompiler.cxx.o
+/usr/bin/c++   /DCOUNT=10  -o CMakeFiles/cmTC_0cdb6.dir/testCXXCompiler.cxx.o -c /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+c++: warning: /DCOUNT=10: linker input file unused because linking not done
+c++: error: /DCOUNT=10: linker input file not found: Нет такого файла или каталога
+gmake[1]: *** [CMakeFiles/cmTC_0cdb6.dir/build.make:78: CMakeFiles/cmTC_0cdb6.dir/testCXXCompiler.cxx.o] Ошибка 1
+gmake[1]: *** Удаляется файл «CMakeFiles/cmTC_0cdb6.dir/testCXXCompiler.cxx.o»
+gmake[1]: выход из каталога «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+gmake: *** [Makefile:127: cmTC_0cdb6/fast] Ошибка 2
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags:  
+
+The output was:
+1
+/usr/bin/ld: невозможно найти DCOUNT=10: Нет такого файла или каталога
+collect2: error: ld returned 1 exit status
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags: -c 
+
+The output was:
+1
+c++: warning: DCOUNT=10: linker input file unused because linking not done
+c++: error: DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags: --c++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--c++’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags: --ec++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--ec++’; did you mean ‘-Weffc++’?
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+
+The output was:
+1
+c++: warning: ‘-mcpu=’ is deprecated; use ‘-mtune=’ or ‘-march=’ instead
+c++: error: unrecognized command-line option ‘--target=arm-arm-none-eabi’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: DCOUNT=10
+Id flags: -c;-I__does_not_exist__ 
+
+The output was:
+1
+c++: warning: DCOUNT=10: linker input file unused because linking not done
+c++: error: DCOUNT=10: linker input file not found: Нет такого файла или каталога
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_ed635/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ed635.dir/build.make CMakeFiles/cmTC_ed635.dir/build
+gmake[1]: Entering directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_ed635.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++   DCOUNT=10    -v -o CMakeFiles/cmTC_ed635.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp
+Using built-in specs.
+COLLECT_GCC=/usr/bin/c++
+OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 11.3.0-1ubuntu1~22.04' --with-bugurl=file:///usr/share/doc/gcc-11/README.Bugs --enable-languages=c,ada,c++,go,brig,d,fortran,objc,obj-c++,m2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-11 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-nvptx/usr,amdgcn-amdhsa=/build/gcc-11-xKiWfi/gcc-11-11.3.0/debian/tmp-gcn/usr --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=2
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 11.3.0 (Ubuntu 11.3.0-1ubuntu1~22.04) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_ed635.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_ed635.dir/'
+ /usr/lib/gcc/x86_64-linux-gnu/11/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_ed635.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -fasynchronous-unwind-tables -fstack-protector-strong -Wformat -Wformat-security -fstack-clash-protection -fcf-protection -o /tmp/cc8MV4Wf.s
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring duplicate directory "/usr/include/x86_64-linux-gnu/c++/11"
+ignoring nonexistent directory "/usr/local/include/x86_64-linux-gnu"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/include-fixed"
+ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/11/../../../../x86_64-linux-gnu/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/include/c++/11
+ /usr/include/x86_64-linux-gnu/c++/11
+ /usr/include/c++/11/backward
+ /usr/lib/gcc/x86_64-linux-gnu/11/include
+ /usr/local/include
+ /usr/include/x86_64-linux-gnu
+ /usr/include
+End of search list.
+GNU C++17 (Ubuntu 11.3.0-1ubuntu1~22.04) version 11.3.0 (x86_64-linux-gnu)
+	compiled by GNU C version 11.3.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: 449548cbb29044828dc7ea158b577b98
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_ed635.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_ed635.dir/'
+ as -v --64 -o CMakeFiles/cmTC_ed635.dir/CMakeCXXCompilerABI.cpp.o /tmp/cc8MV4Wf.s
+GNU assembler version 2.38 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.38
+COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/
+LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/11/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/11/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_ed635.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_ed635.dir/CMakeCXXCompilerABI.cpp.'
+c++: warning: DCOUNT=10: linker input file unused because linking not done
+c++: error: DCOUNT=10: linker input file not found: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTC_ed635.dir/build.make:78: CMakeFiles/cmTC_ed635.dir/CMakeCXXCompilerABI.cpp.o] Error 1
+gmake[1]: *** Deleting file 'CMakeFiles/cmTC_ed635.dir/CMakeCXXCompilerABI.cpp.o'
+gmake[1]: Leaving directory '/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_ed635/fast] Error 2
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_1b385/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_1b385.dir/build.make CMakeFiles/cmTC_1b385.dir/build
+gmake[1]: вход в каталог «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+Building CXX object CMakeFiles/cmTC_1b385.dir/testCXXCompiler.cxx.o
+/usr/bin/c++   DCOUNT=10  -o CMakeFiles/cmTC_1b385.dir/testCXXCompiler.cxx.o -c /media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+c++: warning: DCOUNT=10: linker input file unused because linking not done
+c++: error: DCOUNT=10: linker input file not found: Нет такого файла или каталога
+gmake[1]: *** [CMakeFiles/cmTC_1b385.dir/build.make:78: CMakeFiles/cmTC_1b385.dir/testCXXCompiler.cxx.o] Ошибка 1
+gmake[1]: *** Удаляется файл «CMakeFiles/cmTC_1b385.dir/testCXXCompiler.cxx.o»
+gmake[1]: выход из каталога «/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/CMakeTmp»
+gmake: *** [Makefile:127: cmTC_1b385/fast] Ошибка 2
+
+
+

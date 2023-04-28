@@ -3,18 +3,15 @@
 .text
 
 get_copy_len:
-.cfi_startproc
         push edi
         mov edi, esi
         call strlen
         cmp eax, ecx
-        cmovb ecx, eax # cf = 1, если ниже
+        cmovb ecx, eax
         pop edi
         ret
-.cfi_endproc
 
 strlen:
-.cfi_startproc
         push ecx
         mov ecx, -1
         xor al, al
@@ -24,17 +21,16 @@ strlen:
         mov eax, ecx
         pop ecx
         ret
-.cfi_endproc
 
 my_strncpy:
-        push ebp # Создание кадра стека
+        push ebp
         mov ebp, esp
-        mov edi, [ebp + 8] # Копирование параметров. Здесь указатель на dsc
-        mov esi, [ebp + 12] # src
-        mov ecx, [ebp + 16] # len
+        mov ecx, [ebp + 8]
+        mov edi, [ebp + 12]
+        mov esi, [ebp + 16]
 
         cmp edi, esi
-        jae sub_addr # cf = 0, если больше или равно
+        jae sub_addr
         xchg edi, esi
         mov eax, edi
         sub eax, esi

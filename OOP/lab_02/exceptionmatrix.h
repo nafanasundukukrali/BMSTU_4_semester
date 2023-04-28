@@ -62,6 +62,30 @@ public:
     }
 };
 
+class ExceptionEmptyObject: public Exception
+{
+private:
+    std::string _special_error_message =" (error type: object (matrix ro row) free)\n";
+public:
+    ExceptionEmptyObject(std::string file, std::string class_name, size_t line, std::string message = ""):
+        Exception(file, class_name, line)
+    {
+        _error_message += message + _special_error_message + "\n";
+    }
+};
+
+class ExceptionIncorrectSrcParams: public Exception
+{
+private:
+    std::string _special_error_message =" (error type: source object has incorrect params)\n";
+public:
+    ExceptionIncorrectSrcParams(std::string file, std::string class_name, size_t line, std::string message = ""):
+        Exception(file, class_name, line)
+    {
+        _error_message += message + _special_error_message + "\n";
+    }
+};
+
 #include "exceptionmatrix.hpp"
 
 #endif // EXCEPTION_H

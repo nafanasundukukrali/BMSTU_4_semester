@@ -1,0 +1,7 @@
+/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/lab_08.dir
+/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/edit_cache.dir
+/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/rebuild_cache.dir
+/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/list_install_components.dir
+/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/install.dir
+/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/install/local.dir
+/media/alina/OS/Users/alina/Documents/ВУЗ/Transfer/BMSTU_4_semester/ASM/lab_08/CMakeFiles/install/strip.dir
