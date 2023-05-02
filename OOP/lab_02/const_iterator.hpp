@@ -1,35 +1,35 @@
 #include "const_iterator.h"
 #include "exceptionmatrix.h"
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-IteratorConst<Container, T>::IteratorConst(const Container<T> &container, const size_t index)
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+IteratorConst<Container, Class_T, T>::IteratorConst(const Container<Class_T> &container, const size_t index)
 {
     this->_index = index;
-    this->_data.reset(container._data);
+    this->_data = container._data;
     this->_rows = container._rows;
-    this->_columns = container.columns;
+    this->_columns = container._columns;
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-bool IteratorConst<Container, T>::operator != (IteratorConst const& iterator) const
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+bool IteratorConst<Container, Class_T, T>::operator != (IteratorConst<Container, Class_T, T> const& iterator) const
 {
     return this->_index != iterator._index;
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-bool IteratorConst<Container, T>::operator == (IteratorConst const& other) const
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+bool IteratorConst<Container, Class_T, T>::operator == (IteratorConst<Container, Class_T, T> const& other) const
 {
     return this->_index == other._index;
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-bool IteratorConst<Container, T>::operator < (IteratorConst const& other) const
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+bool IteratorConst<Container, Class_T, T>::operator < (IteratorConst<Container, Class_T, T> const& other) const
 {
     return this->_index < other._index;
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-IteratorConst<Container, T> IteratorConst<Container, T>::operator + (const int value)
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+IteratorConst<Container, Class_T, T> IteratorConst<Container, Class_T, T>::operator + (const int value)
 {
    if (value < 0 && this->_index < static_cast<size_t>(-value))
        this->_index = 0;
@@ -42,14 +42,14 @@ IteratorConst<Container, T> IteratorConst<Container, T>::operator + (const int v
    return this;
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-IteratorConst<Container, T> IteratorConst<Container, T>::operator - (const int value)
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+IteratorConst<Container, Class_T, T> IteratorConst<Container, Class_T, T>::operator - (const int value)
 {
     return operator + (-value);
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-IteratorConst<Container, T> &IteratorConst<Container, T>::operator += (const int value)
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+IteratorConst<Container, Class_T, T> &IteratorConst<Container, Class_T, T>::operator += (const int value)
 {
     operator + (value);
 
@@ -57,8 +57,8 @@ IteratorConst<Container, T> &IteratorConst<Container, T>::operator += (const int
 }
 
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-IteratorConst<Container, T> &IteratorConst<Container, T>::operator = (const IteratorConst<Container, T> &iterator)
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+IteratorConst<Container, Class_T, T> &IteratorConst<Container, Class_T, T>::operator = (const IteratorConst<Container, Class_T, T> &iterator)
 {
     this->_data = iterator._data;
     this->_index = iterator._index;
@@ -69,8 +69,8 @@ IteratorConst<Container, T> &IteratorConst<Container, T>::operator = (const Iter
 }
 
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-IteratorConst<Container, T> &IteratorConst<Container, T>::operator ++()
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+IteratorConst<Container, Class_T, T> &IteratorConst<Container, Class_T, T>::operator ++()
 {
     if (this->_index < this->_columns *this->_rows)
        this->_index++;
@@ -78,8 +78,8 @@ IteratorConst<Container, T> &IteratorConst<Container, T>::operator ++()
     return *this;
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-IteratorConst<Container, T> IteratorConst<Container, T>::operator ++(int) const
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+IteratorConst<Container, Class_T, T> IteratorConst<Container, Class_T, T>::operator ++(int) const
 {
     IteratorConst& buffer = *this;
     ++(*this);
@@ -88,8 +88,8 @@ IteratorConst<Container, T> IteratorConst<Container, T>::operator ++(int) const
 }
 
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-IteratorConst<Container, T> &IteratorConst<Container, T>::operator --()
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+IteratorConst<Container, Class_T, T> &IteratorConst<Container, Class_T, T>::operator --()
 {
     if (this->_index > 0)
        this->_index--;
@@ -97,8 +97,8 @@ IteratorConst<Container, T> &IteratorConst<Container, T>::operator --()
     return *this;
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-IteratorConst<Container, T> IteratorConst<Container, T>::operator --(int) const
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+IteratorConst<Container, Class_T, T> IteratorConst<Container, Class_T, T>::operator --(int) const
 {
     IteratorConst& buffer = *this;
     --(*this);
@@ -106,19 +106,19 @@ IteratorConst<Container, T> IteratorConst<Container, T>::operator --(int) const
     return buffer;
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-T &IteratorConst<Container, T>::operator *() const
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+T &IteratorConst<Container, Class_T, T>::operator *() const
 {
     this->_check_data_expairing(__LINE__, typeid(*this).name());
-    this->_check_valid_index(__LINE__, typeid(*this).name());
+    this->_check_valid_index(__LINE__, typeid(this).name());
 
     std::shared_ptr<T[]> buffer = this->_data.lock();
 
     return *(buffer.get() + this->_index);
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-T *IteratorConst<Container, T>::operator ->() const
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+T *IteratorConst<Container, Class_T, T>::operator ->() const
 {
     this->_check_data_expairing(__LINE__, typeid(*this).name());
     this->_check_valid_index(__LINE__, typeid(*this).name());
@@ -128,8 +128,8 @@ T *IteratorConst<Container, T>::operator ->() const
     return buffer.get() + this->_index;
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-void IteratorConst<Container, T>::_check_valid_index(size_t line, std::string class_name)
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+void IteratorConst<Container, Class_T, T>::_check_valid_index(const size_t line, const std::string class_name) const
 {
     if (this->_index < this->_rows * this->_columns)
         return;
@@ -137,8 +137,8 @@ void IteratorConst<Container, T>::_check_valid_index(size_t line, std::string cl
     throw ExceptionIndex(__FILE__, class_name, line);
 }
 
-template<template <typename U> class Container, typename T> requires ContainerRequires<Container, T>
-void IteratorConst<Container, T>::_check_data_expairing(size_t line, std::string class_name)
+template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
+void IteratorConst<Container, Class_T, T>::_check_data_expairing(const size_t line, const std::string class_name) const
 {
     if (!this->_data.expired())
         return;

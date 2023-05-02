@@ -9,17 +9,18 @@
 #include "exceptionmatrix.h"
 #include <cstddef>
 #include <ranges>
+#include <iostream>
 
 template<typename T>
 class Matrix: public MatrixBase
 {
-    friend Iterator<Matrix, T>;
-    friend IteratorConst<Matrix, T>;
+    friend Iterator<Matrix, T, MatrixRow<T>>;
+    friend IteratorConst<Matrix, T, MatrixRow<T>>;
 public:
     explicit Matrix() = default;
     Matrix(const size_t rows, const size_t columns);
-    Matrix(const Matrix &matrix);
-    Matrix(Matrix &&matrix);
+    explicit Matrix(const Matrix<T> &matrix);
+    Matrix(Matrix<T> &&matrix);
     Matrix(std::initializer_list<std::initializer_list<T>> list);
     ~Matrix() noexcept = default;
 
@@ -27,47 +28,52 @@ public:
     Matrix<T>& operator = (Matrix<T>&& matrix);
     Matrix<T>& operator = (std::initializer_list<std::initializer_list<T>> list);
 
+    bool operator == (const Matrix<T>& matrix) const;
+    bool operator != (const Matrix<T>& matrix) const;
 
+    Matrix<T>& operator += (const Matrix<T>& matrix);
+    Matrix<T> operator + (const Matrix<T>& matrix);
 
-    bool operator == (const Matrix& matrix) const;
-    bool operator != (const Matrix& matrix) const;
+    Matrix<T>& operator -= (const Matrix<T>& matrix);
+    Matrix<T> operator - (const Matrix<T>& matrix);
+
+    Matrix<T>& operator *= (const Matrix<T>& matrix);
+    Matrix<T>& operator *= (const T value);
+    Matrix<T> operator * (const Matrix<T>& matrix);
+    Matrix<T> operator * (const T value);
+
+    MatrixRow<T>& operator [] (size_t row);
+    const MatrixRow<T>& operator [] (size_t row) const;
+
+    Matrix<T> sum(const Matrix<T>& matrix);
+    Matrix<T> sub(const Matrix<T>& matrix);
+    Matrix<T> mul(const T value);
 
     void change_columns(size_t from_position, size_t to_position);
     void change_rows(size_t from_position, size_t to_position);
-    void add_column(size_t previously_column_number, std::initializer_list<std::initializer_list<T>> list);
-    void add_row(size_t previosly_row_number, std::initializer_list<std::initializer_list<T>> list);
+    void add_column(size_t post_column_number, std::initializer_list<T> list);
+    void add_row(size_t post_row_number, std::initializer_list<T> list);
     void delete_column(size_t column_number);
     void delete_row(size_t row_number);
 
-    bool is_zero() const;
-    bool is_square() const;
+    Iterator<Matrix, T, MatrixRow<T>> begin();
+    Iterator<Matrix, T, MatrixRow<T>> end();
+    IteratorConst<Matrix, T, MatrixRow<T>> begin() const;
+    IteratorConst<Matrix, T, MatrixRow<T>> end() const;
+    IteratorConst<Matrix, T, MatrixRow<T>> cbegin() const;
+    IteratorConst<Matrix, T, MatrixRow<T>> cend() const;
 
-    Matrix &transpose();
-
-    Iterator< Matrix, MatrixRow<T>> begin();
-    Iterator< Matrix, MatrixRow<T>> end();
-    IteratorConst<Matrix, MatrixRow<T>> begin() const;
-    IteratorConst<Matrix, MatrixRow<T>> end() const;
-    IteratorConst<Matrix, MatrixRow<T>> cbegin() const;
-    IteratorConst<Matrix, MatrixRow<T>> cend() const;
-    Iterator< Matrix, MatrixRow<T>> rbegin();
-    Iterator< Matrix, MatrixRow<T>> rend();
-    IteratorConst<Matrix, MatrixRow<T>> rbegin() const;
-    IteratorConst<Matrix, MatrixRow<T>> rend() const;
-    IteratorConst<Matrix, MatrixRow<T>> crbegin() const;
-    IteratorConst<Matrix, MatrixRow<T>> crend() const;
-
-    void fill(Iterator<Matrix, MatrixRow<T>> start, const Iterator<Matrix, MatrixRow<T>> &end, const T &value);
-    void fill(Iterator<Matrix, MatrixRow<T>> start, Iterator<Matrix, MatrixRow<T>> source_start, const Iterator<Matrix, MatrixRow<T>> &source_end);
-
-    // friend std::ostream& operator << (std::ostream& os, const Matrix<T>& mtrx);
+    size_t get_rows_count() const;
+    IteratorConst<Matrix, T, MatrixRow<T>> size() const;
 
 private:
     std::shared_ptr<MatrixRow<T>[]> _data = nullptr;
     void _reallocate_data();
     void _check_input_matrix_size_params();
+    void _copy_data_from_another_range(auto &range);
 };
 
+static_assert(std::ranges::bidirectional_range<Matrix<int>>);
 //static_assert(std::ranges::bidirectional_range<Matrix<int>>);
 
 #include "matrix.hpp"

@@ -1,1 +1,0 @@
-/usr/bin/c++ "-DCOUNT=50" -m80387 -mno-80387  -mno-sse  -masm=intel -Wall -Werror CMakeFiles/lab_08.dir/main.cpp.o -o lab_08 

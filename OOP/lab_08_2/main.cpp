@@ -45,9 +45,9 @@ int main()
     printf("%s", "sin(x):\n");
     printf("sin(3.14) = %.20f\n", sin_asm(3.14));
     printf("sin(3.141596) = %.20f\n", sin_asm(3.141596));
-    printf("sin(FPU IP / 2) = %.20f\n", sin_asm(0, true));
+    printf("sin(FPU PI) = %.20f\n", sin_asm(0, true));
     printf("%s", "sin(x / 2):\n");
     printf("sin(3.14 / 2) = %.20f\n", sin_asm(3.14 / 2.0));
     printf("sin(3.141596 / 2) = %.20f\n", sin_asm(3.141596 / 2.0));
-    printf("sin(FPU IP / 2) = %.20f\n", sin_half_asm());
+    printf("sin(FPU PI / 2) = %.20f\n", sin_half_asm());
 }

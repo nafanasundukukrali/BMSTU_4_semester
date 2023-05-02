@@ -7,28 +7,39 @@ project(lab_02 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
-set(CMAKE_CXX_FLAGS "-fconcepts-diagnostics-depth=3")
+set(CMAKE_AUTOMOC ON)
+
+set(CMAKE_CXX_FLAGS "-fconcepts-diagnostics-depth=3 -g3")
 find_package(Qt6 REQUIRED COMPONENTS Test)
 
-add_executable(lab_02
-    matrix.h
+set(FILES matrix.h
     matrix.hpp
     iterator.h
     iterator.hpp
     matrixbase.h
-    matrixbase.hpp
     matrixrow.h
     matrixrow.hpp
-    testmatrixrow.h
-    testmatrixrow.hpp
     const_iterator.h
     const_iterator.hpp
     exceptionmatrix.h
     exceptionmatrix.hpp
-    main.cpp
     concepts.h)
+
+string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UP)
+if (${CMAKE_BUILD_TYPE_UP} STREQUAL "RELEASE")
+    add_executable(lab_02
+        testmatrix.h
+        testmatrix.cpp
+        ${FILES})
+else()
+    add_executable(lab_02
+        main.cpp
+        ${FILES})
+endif()
+
+target_link_libraries(lab_02 PRIVATE Qt6::Test)
+
 install(TARGETS lab_02
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-target_link_libraries(lab_02 PRIVATE Qt6::Test)
 
 
