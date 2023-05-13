@@ -1,0 +1,146 @@
+     1                                  global _start
+     2                                  extern gtk_init
+     3                                  extern gtk_window_new
+     4                                  extern gtk_signal_connect
+     5                                  extern g_list_append
+     6                                  extern gtk_combo_new
+     7                                  extern gtk_container_add
+     8                                  extern gtk_container_set_border_width
+     9                                  extern gtk_widget_show
+    10                                  extern gtk_main
+    11                                  extern gtk_main_quit
+    12                                  extern g_print
+    13                                  extern gtk_combo_set_popdown_strings
+    14                                  extern gtk_signal_connect
+    15                                  
+    16                                  GTK_WINDOW_TOPLEVEL equ 0
+    17                                  
+    18                                  section .text
+    19                                  _start:
+    20 00000000 89E5                    mov ebp,esp ;create stack frame
+    21 00000002 83EC0C                  sub esp,12 ;allocate local storage
+    22                                  ; [ebp-4] pointer to window structure
+    23                                  ; [ebp-8] pointer to combo box
+    24                                  ; [ebp-12] list pointer
+    25                                  
+    26                                  ; Initialize GTK
+    27                                  ; gtk_init (&argc, &argv);
+    28 00000005 68[00000000]            push argv ;argv pointer
+    29 0000000A 68[0C000000]            push argc ;argc pointer
+    30 0000000F E8(00000000)            call gtk_init
+    31 00000014 83C408                  add esp,8 ;clean up stack
+    32                                  ;
+    33                                  ; Create the new window
+    34 00000017 6A00                    push GTK_WINDOW_TOPLEVEL
+    35 00000019 E8(00000000)            call gtk_window_new
+    36 0000001E 83C404                  add esp,4 ;clean up stack
+    37 00000021 8945FC                  mov [ebp-4],eax ;-> window structure
+    38                                  
+    39                                  ; /*--Connect the window to the destroyapp function --*/
+    40                                  ; gtk_signal_connect(GTK_OBJECT(window), "delete_event", GTK_SIGNAL_FUNC(destroyapp), NULL);
+    41 00000024 6A00                    push 0
+    42 00000026 68[06010000]            push close
+    43 0000002B 68[47000000]            push eventstr
+    44 00000030 FF75FC                  push dword [ebp-4] ;window ptr
+    45 00000033 E8(00000000)            call gtk_signal_connect
+    46                                  
+    47                                  ; Items to be added to combo widget
+    48 00000038 C745F400000000          mov dword [ebp-12],0 ;null list
+    49 0000003F 68[28000000]            push item1
+    50 00000044 FF75F4                  push dword [ebp-12]
+    51 00000047 E8(00000000)            call g_list_append
+    52 0000004C 83C408                  add esp,8
+    53 0000004F 8945F4                  mov [ebp-12],eax
+    54 00000052 68[2D000000]            push item2
+    55 00000057 FF75F4                  push dword [ebp-12]
+    56 0000005A E8(00000000)            call g_list_append
+    57 0000005F 83C408                  add esp,8
+    58 00000062 8945F4                  mov [ebp-12],eax
+    59 00000065 68[32000000]            push item3
+    60 0000006A FF75F4                  push dword [ebp-12]
+    61 0000006D E8(00000000)            call g_list_append
+    62 00000072 83C408                  add esp,8
+    63 00000075 8945F4                  mov [ebp-12],eax
+    64 00000078 68[37000000]            push item4
+    65 0000007D FF75F4                  push dword [ebp-12]
+    66 00000080 E8(00000000)            call g_list_append
+    67 00000085 83C408                  add esp,8
+    68 00000088 8945F4                  mov [ebp-12],eax
+    69 0000008B 68[3E000000]            push item5
+    70 00000090 FF75F4                  push dword [ebp-12]
+    71 00000093 E8(00000000)            call g_list_append
+    72 00000098 83C408                  add esp,8
+    73 0000009B 8945F4                  mov [ebp-12],eax
+    74 0000009E 68[43000000]            push item6
+    75 000000A3 FF75F4                  push dword [ebp-12]
+    76 000000A6 E8(00000000)            call g_list_append
+    77 000000AB 83C408                  add esp,8
+    78 000000AE 8945F4                  mov [ebp-12],eax
+    79                                  
+    80                                  ; Create a new combo widget
+    81 000000B1 E8(00000000)            call gtk_combo_new
+    82 000000B6 8945F8                  mov [ebp-8],eax ;-> combo box structure
+    83                                  
+    84                                  ; Set items in the popup list
+    85 000000B9 FF75F4                  push dword [ebp-12] ;items list
+    86 000000BC FF75F8                  push dword [ebp-8] ;combo box
+    87 000000BF E8(00000000)            call gtk_combo_set_popdown_strings
+    88 000000C4 83C408                  add esp,8
+    89                                  
+    90                                  ; Add combo widget to window
+    91 000000C7 FF75F8                  push dword [ebp-8] ;combo
+    92 000000CA FF75FC                  push dword [ebp-4] ;window
+    93 000000CD E8(00000000)            call gtk_container_add
+    94 000000D2 83C408                  add esp,8 ;clean up stack
+    95                                  
+    96                                  ; Add a border to the window to give the button a little room
+    97 000000D5 6A0F                    push 15 ;border width
+    98 000000D7 FF75FC                  push dword [ebp-4] ;window
+    99 000000DA E8(00000000)            call gtk_container_set_border_width
+   100 000000DF 83C408                  add esp,8 ;clean up stack
+   101                                  
+   102                                  ; Display the widgets
+   103 000000E2 FF75F8                  push dword [ebp-8] ;combo
+   104 000000E5 E8(00000000)            call gtk_widget_show
+   105 000000EA 83C404                  add esp,4 ;clean up stack
+   106 000000ED FF75FC                  push dword [ebp-4] ;window
+   107 000000F0 E8(00000000)            call gtk_widget_show
+   108 000000F5 83C404                  add esp,4 ;clean up stack
+   109                                  
+   110                                  ; /*-- Start the GTK event loop--*/
+   111 000000F8 E8(00000000)            call gtk_main
+   112                                  ;------------------------------------------------
+   113                                  ;exit with return = 0
+   114                                  ;------------------------------------------------
+   115 000000FD B801000000              exit: mov eax,1 ;linux exit
+   116 00000102 31DB                    xor ebx,ebx ;return code
+   117 00000104 CD80                    int 80h ;does not return
+   118                                  ;------------------------------------------------
+   119                                  ;callback routines
+   120                                  ;------------------------------------------------
+   121                                  ; This function allows the program to exit properly when the window is closed
+   122 00000106 68[10000000]            close: push quitstr
+   123 0000010B E8(00000000)            call g_print;
+   124 00000110 83C404                  add esp,4
+   125 00000113 E8(00000000)            call gtk_main_quit
+   126 00000118 C3                      ret
+   127                                  ;-----------------------------------------------
+   128                                  ;data section
+   129                                  ;-----------------------------------------------
+   130                                  section .data
+   131 00000000 [04000000]              argv dd arglist
+   132 00000004 [1D000000]              arglist dd title
+   133 00000008 00000000                dd 0
+   134 0000000C 01000000                argc dd 1
+   135 00000010 5175697474696E672E-     quitstr db 'Quitting...',10,0
+   135 00000019 2E2E0A00           
+   136 0000001D 417373656D626C6572-     title db 'Assemblers',0
+   136 00000026 7300               
+   137 00000028 4E41534D00              item1 db 'NASM',0
+   138 0000002D 4641534D00              item2 db 'FASM',0
+   139 00000032 5941534D00              item3 db 'YASM',0
+   140 00000037 526F7341736D00          item4 db 'RosAsm',0
+   141 0000003E 4D41534D00              item5 db 'MASM',0
+   142 00000043 484C4100                item6 db 'HLA',0
+   143 00000047 64656C6574655F6576-     eventstr db 'delete_event',0
+   143 00000050 656E7400           

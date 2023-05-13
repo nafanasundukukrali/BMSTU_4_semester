@@ -39,38 +39,46 @@ bool Iterator<Container, Class_T, T>::operator < (Iterator<Container, Class_T, T
 }
 
 template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
-Iterator<Container, Class_T, T> Iterator<Container, Class_T, T>::operator + (const int value)
+Iterator<Container, Class_T, T> Iterator<Container, Class_T, T>::operator + (const size_t value)
 {
     Iterator<Container, Class_T, T> buffer(*this);
-    if (value < 0 && this->_index < static_cast<size_t>(-value))
-        this->_index = 0;
-    else
-        this->_index++;
-    if (this->_index > this->_rows * this->_columns)
-        this->_index = this->_rows * this->_columns;
 
-   return buffer;
+    buffer += value;
+
+    return buffer;
 }
 
 template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
-Iterator<Container, Class_T, T> Iterator<Container, Class_T, T>::operator - (const int value)
+Iterator<Container, Class_T, T> Iterator<Container, Class_T, T>::operator - (const size_t value)
 {
-    return operator + (-value);
+    Iterator<Container, Class_T, T> buffer(*this);
+
+    buffer -= value;
+
+    return buffer;
 }
 
 template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
-Iterator<Container, Class_T, T> &Iterator<Container, Class_T, T>::operator += (const int value)
+Iterator<Container, Class_T, T> &Iterator<Container, Class_T, T>::operator += (const size_t value)
 {
-    operator + (value);
+    this->_check_data_expairing(__LINE__);
+
+    this->_index += value;
+
+    this->_check_valid_index(__LINE__);
 
     return *this;
 }
 
 
 template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
-Iterator<Container, Class_T, T> &Iterator<Container, Class_T, T>::operator -= (const int value)
+Iterator<Container, Class_T, T> &Iterator<Container, Class_T, T>::operator -= (const size_t value)
 {
-    operator - (value);
+    this->_check_data_expairing(__LINE__);
+
+    this->_index -= value;
+
+    this->_check_valid_index(__LINE__);
 
     return *this;
 }
@@ -90,7 +98,7 @@ Iterator<Container, Class_T, T> &Iterator<Container, Class_T, T>::operator = (co
 template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
 Iterator<Container, Class_T, T> &Iterator<Container, Class_T, T>::operator ++()
 {
-    if (this->_index < this->_columns *this->_rows)
+    if (this->_index < this->_columns * this->_rows)
        this->_index++;
 
     return *this;
@@ -128,8 +136,8 @@ Iterator<Container, Class_T, T> Iterator<Container, Class_T, T>::operator --(int
 template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
 T &Iterator<Container, Class_T, T>::operator *()
 {
-    this->_check_data_expairing(__LINE__, typeid(*this).name());
-    this->_check_valid_index(__LINE__, typeid(*this).name());
+    this->_check_data_expairing(__LINE__);
+    this->_check_valid_index(__LINE__);
 
     std::shared_ptr<T[]> buffer = this->_data.lock();
 
@@ -139,8 +147,8 @@ T &Iterator<Container, Class_T, T>::operator *()
 template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
 T &Iterator<Container, Class_T, T>::operator *() const
 {
-    this->_check_data_expairing(__LINE__, typeid(*this).name());
-    this->_check_valid_index(__LINE__, typeid(*this).name());
+    this->_check_data_expairing(__LINE__);
+    this->_check_valid_index(__LINE__);
 
     std::shared_ptr<T[]> buffer = this->_data.lock();
 
@@ -150,8 +158,8 @@ T &Iterator<Container, Class_T, T>::operator *() const
 template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
 T *Iterator<Container, Class_T, T>::operator ->()
 {
-    this->_check_data_expairing(__LINE__, typeid(*this).name());
-    this->_check_valid_index(__LINE__, typeid(*this).name());
+    this->_check_data_expairing(__LINE__);
+    this->_check_valid_index(__LINE__);
 
     std::shared_ptr<T[]> buffer = this->_data.lock();
 
@@ -159,10 +167,10 @@ T *Iterator<Container, Class_T, T>::operator ->()
 }
 
 template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
-T*Iterator<Container, Class_T, T>::operator ->() const
+T *Iterator<Container, Class_T, T>::operator ->() const
 {
-    this->_check_data_expairing(__LINE__, typeid(*this).name());
-    this->_check_valid_index(__LINE__, typeid(*this).name());
+    this->_check_data_expairing(__LINE__);
+    this->_check_valid_index(__LINE__);
 
     std::shared_ptr<T[]> buffer = this->_data.lock();
 
@@ -170,19 +178,19 @@ T*Iterator<Container, Class_T, T>::operator ->() const
 }
 
 template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
-void Iterator<Container, Class_T, T>::_check_valid_index(size_t line, std::string class_name)
+void Iterator<Container, Class_T, T>::_check_valid_index(size_t line) const
 {
-    if (this->_index < this->_rows * this->_columns)
+    if (this->_index <= this->_rows * this->_columns)
         return;
 
-    throw ExceptionIndex(__FILE__, class_name, line);
+    throw ExceptionIndex(__FILE__, line);
 }
 
 template<template <typename> class Container, typename Class_T, typename T> requires ContainerRequires<Container, Class_T, T>
-void Iterator<Container, Class_T, T>::_check_data_expairing(size_t line, std::string class_name)
+void Iterator<Container, Class_T, T>::_check_data_expairing(size_t line) const
 {
     if (!this->_data.expired())
         return;
 
-    throw ExceptionDataExpaired(__FILE__, class_name, line);
+    throw ExceptionDataExpaired(__FILE__, line);
 }

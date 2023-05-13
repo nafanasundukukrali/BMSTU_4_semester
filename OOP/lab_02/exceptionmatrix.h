@@ -13,7 +13,7 @@ class Exception: public std::exception
 protected:
     std::string _error_message;
 public:
-    Exception(std::string file, std::string class_name, size_t line)
+    Exception(std::string file, size_t line)
     {
         auto error_time = std::time(nullptr);
         auto tm = *std::localtime(&error_time);
@@ -21,7 +21,7 @@ public:
         ss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
         ss.imbue(std::locale("ru_RU.utf-8"));
 
-        _error_message = "\nFile name: " + file + "\nIn line " + std::to_string(line) + ", in class " + class_name
+        _error_message = "\nFile name: " + file + "\nIn line " + std::to_string(line)
                          + "\nTime: " + ss.str() + "\nInfo: ";
     }
 
@@ -36,10 +36,10 @@ public:
 class ExceptionIndex: public Exception
 {
 private:
-    std::string _special_error_message =" (error type: index error)\n";
+    std::string _special_error_message = " (error type: index error)\n";
 public:
-    ExceptionIndex(std::string file, std::string class_name, size_t line, std::string message = ""):
-        Exception(file, class_name, line)
+    ExceptionIndex(std::string file, size_t line, std::string message = ""):
+        Exception(file, line)
     {
         _error_message += message + _special_error_message + "\"";
     }
@@ -49,10 +49,10 @@ public:
 class ExceptionDataExpaired: public Exception
 {
 private:
-    std::string _special_error_message =" (error type: data is expired)\n";
+    std::string _special_error_message = " (error type: data is expired)\n";
 public:
-    ExceptionDataExpaired(std::string file, std::string class_name, size_t line, std::string message = ""):
-        Exception(file, class_name, line)
+    ExceptionDataExpaired(std::string file, size_t line, std::string message = ""):
+        Exception(file, line)
     {
         _error_message += message + _special_error_message + "\n";
     }
@@ -61,10 +61,10 @@ public:
 class ExceptionBadAllocate: public Exception
 {
 private:
-    std::string _special_error_message =" (error type: bad Allocate)\n";
+    std::string _special_error_message = " (error type: bad Allocate)\n";
 public:
-    ExceptionBadAllocate(std::string file, std::string class_name, size_t line, std::string message = ""):
-        Exception(file, class_name, line)
+    ExceptionBadAllocate(std::string file, size_t line, std::string message = ""):
+        Exception(file, line)
     {
         _error_message += message + _special_error_message + "\n";
     }
@@ -73,10 +73,10 @@ public:
 class ExceptionEmptyObject: public Exception
 {
 private:
-    std::string _special_error_message =" (error type: object (matrix ro row) free)\n";
+    std::string _special_error_message = " (error type: object (matrix ro row) free)\n";
 public:
-    ExceptionEmptyObject(std::string file, std::string class_name, size_t line, std::string message = ""):
-        Exception(file, class_name, line)
+    ExceptionEmptyObject(std::string file, size_t line, std::string message = ""):
+        Exception(file, line)
     {
         _error_message += message + _special_error_message + "\n";
     }
@@ -85,10 +85,10 @@ public:
 class ExceptionIncorrectSrcParams: public Exception
 {
 private:
-    std::string _special_error_message =" (error type: source object has incorrect params)\n";
+    std::string _special_error_message = " (error type: source object has incorrect params)\n";
 public:
-    ExceptionIncorrectSrcParams(std::string file, std::string class_name, size_t line, std::string message = ""):
-        Exception(file, class_name, line)
+    ExceptionIncorrectSrcParams(std::string file, size_t line, std::string message = ""):
+        Exception(file, line)
     {
         _error_message += message + _special_error_message + "\n";
     }
@@ -97,10 +97,46 @@ public:
 class ExceptionImpossibleOperation: public Exception
 {
 private:
-    std::string _special_error_message =" (error type: this operation is impossible for objects.)\n";
+    std::string _special_error_message = " (error type: this operation is impossible for objects.)\n";
 public:
-    ExceptionImpossibleOperation(std::string file, std::string class_name, size_t line, std::string message = ""):
-        Exception(file, class_name, line)
+    ExceptionImpossibleOperation(std::string file, size_t line, std::string message = ""):
+        Exception(file, line)
+    {
+        _error_message += message + _special_error_message + "\n";
+    }
+};
+
+class ExceptionNullObjectPointer: public Exception
+{
+private:
+    std::string _special_error_message = " (error type: there was met null pointer)\n";
+public:
+    ExceptionNullObjectPointer(std::string file, size_t line, std::string message = ""):
+        Exception(file, line)
+    {
+        _error_message += message + _special_error_message + "\n";
+    }
+};
+
+class ExceptionRowNotIterrable: public Exception
+{
+private:
+    std::string _special_error_message = " (error type: there was no iterable row)\n";
+public:
+    ExceptionRowNotIterrable(std::string file, size_t line, std::string message = ""):
+        Exception(file, line)
+    {
+        _error_message += message + _special_error_message + "\n";
+    }
+};
+
+class ExceptionImpossibleToDivide: public Exception
+{
+private:
+    std::string _special_error_message = " (error type: there was no way to divide objects)\n";
+public:
+    ExceptionImpossibleToDivide(std::string file, size_t line, std::string message = ""):
+        Exception(file, line)
     {
         _error_message += message + _special_error_message + "\n";
     }

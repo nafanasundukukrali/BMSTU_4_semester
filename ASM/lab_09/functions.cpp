@@ -2,6 +2,7 @@
 #define FUNCTIONS_H
 
 #include <concepts>
+#include <memory>
 
 std::size_t calculate_cx(const std::size_t size)
 {
@@ -24,9 +25,12 @@ template<typename T> requires FloatType<T>
 }
 
 template<typename T> requires FloatType<T>
-    void sum_vector_asm(T*v_1, T*v_2, const std::size_t size)
+void sum_vector_asm(std::shared_ptr<T[]> &v_1, std::shared_ptr<T[]> &v_2, const std::size_t size)
 {
     std::size_t new_size = calculate_cx(size);
+
+    T *a_1 = v_1.get();
+    T *a_2 = v_2.get();
 
     asm (
         "mov rcx, %2 \n\t"
@@ -39,10 +43,13 @@ template<typename T> requires FloatType<T>
         "mov rax, 8 \n\t"
         "add rsi, rax \n\t"
         "loop reader_1 \n\t"
-        : "=m" (v_1)
-        : "m" (v_2), "r"(new_size)
-        : "rcx", "rsi"
+        : "=r" (a_1)
+        : "r" (a_2), "r"(new_size)
+        : "rcx", "rsi", "ymm0", "ymm1"
         );
+
+    return;
+
 }
 
 #endif // FUNCTIONS_H

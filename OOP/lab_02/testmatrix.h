@@ -21,6 +21,7 @@ private slots:
     void delete_column();
     void delete_row();
     void get_matrix_element();
+    void transpose();
 };
 
 #endif // TESTMATRIXROW_H

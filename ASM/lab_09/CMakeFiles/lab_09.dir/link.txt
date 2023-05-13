@@ -1,0 +1,1 @@
+/usr/bin/c++ "-DTEST_ARRAY_SIZE=31" -mavx -masm=intel -g3 CMakeFiles/lab_09.dir/main.cpp.o -o lab_09 

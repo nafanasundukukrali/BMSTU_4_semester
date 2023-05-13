@@ -13,20 +13,22 @@ public:
     virtual size_t get_rows_count() const = 0;
     size_t get_columns_count() const { return this->_columns; };
 protected:
-    std::string _get_class_name_new() {
-        return typeid(*this).name();
-    };
-
-    void _validate_empty_new() const {
+    void _validate_empty(size_t line) const {
         if (this->_columns == 0 || this->_rows == 0)
-            throw ExceptionEmptyObject(__FILE__, typeid(this).name(), __LINE__);
+            throw ExceptionEmptyObject(__FILE__, line);
     };
 
-    void _validate_another_matrix_row_params_new(size_t rows, size_t columns)
+    void _validate_another_matrix_params(size_t rows, size_t columns, size_t line)
     {
         if (this->_rows != rows || this->_columns != columns)
-            throw ExceptionIncorrectSrcParams(__FILE__, typeid(*this).name(), __LINE__);
+            throw ExceptionIncorrectSrcParams(__FILE__, line);
     };
+
+    void _validate_input_pointer(void *pointer, size_t line)
+    {
+        if (pointer == NULL)
+            throw ExceptionNullObjectPointer(__FILE__, line);
+    }
 
     size_t _rows = 0;
     size_t _columns = 0;

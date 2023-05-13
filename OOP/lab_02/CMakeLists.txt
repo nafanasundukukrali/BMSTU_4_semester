@@ -22,8 +22,10 @@ set(FILES matrix.h
     const_iterator.h
     const_iterator.hpp
     exceptionmatrix.h
-    exceptionmatrix.hpp
-    concepts.h)
+    concepts.h
+#    range.h
+#    range.cpp
+)
 
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UP)
 if (${CMAKE_BUILD_TYPE_UP} STREQUAL "RELEASE")
@@ -32,6 +34,7 @@ if (${CMAKE_BUILD_TYPE_UP} STREQUAL "RELEASE")
         testmatrix.cpp
         ${FILES})
 else()
+    SET(CMAKE_BUILD_TYPE Debug)
     add_executable(lab_02
         main.cpp
         ${FILES})

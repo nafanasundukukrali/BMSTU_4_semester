@@ -1,4 +1,4 @@
-#include "testmatrix.h"
+ #include "testmatrix.h"
 #include "matrix.h"
 
 void TestMatrix::base_constructor()
@@ -28,7 +28,7 @@ void TestMatrix::sum_matrix()
 void TestMatrix::sub_matrix()
 {
     Matrix<int> matrix {{1, 2, 6}, {3, 4, 5}};
-    Matrix<int> matrix_1 = matrix;
+    Matrix<int> matrix_1(matrix);
     Matrix<int> result = matrix - matrix_1;
     Matrix<int> real_res {{0, 0, 0}, {0, 0, 0}};
 
@@ -124,6 +124,14 @@ void TestMatrix::get_matrix_element()
     int value = matrix[1][2];
 
     QVERIFY(value == 5);
+}
+
+void TestMatrix::transpose()
+{
+    Matrix<int> matrix {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    Matrix<int> matrix_r {{1, 4, 7}, {2, 5, 8}, {3, 6, 9}};
+
+    QVERIFY(matrix_r == matrix.transpose());
 }
 
 QTEST_MAIN(TestMatrix)

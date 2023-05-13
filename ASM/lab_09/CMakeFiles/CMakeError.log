@@ -1,0 +1,67 @@
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: "-DTEST_COUNT=30;;;;;;;;;;;;;;;;;-DTEST_ARRAY_SIZE=10"
+Id flags:  
+
+The output was:
+1
+<command-line>: warning: missing terminating " character
+/usr/bin/ld: невозможно найти "-DTEST_COUNT=30: Нет такого файла или каталога
+collect2: error: ld returned 1 exit status
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: "-DTEST_COUNT=30;;;;;;;;;;;;;;;;;-DTEST_ARRAY_SIZE=10"
+Id flags: -c 
+
+The output was:
+1
+<command-line>: warning: missing terminating " character
+c++: warning: "-DTEST_COUNT=30: linker input file unused because linking not done
+c++: error: "-DTEST_COUNT=30: linker input file not found: Нет такого файла или каталога
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: "-DTEST_COUNT=30;;;;;;;;;;;;;;;;;-DTEST_ARRAY_SIZE=10"
+Id flags: --c++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--c++’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: "-DTEST_COUNT=30;;;;;;;;;;;;;;;;;-DTEST_ARRAY_SIZE=10"
+Id flags: --ec++ 
+
+The output was:
+1
+c++: error: unrecognized command-line option ‘--ec++’; did you mean ‘-Weffc++’?
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: "-DTEST_COUNT=30;;;;;;;;;;;;;;;;;-DTEST_ARRAY_SIZE=10"
+Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+
+The output was:
+1
+c++: warning: ‘-mcpu=’ is deprecated; use ‘-mtune=’ or ‘-march=’ instead
+c++: error: unrecognized command-line option ‘--target=arm-arm-none-eabi’
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: /usr/bin/c++ 
+Build flags: "-DTEST_COUNT=30;;;;;;;;;;;;;;;;;-DTEST_ARRAY_SIZE=10"
+Id flags: -c;-I__does_not_exist__ 
+
+The output was:
+1
+<command-line>: warning: missing terminating " character
+c++: warning: "-DTEST_COUNT=30: linker input file unused because linking not done
+c++: error: "-DTEST_COUNT=30: linker input file not found: Нет такого файла или каталога
+
+

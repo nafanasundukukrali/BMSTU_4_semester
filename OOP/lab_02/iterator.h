@@ -24,7 +24,6 @@ public:
     Iterator() = default;
     Iterator(Container<Class_T> &data, const size_t index = 0);
     Iterator(const Container<Class_T> &matrix, const size_t index = 0);
-    Iterator(const Iterator<Container, Class_T, T>& iterator) = default;
 
     ~Iterator() noexcept = default;
 
@@ -32,10 +31,10 @@ public:
     bool operator == (Iterator<Container, Class_T, T> const& iterator) const;
     bool operator < (Iterator<Container, Class_T, T> const& iterator) const;
 
-    Iterator<Container, Class_T, T> operator + (const int value);
-    Iterator<Container, Class_T, T> operator - (const int value);
-    Iterator<Container, Class_T, T> &operator += (const int value);
-    Iterator<Container, Class_T, T> &operator -= (const int value);
+    Iterator<Container, Class_T, T> operator + (const size_t value);
+    Iterator<Container, Class_T, T> operator - (const size_t value);
+    Iterator<Container, Class_T, T> &operator += (const size_t value);
+    Iterator<Container, Class_T, T> &operator -= (const size_t value);
     Iterator<Container, Class_T, T> &operator = (const Iterator<Container, Class_T, T> &iterator);
 
     Iterator<Container, Class_T, T>& operator++();
@@ -54,8 +53,8 @@ private:
     size_t _rows = 0;
     size_t _columns = 0;
 
-    void _check_valid_index(size_t line, std::string class_name);
-    void _check_data_expairing(size_t line, std::string class_name);
+    void _check_valid_index(size_t line) const;
+    void _check_data_expairing(size_t line) const;
 };
 
 #include "iterator.hpp"
