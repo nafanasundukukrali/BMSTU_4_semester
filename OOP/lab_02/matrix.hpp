@@ -6,6 +6,15 @@
 #include "exceptionmatrix.h"
 
 template<MatrixType T>
+Matrix<T>::Matrix(const size_t rows, const size_t columns): MatrixBase(rows, columns)
+{
+    if (rows == 0 || columns == 0)
+        throw ExceptionIndex(__FILE__,  __LINE__, "Matrix params incorrect.");
+
+    this->_reallocate_data();
+}
+
+template<MatrixType T>
 Matrix<T>::Matrix(const size_t rows, const size_t columns, const bool is_unit_matrix): MatrixBase(rows, columns)
 {
     if (rows == 0 || columns == 0)
@@ -16,9 +25,9 @@ Matrix<T>::Matrix(const size_t rows, const size_t columns, const bool is_unit_ma
 
     this->_reallocate_data();
 
-    std::ranges::for_each(*this, [] (auto &row) {row.make_zero();});
+    std::ranges::for_each(*this, [] (auto &element) {element = 0;});
 
-    if (is_unit_matrix) for (size_t i = 0; i < this->_columns; i++) this->_data[i][i] = 1;
+    if (is_unit_matrix) for (size_t i = 0; i < this->_columns; i++) (*this)[i][i] = 1;
 }
 
 template<MatrixType T>
@@ -26,30 +35,43 @@ Matrix<T>::Matrix(const Matrix<T> &matrix): MatrixBase(matrix._rows, matrix._col
 {
     this->_reallocate_data();
 
-    for (auto iter_1 = this->begin(), iter_2 = matrix.begin();
-         iter_1 != this->end(); iter_1++, iter_2++)
-        std::ranges::copy((*iter_2).begin(), (*iter_2).end(), (*iter_1).begin());
+    std::ranges::copy(matrix.begin(), matrix.end(), (*this).begin());
 }
 
 template<MatrixType T>
 template <std::input_iterator Iter, std::sentinel_for<Iter> Iter_e>
-requires std::constructible_from<MatrixRow<T>, typename std::iterator_traits<Iter>::reference>
-Matrix<T>::Matrix(const Iter begin, const Iter_e end): MatrixBase()
+requires std::constructible_from<T, typename std::iterator_traits<Iter>::reference>
+Matrix<T>::Matrix(const Iter begin, const Iter_e end, const size_t column_size): MatrixBase()
 {
-    size_t size_rows = 0, size_columns = 0;
+    size_t size_rows = 0;
 
     for (auto iter = begin; iter != end; iter++, size_rows++);
-    for (auto iter = (*begin).begin(); iter != (*begin).end(); iter++, size_columns++);
 
-    this->_columns = size_columns;
-    this->_rows = size_rows;
+    if (size_rows == 0 || size_rows % column_size != 0)
+        ExceptionIncorrectSrcParams(__FILE__, __LINE__, "Incorrect column_size param");
+
+    this->_columns = column_size;
+    this->_rows = size_rows / column_size;
     this->_reallocate_data();
 
-    for (auto iter = this->begin(), iter_2 = begin; iter != this->end(); iter++, iter_2++)
-    {
-        MatrixRow<T> buffer_row((*iter_2).begin(), (*iter_2).end());
-        (*iter) = buffer_row;
-    }
+    std::ranges::copy(begin, end, this->begin());
+}
+
+template<MatrixType T>
+Matrix<T>::Matrix(FriendlyRange auto range, const size_t column_size): MatrixBase()
+{
+    size_t size_rows = 0;
+
+    for (auto iter = std::begin(range); iter != std::end(range); iter++, size_rows++);
+
+    if (size_rows == 0 || size_rows % column_size != 0)
+        ExceptionIncorrectSrcParams(__FILE__, __LINE__, "Incorrect column_size param");
+
+    this->_columns = column_size;
+    this->_rows = size_rows / column_size;
+    this->_reallocate_data();
+
+    std::ranges::copy(std::begin(range), std::end(range), this->begin());
 }
 
 template<MatrixType T>
@@ -112,8 +134,7 @@ Matrix<T>& Matrix<T>::operator = (Matrix<T>& matrix)
 
     this->_reallocate_data();
 
-    for (size_t i = 0; i < this->_rows; i++)
-        std::ranges::copy(matrix._data[i].begin(), matrix._data[i].end(), this->_data[i].begin());
+    std::ranges::copy(matrix.begin(), matrix.end(), this->begin());
 
     return *this;
 }
@@ -125,7 +146,7 @@ bool Matrix<T>::is_square()
 }
 
 template<MatrixType T>
-bool Matrix<T>::is_unit()
+bool Matrix<T>::is_unit() requires MatrixOnlyFloatPointingRequires<T>
 {
     if (!this->is_square())
         return false;
@@ -138,49 +159,6 @@ bool Matrix<T>::is_unit()
                 return false;
 
     return true;
-}
-
-template<MatrixType T>
-T Matrix<T>::_calc_determinant()
-{
-    Matrix<T> U(*this);
-    Matrix<T> L(this->_rows, this->_columns);
-
-    for (size_t i = 0; i < this->_columns; i++)
-        for (size_t j = i; j < this->_columns; j++)
-            try
-            {
-                L[j][i]=U[j][i]/U[i][i];
-            }
-            catch (...)
-            {
-                ExceptionImpossibleToDivide(__FILE__, __LINE__);
-            }
-
-    for(size_t k = 1; k < this->_columns; k++)
-    {
-        for(size_t i = k-1; i < this->_columns; i++)
-            for(size_t j = i; j < this->_columns; j++)
-                try
-                {
-                    L[j][i]=U[j][i]/U[i][i];
-                }
-                catch (...)
-                {
-                    ExceptionImpossibleToDivide(__FILE__, __LINE__);
-                }
-
-        for(size_t i = k; i < this->_columns; i++)
-            for(size_t j = k-1; j < this->_columns; j++)
-                U[i][j]=U[i][j]-L[i][k-1]*U[k-1][j];
-    }
-
-    T prov = U[0][0];
-
-    for (size_t i = 1; i < this->_columns; i++)
-        prov *= U[i][i];
-
-    return prov;
 }
 
 template<MatrixType T>
@@ -200,17 +178,9 @@ Matrix<T> Matrix<T>::transpose()
 }
 
 template<MatrixType T>
-Matrix<T> Matrix<T>::inverse()
+Matrix<T> Matrix<T>::inverse() requires MatrixOnlyFloatPointingRequires<T>
 {
-    if (!this->is_square() || this->_calc_determinant() == 0)
-        throw ExceptionImpossibleOperation(__FILE__, __LINE__,
-                                           "Transposition is not availiable.");
-
-    Matrix<T> buffer_1 = (*this) * this->transpose();
-
-    if (buffer_1.is_unit())
-        throw ExceptionImpossibleOperation(__FILE__, __LINE__,
-                                           "Transposition is not availiable.");
+    this->_check_possibility_to_inverse();
 
     Matrix<T> buffer(*this), result(this->_columns, this->_columns, true);
 
@@ -221,16 +191,21 @@ Matrix<T> Matrix<T>::inverse()
 
             for (; k < this->_columns && buffer[j][k] == 0; k++);
 
-            std::swap(buffer[j], buffer[k]);
+            if (k == this->_columns)
+                throw ExceptionImpossibleOperation(__FILE__, __LINE__,
+                                                   "Inversion is not availiable, det is null.");
+
+            std::swap_ranges(buffer.begin() + j * this->_columns, buffer.begin() + (j + 1) * this->_columns,
+                             buffer.begin() + k * this->_columns);
         }
 
         T divide = buffer[j][j];
 
-        buffer[j] /= divide, result[j] /= divide;
+        std::for_each_n(buffer.begin() + j * _columns, buffer._columns, [divide] (auto &x) {x /= divide;});
+        std::for_each_n(result.begin() + j * _columns, result._columns, [divide] (auto &x) {x /= divide;});
 
         for (size_t i = 0; i < this->_columns; i++) {
-            if (i == j)
-                continue;
+            if (i == j) continue;
 
             T buf_1 = buffer[i][j];
 
@@ -257,75 +232,72 @@ Matrix<T>& Matrix<T>::operator = (std::initializer_list<std::initializer_list<T>
 }
 
 template<MatrixType T>
-bool Matrix<T>::operator == (const Matrix<T>& matrix) const
+template <typename U> requires MatrixEqualityOperationRequires<U>
+bool Matrix<T>::operator == (const Matrix<U>& matrix) const
 {
     return std::equal(this->begin(), this->end(), matrix.begin(), matrix.end());
 }
 
 template<MatrixType T>
-bool Matrix<T>::operator != (const Matrix<T>& matrix) const
+template <typename U> requires MatrixEqualityOperationRequires<U>
+bool Matrix<T>::operator != (const Matrix<U>& matrix) const
 {
     return !std::ranges::equal(this->begin(), this->end(), matrix.begin(), matrix.end());
 }
 
 template<MatrixType T>
-MatrixRow<T>& Matrix<T>::operator [] (const size_t row)
+Matrix<T>::MatrixRow Matrix<T>::operator [] (const size_t row)
 {
     if (this->_rows <= row)
         throw ExceptionIndex(__FILE__,  __LINE__, "Icorrect row index.");
 
-    return this->_data[row];
+    return MatrixRow(*this, row);
 }
 
 template<MatrixType T>
-const MatrixRow<T>& Matrix<T>::operator [] (const size_t row) const
+Matrix<T>::MatrixRow Matrix<T>::operator [] (const size_t row) const
 {
     if (this->_rows <= row)
         throw ExceptionIndex(__FILE__, __LINE__, "Icorrect row index.");
 
-    return this->_data[row];
+    return MatrixRow(*this, row);
 }
 
 template<MatrixType T>
-T &Matrix<T>::operator()(size_t row, size_t col)
+T &Matrix<T>::operator()(size_t row, size_t column)
 {
-    return this->_data[row][col];
+    return this->_data[row * this->_columns + column];
 }
 
 template<MatrixType T>
-const T &Matrix<T>::operator()(size_t row, size_t col) const
+const T &Matrix<T>::operator()(size_t row, size_t column) const
 {
-    return this->_data[row][col];
+    return this->_data[row * this->_columns + column];
 }
 
 template<MatrixType T>
-Matrix<T> Matrix<T>::sum(const Matrix<T>& matrix)
+template <typename U> requires MatrixSumOperationRequires<T, U>
+void Matrix<T>::sum(const Matrix<U>& matrix)
 {
     this->_validate_another_matrix_params(matrix._rows, matrix._columns, __LINE__);
 
-    Matrix<T> buffer(*this);
-
-    std::transform(buffer.begin(), buffer.end(), matrix.begin(), buffer.begin(),
+    std::transform(this->begin(), this->end(), matrix.begin(), this->begin(),
                    [](auto &left, auto &right) { return left + right; });
-
-    return buffer;
 }
 
 template<MatrixType T>
-Matrix<T> Matrix<T>::sub(const Matrix<T>& matrix)
+template <typename U> requires MatrixSubOperationRequires<T, U>
+void Matrix<T>::sub(const Matrix<U>& matrix)
 {
     this->_validate_another_matrix_params(matrix._rows, matrix._columns, __LINE__);
 
-    Matrix<T> buffer(*this);
-
-    std::transform(buffer.begin(), buffer.end(), matrix.begin(), buffer.begin(),
+    std::transform(this->begin(), this->end(), matrix.begin(), this->begin(),
                    [](auto &left, auto &right) { return left - right; });
-
-    return buffer;
 }
 
 template<MatrixType T>
-Matrix<T> Matrix<T>::mul(const Matrix<T>& matrix)
+template <typename U> requires MatrixMulOperationRequires<T, U>
+void  Matrix<T>::mul(const Matrix<U>& matrix)
 {
     if (this->_columns != matrix._rows)
         throw ExceptionImpossibleOperation(__FILE__,  __LINE__, "Incorrect count of rows vs columns for mul.");
@@ -334,200 +306,158 @@ Matrix<T> Matrix<T>::mul(const Matrix<T>& matrix)
 
     for (size_t i = 0; i < buffer._columns; i++)
     {
-        MatrixRow<T> buffer_column;
+        Matrix<T> buffer_column(1, matrix._rows);
 
-        buffer_column.reset_data(new T[matrix._rows], matrix._rows);
-
-        std::transform(matrix.begin(), matrix.end(), buffer_column.begin(),
-                       [matrix, i] (auto &row_1) {return row_1[i];});
+        for (size_t j = 0; j < matrix._rows; j++)
+            buffer_column[0][j] = matrix[j][i];
 
         for (size_t j = 0; j < buffer._rows; j++)
-            buffer[j][i] = std::inner_product(buffer_column.begin(), buffer_column.end(), (*this)[j].begin(), 0);
+            buffer[j][i] = std::inner_product(buffer_column.begin(), buffer_column.end(), this->begin() + j * this->_columns, 0);
     }
 
-    return buffer;
+    *this = buffer;
 }
 
 template<MatrixType T>
-Matrix<T> Matrix<T>::div(const Matrix<T>& matrix)
+template <typename U> requires MatrixDivOperationRequires<T, U>
+void Matrix<T>::div(const Matrix<U>& matrix)
 {
     if (this->_columns != matrix._rows)
         throw ExceptionImpossibleOperation(__FILE__,  __LINE__, "Incorrect count of rows vs columns for div.");
 
-    Matrix<T> buffer = matrix.inverse(), buffer_1(*this);
-    buffer_1 *= buffer;
-
-    return buffer_1;
+    Matrix<T> buffer = matrix.inverse();
+    this->mul(buffer);
 }
 
 template<MatrixType T>
-Matrix<T> Matrix<T>::mul(const T value)
+template <typename U> requires MatrixMulOperationRequires<T, U>
+void Matrix<T>::mul(const U value)
 {
     this->_validate_empty(__LINE__);
 
-    Matrix<T> buffer(*this);
+    std::transform(this->begin(), this->end(), this->begin(),
+                   [value](auto &left, auto &right) { return left * value; });
+}
 
-    for (auto &row: buffer) row *= value;
+template<MatrixType T>
+template <typename U> requires MatrixDivOperationRequires<T, U>
+void Matrix<T>::div(const U value)
+{
+    if (value == 0)
+        ExceptionImpossibleToDivide(__FILE__, __LINE__);
+
+    this->_validate_empty(__LINE__);
+
+    for (auto &x: *this) x /= value;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSumOperationRequires<T, U>
+Matrix<T>& Matrix<T>::operator += (const Matrix<U>& matrix)
+{
+    this->sum(matrix);
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSubOperationRequires<T, U>
+Matrix<T>& Matrix<T>::operator -= (const Matrix<U>& matrix)
+{
+    this->sub(matrix);
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixMulOperationRequires<T, U>
+Matrix<T>& Matrix<T>::operator *= (const Matrix<U>& matrix)
+{
+    this->mul(matrix);
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixMulOperationRequires<T, U>
+Matrix<T>& Matrix<T>::operator *= (const U value)
+{
+    this->mul(value);
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixDivOperationRequires<T, U>
+Matrix<T>& Matrix<T>::operator /= (const U value)
+{
+    this->div(value);
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixDivOperationRequires<T, U>
+    Matrix<T>& Matrix<T>::operator /= (const Matrix<U> &matrix)
+{
+    this->div(matrix);
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSumOperationRequires<T, U>
+Matrix<T> Matrix<T>::operator + (const Matrix<U>& matrix) const
+{
+    Matrix<T> buffer (*this);
+
+    buffer.sum(matrix);
 
     return buffer;
 }
 
 template<MatrixType T>
-Matrix<T> Matrix<T>::div(const T value)
+template <typename U> requires MatrixSubOperationRequires<T, U>
+Matrix<T> Matrix<T>::operator - (const Matrix<U>& matrix) const
 {
-    this->_validate_empty(__LINE__);
+    Matrix<T> buffer (*this);
 
-    Matrix<T> buffer(*this);
-
-    for (auto &row: buffer) row /= value;
+    buffer.sub(matrix);
 
     return buffer;
 }
 
 template<MatrixType T>
-Matrix<T>& Matrix<T>::operator += (const Matrix<T>& matrix)
+template <typename U> requires MatrixMulOperationRequires<T, U>
+Matrix<T> Matrix<T>::operator * (const Matrix<U>& matrix) const
 {
-    *this = this->sum(matrix);
+    Matrix<T> buffer (*this);
 
-    return *this;
+    buffer.mul(matrix);
+
+    return buffer;
 }
 
 template<MatrixType T>
-Matrix<T>& Matrix<T>::operator -= (const Matrix<T>& matrix)
+template <typename U> requires MatrixDivOperationRequires<T, U>
+Matrix<T> Matrix<T>::operator / (const Matrix<U>& matrix) const
 {
-    *this = this->sub(matrix);
+    Matrix<T> buffer(this);
 
-    return *this;
+    buffer.div(matrix);
+
+    return buffer;
 }
 
 template<MatrixType T>
-Matrix<T>& Matrix<T>::operator *= (const Matrix<T>& matrix)
+template <typename U> requires MatrixDivOperationRequires<T, U>
+Matrix<T> Matrix<T>::operator / (const U value) const
 {
-    *this = this->mul(matrix);
-    this->_columns = matrix._columns;
+    Matrix<T> buffer(this);
 
-    return *this;
-}
+    buffer.div(value);
 
-template<MatrixType T>
-Matrix<T>& Matrix<T>::operator *= (const T value)
-{
-    *this = this->mul(value);
-
-    return *this;
-}
-
-template<MatrixType T>
-Matrix<T>& Matrix<T>::operator /= (const T value)
-{
-    *this = this->div(value);
-
-    return *this;
-}
-
-template<MatrixType T>
-Matrix<T> Matrix<T>::operator + (const Matrix<T>& matrix)
-{
-    return this->sum(matrix);
-}
-
-template<MatrixType T>
-Matrix<T> Matrix<T>::operator - (const Matrix<T>& matrix)
-{
-    return this->sub(matrix);
-}
-
-template<MatrixType T>
-Matrix<T> Matrix<T>::operator * (const Matrix<T>& matrix)
-{
-    return this->mul(matrix);
-}
-
-template<MatrixType T>
-Matrix<T> Matrix<T>::operator / (const Matrix<T>& matrix)
-{
-    return this->div(matrix);
-}
-
-template<MatrixType T>
-void Matrix<T>::change_columns(size_t from_position, size_t to_position)
-{
-    if (this->_columns <= from_position || this->_columns <= to_position)
-        throw ExceptionIndex(__FILE__,  __LINE__, "Inccorect input positions.");
-
-    for (auto &row: *this)
-        std::swap(row[from_position], row[to_position]);
-}
-
-template<MatrixType T>
-void Matrix<T>::change_rows(size_t from_position, size_t to_position)
-{
-    if (this->_rows <= from_position || this->_rows <= to_position)
-        throw ExceptionIndex(__FILE__,  __LINE__, "Inccorect input positions.");
-
-    std::swap_ranges(this->_data[from_position].begin(),
-                     this->_data[from_position].end(),
-                     this->_data[to_position].begin());
-}
-
-template<MatrixType T>
-void Matrix<T>::add_column(size_t post_column_number, std::initializer_list<T> list)
-{
-    if (this->_columns < post_column_number || list.size() != this->_rows)
-        throw ExceptionIndex(__FILE__,  __LINE__, "Inccorect input positions.");
-
-    size_t list_i = 0;
-
-    for (auto &row: *this)
-    {
-        row.add_column(post_column_number, *(list.begin() + list_i));
-        list_i++;
-    }
-
-    this->_columns++;
-}
-
-template<MatrixType T>
-void Matrix<T>::add_row(size_t post_row_number, std::initializer_list<T> list)
-{
-    if (list.size() != this->_columns || this->_rows < post_row_number)
-        throw ExceptionIndex(__FILE__,  __LINE__, "Inccorect input positions.");
-
-    Matrix<T> buffer(this->_rows + 1, this->_columns);
-
-    std::ranges::copy(this->begin(), this->begin() + post_row_number, buffer.begin());
-
-    buffer[post_row_number] = list;
-
-    std::ranges::copy(this->begin() + size_t(post_row_number), this->end(), buffer.begin() + size_t(post_row_number+ 1));
-
-    *this = buffer;
-}
-
-template<MatrixType T>
-void Matrix<T>::delete_column(size_t delete_column_number)
-{
-    if (this->_columns <= delete_column_number)
-        throw ExceptionIndex(__FILE__,  __LINE__, "Inccorect input positions.");
-
-    for (auto &row: *this)
-        row.delete_column(delete_column_number);
-
-    this->_columns--;
-}
-
-template<MatrixType T>
-void Matrix<T>::delete_row(size_t delete_row_number)
-{
-    if (this->_rows <= delete_row_number)
-        throw ExceptionIndex(__FILE__,  __LINE__, "Inccorect input positions.");
-
-    Matrix<T> buffer(this->_rows - 1, this->_columns);
-
-    std::ranges::copy(this->begin(), this->begin() + delete_row_number, buffer.begin());
-    std::ranges::copy(this->begin() + size_t(delete_row_number + 1), this->end(), buffer.begin() + delete_row_number);
-
-    *this = buffer;
+    return buffer;
 }
 
 template<MatrixType T>
@@ -537,45 +467,88 @@ size_t Matrix<T>::get_rows_count() const
 }
 
 template<MatrixType T>
-Matrix<T> Matrix<T>::operator * (const T value)
+template <typename U> requires MatrixMulOperationRequires<T, U>
+Matrix<T> Matrix<T>::operator * (const U value) const
 {
     return this->mul(value);
 }
 
 template<MatrixType T>
-Iterator<Matrix, T, MatrixRow<T>> Matrix<T>::begin()
+Matrix<T>::iterator Matrix<T>::begin()
 {
-    return Iterator<Matrix, T, MatrixRow<T>>(*this, size_t(0));
+    return Iterator<T>(*this, 0);
 }
 
 template<MatrixType T>
-Iterator<Matrix, T, MatrixRow<T>> Matrix<T>::end()
+Matrix<T>::iterator Matrix<T>::end()
 {
-    return Iterator<Matrix, T, MatrixRow<T>>(*this, this->_rows);
+    return Iterator<T>(*this, this->_rows * this->_columns);
 }
 
 template<MatrixType T>
-IteratorConst<Matrix, T, MatrixRow<T>> Matrix<T>::begin() const
+Matrix<T>::const_iterator Matrix<T>::begin() const
 {
-    return IteratorConst<Matrix, T, MatrixRow<T>>(*this, 0);
+    return IteratorConst<T>(*this, 0);
 }
 
 template<MatrixType T>
-IteratorConst<Matrix, T, MatrixRow<T>>  Matrix<T>::end() const
+Matrix<T>::const_iterator  Matrix<T>::end() const
 {
-    return IteratorConst<Matrix, T, MatrixRow<T>>(*this, this->_rows);
+    return IteratorConst<T>(*this, this->_rows * this->_columns);
 }
 
 template<MatrixType T>
-IteratorConst<Matrix, T, MatrixRow<T>>  Matrix<T>::cbegin() const
+Matrix<T>::const_iterator  Matrix<T>::cbegin() const
 {
-    return IteratorConst<Matrix, T, MatrixRow<T>>(*this, 0);
+    return IteratorConst<T>(*this, 0);
 }
 
 template<MatrixType T>
-IteratorConst<Matrix, T, MatrixRow<T>> Matrix<T>::cend() const
+Matrix<T>::const_iterator Matrix<T>::cend() const
 {
-    return IteratorConst<Matrix, T, MatrixRow<T>>(*this, this->_rows);
+    return IteratorConst<T>(*this, this->_rows * this->_columns);
+}
+
+template<MatrixType T>
+Matrix<T>::reverse_iterator Matrix<T>::rend()
+{
+    return std::reverse_iterator(Iterator<T>(*this, -1));
+}
+
+template<MatrixType T>
+Matrix<T>::reverse_iterator Matrix<T>::rbegin()
+{
+    return std::reverse_iterator(Iterator(*this, this->size() - 1) );
+}
+
+template<MatrixType T>
+Matrix<T>::const_reverse_iterator Matrix<T>::rend() const
+{
+    return std::reverse_iterator(Iterator<T>(*this, -1));
+}
+
+template<MatrixType T>
+Matrix<T>::const_reverse_iterator  Matrix<T>::rbegin() const
+{
+    return std::reverse_iterator(Iterator(*this, this->size() - 1));
+}
+
+template<MatrixType T>
+Matrix<T>::const_reverse_iterator Matrix<T>::rcend() const
+{
+    return std::reverse_iterator(IteratorConst<T>(*this, -1));
+}
+
+template<MatrixType T>
+Matrix<T>::const_reverse_iterator Matrix<T>::rcbegin() const
+{
+    return std::reverse_iterator(IteratorConst<T>(*this, this->_size() - 1));
+}
+
+template<MatrixType T>
+size_t Matrix<T>::size() const
+{
+    return this->_rows * this->_columns;
 }
 
 template<MatrixType T>
@@ -583,10 +556,7 @@ void Matrix<T>::_reallocate_data()
 {
     try
     {
-        this->_data.reset(new MatrixRow<T>[this->_rows]);
-
-        for (size_t i = 0; i < this->_rows; i++)
-            this->_data[i].reset_data(new T[this->_columns], this->_columns);
+        this->_data.reset(new T[this->_rows * this->_columns]);
     }
     catch (std::bad_alloc)
     {
@@ -597,7 +567,7 @@ void Matrix<T>::_reallocate_data()
 template<MatrixType T>
 void Matrix<T>::_copy_data_from_another_range(auto &range)
 {
-    size_t i = 0;
+    auto iter_1 = this->begin();
 
     for (auto &iter: range)
         if (this->_columns != iter.size())
@@ -606,7 +576,21 @@ void Matrix<T>::_copy_data_from_another_range(auto &range)
         }
         else
         {
-            std::ranges::copy(iter, this->_data[i].begin());
-            i++;
+            std::ranges::copy(iter, iter_1);
+            iter_1 += this->_columns;
         }
+}
+
+template<MatrixType T>
+void Matrix<T>::_check_possibility_to_inverse()
+{
+    if (!this->is_square())
+        throw ExceptionImpossibleOperation(__FILE__, __LINE__,
+                                           "Inversion is not availiable.");
+
+    Matrix<T> buffer_1 = (*this) * this->transpose();
+
+    if (buffer_1.is_unit())
+        throw ExceptionImpossibleOperation(__FILE__, __LINE__,
+                                           "Inversion is not availiable.");
 }

@@ -5,17 +5,48 @@
 #include <iterator>
 
 template<typename T>
-concept MatrixType = requires (T a) {
-    std::copyable<T>;
+concept MatrixType = requires {
+    std::semiregular<T>;
+};
+
+template<typename T>
+concept MatrixEqualityOperationRequires = requires {
+    MatrixType<T>;
     std::equality_comparable<T>;
-    { a + a } -> std::convertible_to<T>;
-    { a * a } -> std::convertible_to<T>;
-    { a - a } -> std::convertible_to<T>;
-    { a / a } -> std::convertible_to<T>;
 };
 
 template<typename T, typename U>
-concept FriendlyRange = requires(U &u) {
+concept MatrixSumOperationRequires = requires(T a, U b) {
+    std::constructible_from<U, T>;
+    {a + b} -> std::convertible_to<T>;
+};
+
+template<typename T, typename U>
+concept MatrixMulOperationRequires = requires(T a, U b) {
+    std::constructible_from<U, T>;
+    {a * b} -> std::convertible_to<T>;
+};
+
+template<typename T, typename U>
+concept MatrixSubOperationRequires = requires(T a, U b) {
+    std::constructible_from<U, T>;
+    {a - b} -> std::convertible_to<T>;
+};
+
+template<typename T>
+concept MatrixOnlyFloatPointingRequires = requires {
+    std::floating_point<T>;
+};
+
+template<typename T, typename U>
+concept MatrixDivOperationRequires = requires(T a, U b) {
+    MatrixOnlyFloatPointingRequires<T>;
+    MatrixOnlyFloatPointingRequires<U>;
+    {a / b} -> std::convertible_to<T>;
+};
+
+template<typename T>
+concept FriendlyRange = requires(T &u) {
     { u.begin() } -> std::input_iterator;
     { u.end() } -> std::sentinel_for<decltype(u.begin())>;
     std::constructible_from<T, typename std::iterator_traits<decltype(u.begin())>::reference>;
@@ -27,14 +58,6 @@ concept SumType = requires(T &t, U &u) {
 };
 
 template <MatrixType T>
-class MatrixRow;
-
-template <MatrixType T>
 class Matrix;
-
-template<template <typename> class Container, typename Class_T, typename T = Class_T>
-concept ContainerRequires = std::is_same_v<Container<T>, MatrixRow<T>>
-                            || std::is_same_v<Container<Class_T>, Matrix<Class_T>>;
-
 
 #endif // CONCEPTS_H
