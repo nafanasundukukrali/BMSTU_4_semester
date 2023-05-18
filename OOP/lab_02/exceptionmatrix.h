@@ -3,6 +3,7 @@
 
 #include <string>
 #include <ctime>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -11,7 +12,7 @@
 class Exception: public std::exception
 {
 protected:
-    std::string _error_message;
+    char _error_message[512];
 public:
     Exception(std::string file, size_t line)
     {
@@ -21,15 +22,17 @@ public:
         ss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
         ss.imbue(std::locale("ru_RU.utf-8"));
 
-        _error_message = "\nFile name: " + file + "\nIn line " + std::to_string(line)
-                         + "\nTime: " + ss.str() + "\nInfo: ";
+        snprintf(_error_message, sizeof(_error_message), "filename: %.*s\nline: %zu\ntime: %.*s\ninfo: ",
+                 (int) file.size(), file.data(),
+                 line,
+                 (int) ss.str().size() , ss.str().data());
     }
 
     virtual ~Exception() {};
 
     virtual const char *what() const noexcept override
     {
-        return _error_message.c_str();
+        return _error_message;
     };
 };
 
@@ -41,7 +44,8 @@ public:
     ExceptionIndex(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
-        _error_message += message + _special_error_message + "\"";
+        std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
+        std::strncat(_error_message, _special_error_message.data(), sizeof(_error_message) - strlen(_error_message));
     }
 };
 
@@ -54,7 +58,8 @@ public:
     ExceptionDataExpaired(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
-        _error_message += message + _special_error_message + "\n";
+        std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
+        std::strncat(_error_message, _special_error_message.data(), sizeof(_error_message) - strlen(_error_message));
     }
 };
 
@@ -66,7 +71,8 @@ public:
     ExceptionBadAllocate(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
-        _error_message += message + _special_error_message + "\n";
+        std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
+        std::strncat(_error_message, _special_error_message.data(), sizeof(_error_message) - strlen(_error_message));
     }
 };
 
@@ -78,7 +84,8 @@ public:
     ExceptionEmptyObject(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
-        _error_message += message + _special_error_message + "\n";
+        std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
+        std::strncat(_error_message, _special_error_message.data(), sizeof(_error_message) - strlen(_error_message));
     }
 };
 
@@ -90,7 +97,8 @@ public:
     ExceptionIncorrectSrcParams(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
-        _error_message += message + _special_error_message + "\n";
+        std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
+        std::strncat(_error_message, _special_error_message.data(), sizeof(_error_message) - strlen(_error_message));
     }
 };
 
@@ -102,7 +110,8 @@ public:
     ExceptionImpossibleOperation(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
-        _error_message += message + _special_error_message + "\n";
+        std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
+        std::strncat(_error_message, _special_error_message.data(), sizeof(_error_message) - strlen(_error_message));
     }
 };
 
@@ -114,7 +123,8 @@ public:
     ExceptionNullObjectPointer(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
-        _error_message += message + _special_error_message + "\n";
+        std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
+        std::strncat(_error_message, _special_error_message.data(), sizeof(_error_message) - strlen(_error_message));
     }
 };
 
@@ -126,7 +136,8 @@ public:
     ExceptionRowNotIterrable(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
-        _error_message += message + _special_error_message + "\n";
+        std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
+        std::strncat(_error_message, _special_error_message.data(), sizeof(_error_message) - strlen(_error_message));
     }
 };
 
@@ -138,7 +149,8 @@ public:
     ExceptionImpossibleToDivide(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
-        _error_message += message + _special_error_message + "\n";
+        std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
+        std::strncat(_error_message, _special_error_message.data(), sizeof(_error_message) - strlen(_error_message));
     }
 };
 

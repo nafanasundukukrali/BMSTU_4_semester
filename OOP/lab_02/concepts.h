@@ -9,6 +9,11 @@ concept MatrixType = requires {
     std::semiregular<T>;
 };
 
+template<typename T, typename U>
+concept FriendlyMatrixType = requires {
+    std::constructible_from<U, T>;
+};
+
 template<typename T>
 concept MatrixEqualityOperationRequires = requires {
     MatrixType<T>;
@@ -17,19 +22,19 @@ concept MatrixEqualityOperationRequires = requires {
 
 template<typename T, typename U>
 concept MatrixSumOperationRequires = requires(T a, U b) {
-    std::constructible_from<U, T>;
+    FriendlyMatrixType<T, U>;
     {a + b} -> std::convertible_to<T>;
 };
 
 template<typename T, typename U>
 concept MatrixMulOperationRequires = requires(T a, U b) {
-    std::constructible_from<U, T>;
+    FriendlyMatrixType<T, U>;
     {a * b} -> std::convertible_to<T>;
 };
 
 template<typename T, typename U>
 concept MatrixSubOperationRequires = requires(T a, U b) {
-    std::constructible_from<U, T>;
+    FriendlyMatrixType<T, U>;
     {a - b} -> std::convertible_to<T>;
 };
 
@@ -50,6 +55,15 @@ concept FriendlyRange = requires(T &u) {
     { u.begin() } -> std::input_iterator;
     { u.end() } -> std::sentinel_for<decltype(u.begin())>;
     std::constructible_from<T, typename std::iterator_traits<decltype(u.begin())>::reference>;
+};
+
+template<typename T, typename U>
+concept FriendlyContainer = requires (U &u) {
+    FriendlyRange<U>;
+
+    { u.empty() } noexcept -> std::same_as<bool>;
+    { u.get_rows_count() } noexcept -> std::same_as<typename T::size_type>;
+    { u.get_columns_count() } noexcept -> std::same_as<typename T::size_type>;
 };
 
 template<typename T, typename U>

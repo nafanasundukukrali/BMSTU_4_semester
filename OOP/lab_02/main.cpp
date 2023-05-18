@@ -41,22 +41,20 @@ int main(int argc, char *argv[])
     cout << endl;
 
 
-    Matrix<int> some(3, 3, true);
+//    Matrix<int> some(3, 3, true);
 
-    cout << some;
+//    cout << some;
 
 
-    Matrix<int> some_1(3, 3, false);
+//    Matrix<int> some_1(3, 3, false);
 
-    cout << some_1;
+//    cout << some_1;
 
     for (auto iter = matrix.rbegin(); iter != matrix.rend(); iter++)
         cout << *iter << ' ';
 
     Matrix<int> matrix_5 = matrix - matrix;
     cout << matrix_5;
-
-//    cout << result << endl;
 
     Matrix<int> matrix_9 = {{1, 2}, {3, 4}, {5, 6}};
 
@@ -70,85 +68,24 @@ int main(int argc, char *argv[])
 
 //    matrix * 5;
 
-//    cout << "MATRIX DEF::" << endl;
-
-//    for (auto &x: matrix)
-//    {
-//        for (auto &y: x)
-//            cout << y << ' ';
-//        cout << endl;
-//    }
-//    cout << endl;
-
-////    cout << endl;
-//    matrix.change_columns(0, 2);
-////    cout << matrix;
-
-
-////    cout << endl;
-//    matrix.change_rows(1, 0);
-////    cout << matrix;
-
-//    cout << endl;
-//    matrix.add_column(3, {1, 2});
-////    cout << matrix;
-
-//    for (auto &x: matrix)
-//    {
-//        for (auto &y: x)
-//            cout << y << ' ';
-//        cout << endl;
-//    }
-//    cout << endl;
-
-////    cout << endl;
-//    matrix.add_row(2, {1, 2, 3, 4});
-////    cout << matrix;
-
-////    cout << endl;
-//    matrix.delete_column(3);
-////    cout << matrix;
-//    for (auto &x: matrix)
-//    {
-//        for (auto &y: x)
-//            cout << y << ' ';
-//        cout << endl;
-//    }
-
-//    cout << endl;
-
-//    Matrix<float> matrix_11({{10, -7, 0}, {-3, 6, 2}, {5, -1, 5}});
-
     Matrix<float> matrix_r = {{1, 2, 3}, {4, 5, 6}, {7, 8, 8}};
 
-//    for (auto &x: matrix_r)
-//    {
-//        for (auto &y: x)
-//            cout << y << ' ';
-//        cout << endl;
-//    }
-
-//    cout << endl;
-
-
-    matrix_r = matrix_r.inverse();
+//    matrix_r = matrix_r.inverse();
 
     cout << endl;
     cout << matrix_r;
 
-//    for (auto &x: matrix_r)
-//    {
-//        for (auto &y: x)
-//            cout << y << ' ';
-//        cout << endl;
-//    }
+    Matrix<int> matrix_f(matrix_r);
+    matrix_r = matrix_f;
 
-//    cout << endl;
+    cout << endl;
+    cout << matrix_f;
 
-//    cout << (matrix_11.calc_determinant()) << endl;
-//    cout << endl;
-//    matrix.delete_row(1);
-////    cout << matrix;
+    cout << endl;
+    cout << matrix_r;
+
+ //   matrix[2][124];
+
 
     return 0;
 }

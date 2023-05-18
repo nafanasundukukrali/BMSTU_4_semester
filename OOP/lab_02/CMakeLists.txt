@@ -18,7 +18,7 @@ set(FILES matrix.h
     iterator.hpp
     matrixbase.h
 #    matrixrow.h
-    matrixrow.hpp
+#    matrixrow.hpp
     const_iterator.h
     const_iterator.hpp
     exceptionmatrix.h

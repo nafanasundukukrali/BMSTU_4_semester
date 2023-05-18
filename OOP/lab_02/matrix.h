@@ -18,6 +18,7 @@ class Matrix: public MatrixBase
     friend IteratorConst<T>;
 public:
     using value_type = T;
+    using size_type = size_t;
     using iterator = Iterator<T>;
     using const_iterator = IteratorConst<T>;
     using reverse_iterator = std::reverse_iterator<iterator>;
@@ -30,9 +31,13 @@ public:
 
     Matrix() = default;
     explicit Matrix(const size_t rows, const size_t columns);
-    Matrix(const size_t rows, const size_t columns, const bool is_unit_matrix);
     explicit Matrix(const Matrix<T> &matrix);
     Matrix(Matrix<T> &&matrix) noexcept;
+
+    template <MatrixType U>
+    explicit Matrix(const Matrix<U> &matrix) requires FriendlyMatrixType<T, U>;
+    template <typename Container> requires FriendlyContainer<T, Container>
+    explicit Matrix(const Container &matrix);
     Matrix(T** array, const size_t rows, const size_t columns);
     template <std::input_iterator Iter, std::sentinel_for<Iter> Iter_e>
     requires std::constructible_from<T, typename std::iterator_traits<Iter>::reference>
@@ -45,6 +50,10 @@ public:
     Matrix<T>& operator = (Matrix<T>& matrix);
     Matrix<T>& operator = (Matrix<T>&& matrix);
     Matrix<T>& operator = (std::initializer_list<std::initializer_list<T>> list);
+    template <MatrixType U>
+    Matrix<T>& operator = (const Matrix<U>& matrix);
+    template <typename Container> requires FriendlyContainer<T, Container>
+    Matrix<T>& operator = (const Container& matrix);
 
     template <typename U> requires MatrixEqualityOperationRequires<U>
     bool operator == (const Matrix<U>& matrix) const;

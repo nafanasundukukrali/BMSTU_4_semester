@@ -14,24 +14,33 @@ Matrix<T>::Matrix(const size_t rows, const size_t columns): MatrixBase(rows, col
     this->_reallocate_data();
 }
 
-template<MatrixType T>
-Matrix<T>::Matrix(const size_t rows, const size_t columns, const bool is_unit_matrix): MatrixBase(rows, columns)
-{
-    if (rows == 0 || columns == 0)
-        throw ExceptionIndex(__FILE__,  __LINE__, "Matrix params incorrect.");
+//template<MatrixType T>
+//Matrix<T>::Matrix(const size_t rows, const size_t columns, const bool is_unit_matrix): MatrixBase(rows, columns)
+//{
+//    if (rows == 0 || columns == 0)
+//        throw ExceptionIndex(__FILE__,  __LINE__, "Matrix params incorrect.");
 
-    if (rows != columns && is_unit_matrix)
-        throw ExceptionImpossibleOperation(__FILE__,  __LINE__, "Not square matrix can't be unit.");
+//    if (rows != columns && is_unit_matrix)
+//        throw ExceptionImpossibleOperation(__FILE__,  __LINE__, "Not square matrix can't be unit.");
 
-    this->_reallocate_data();
+//    this->_reallocate_data();
 
-    std::ranges::for_each(*this, [] (auto &element) {element = 0;});
+//    std::ranges::for_each(*this, [] (auto &element) {element = 0;});
 
-    if (is_unit_matrix) for (size_t i = 0; i < this->_columns; i++) (*this)[i][i] = 1;
-}
+//    if (is_unit_matrix) for (size_t i = 0; i < this->_columns; i++) (*this)[i][i] = 1;
+//}
 
 template<MatrixType T>
 Matrix<T>::Matrix(const Matrix<T> &matrix): MatrixBase(matrix._rows, matrix._columns)
+{
+    this->_reallocate_data();
+
+    std::ranges::copy(matrix.begin(), matrix.end(), (*this).begin());
+}
+
+template<MatrixType T>
+template<MatrixType U>
+Matrix<T>::Matrix(const Matrix<U> &matrix) requires FriendlyMatrixType<T, U>: MatrixBase(matrix.get_rows_count(), matrix.get_columns_count())
 {
     this->_reallocate_data();
 
@@ -72,6 +81,15 @@ Matrix<T>::Matrix(FriendlyRange auto range, const size_t column_size): MatrixBas
     this->_reallocate_data();
 
     std::ranges::copy(std::begin(range), std::end(range), this->begin());
+}
+
+template<MatrixType T>
+template <typename Container> requires FriendlyContainer<T, Container>
+Matrix<T>::Matrix(const Container &container): MatrixBase(container.get_rows_count(), container.get_columns_count())
+{
+    this->_reallocate_data();
+
+    std::ranges::copy(std::begin(container), std::end(container), this->begin());
 }
 
 template<MatrixType T>
@@ -131,6 +149,34 @@ Matrix<T>& Matrix<T>::operator = (Matrix<T>& matrix)
 {
     this->_rows = matrix._rows;
     this->_columns = matrix._columns;
+
+    this->_reallocate_data();
+
+    std::ranges::copy(matrix.begin(), matrix.end(), this->begin());
+
+    return *this;
+}
+
+template<MatrixType T>
+template<MatrixType U>
+Matrix<T>& Matrix<T>::operator = (const Matrix<U>& matrix)
+{
+    this->_rows = matrix.get_rows_count();
+    this->_columns = matrix.get_columns_count();
+
+    this->_reallocate_data();
+
+    std::ranges::copy(matrix.begin(), matrix.end(), this->begin());
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename Container> requires FriendlyContainer<T, Container>
+Matrix<T>& Matrix<T>::operator = (const Container& matrix)
+{
+    this->_rows = matrix.get_rows_count();
+    this->_columns = matrix.get_columns_count();
 
     this->_reallocate_data();
 
