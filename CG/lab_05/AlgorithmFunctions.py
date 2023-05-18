@@ -1,18 +1,31 @@
-from dataclasses import dataclass
-
-from Analyzer import analyzer
 from PySide6.QtCore import QPoint
-from PySide6.QtWidgets import QGraphicsScene
-from math import floor, pi, cos, sin
+from math import fabs
 
 
 class Node:
-    def __init__(self, n, x, dy):
+    def __init__(self, n, x, dy, deltax):
+        self._horizontal = False
         self._n = n
         self._x = x
         self._dy = dy
-        self._dx = x / dy
+
+        if dy == 0:
+            self._dx = 0
+            self._horizontal = True
+        else:
+            self._dx = deltax / float(dy)
+
+        self._end_n = self._n - self._dy
         self._next = None
+
+    def is_horizontal(self):
+        return self._horizontal
+
+    def get_end_n(self):
+        return self._end_n
+
+    def is_active(self, line):
+        return line <= self._n and line >= self._n - self._dy
 
     def get_n(self):
         return self._n
@@ -33,356 +46,137 @@ class Node:
         self._next = next_node
 
     def __eq__(self, other):
-        return (self._next == other.get_next() and
+        return (other is not None and (
             self._n == other.get_n() and
             self._dy == other.get_dy() and
-            self._x == other.get_x)
+            self._x == other.get_x() and
+            self._dx == other.get_dx()))
+
+    def __gt__(self, other):
+        return (other != None and (self._n > other.get_n() or self._n == other.get_n() and self._dy < other.get_dy()))
+
+    def __lt__(self, other):
+        return (other != None and (self._n < other.get_n() or self._n == other.get_n() and self._dy > other.get_dy()))
+
+    def __le__(self, other):
+        return (other != None and self._n <= other.get_n())
+
+    def __str__(self):
+        return f'[ n = {self._n} x = {self._x} dx = {self._dx} dy = {self._dy}]'
+
 
 class Edges:
-    def  __init__(self):
+    def __init__(self):
         self._edges_list = None
+        self._count = 0
 
-    def insert(self, n, x, dy):
-        buffer = Node(n, x, dy)
+    def insert(self, n, x, dy, deltax):
+        buffer = Node(n, x, dy, deltax)
 
         buffer_1 = self._edges_list
         buffer_2 = None
 
-        while buffer_1 != None and buffer_1.get_n() >= buffer.get_n():
-            buffer_2 = buffer_1
-            buffer_1 = buffer_1.get_next()
-
-        while buffer_1 != None and buffer_1.get_x() >= buffer.get_x():
+        while buffer_1 != None and buffer_1 > buffer:
             buffer_2 = buffer_1
             buffer_1 = buffer_1.get_next()
 
         if buffer_2 == None:
+            buffer.set_next(self._edges_list)
             self._edges_list = buffer
+            self._count += 1
+
         elif buffer_2 != buffer:
             buffer_2.set_next(buffer)
             buffer.set_next(buffer_1)
+            self._count += 1
 
     def get_active_edges(self, active_line):
-        active_list = None
+
         buffer_1 = self._edges_list
 
-        active_list = buffer_1
-
-        while buffer_1 != None and active_line >= buffer_1.get_n():
-            active_list.append(buffer_1)
+        while buffer_1 != None and active_line > buffer_1.get_n():
             buffer_1 = buffer_1.get_next()
 
-        return active_list
+        start = buffer_1
 
+        while buffer_1 != None and active_line <= buffer_1.get_n() and active_line >= buffer_1.get_end_n():
+            buffer_1 = buffer_1.get_next()
 
+        end = buffer_1
 
-def get_symmetrical_pixes(array, x, y, x0, y0, intensive=255, is_circle=False):
-    def scale_point(x1, y1, xm, ym, kx, ky):
-        x1 = kx * x1 + (1 - kx) * xm
-        y1 = ky * y1 + (1 - ky) * ym
-
-        return QPoint(x1, y1)
-
-    array.append([QPoint(x, y), intensive])
-    array.append([scale_point(x, y, x0, y0, 1, -1), intensive])
-    array.append([scale_point(x, y, x0, y0, -1, 1), intensive])
-    array.append([scale_point(x, y, x0, y0, -1, -1), intensive])
-
-    if is_circle:
-        array.append([QPoint(y - y0 + x0,  x - x0 + y0), intensive])
-        array.append([QPoint(-y + y0 + x0,  x - x0 + y0), intensive])
-        array.append([QPoint(y - y0 + x0, -x + x0 + y0), intensive])
-        array.append([QPoint(-y + y0 + x0, -x + x0 + y0), intensive])
-
-
-def get_sign(x):
-    if x > 0:
-        return 1
-    elif x < 0:
-        return -1
-    else:
-        return 0
-
-
-class AlgorithmFunctions:
-
-    def __init__(self):
-        return
-
-    def get_algorithms_list(self):
-        return {"Каноническое уравнение": [self.paint_circle_by_cartesian_form, self.paint_ellipse_by_cartesian_form],
-                "Параметрическое уравнение": [self.paint_circle_by_params_form, self.paint_ellipse_by_params_form],
-                "Метод средней точки": [self.paint_circle_by_middle_square, self.paint_ellipse_by_middle_square],
-                "Алгоритм Брезенхема": [self.paint_circle_by_brethenhem, self.paint_ellipse_by_brethenhem],
-                "Метод библиотеки PyQt": [self.paint_circle_by_library_function,
-                                          self.paint_ellipse_by_library_function],
-                }
+        return start, end
 
     @staticmethod
-    @analyzer
-    def paint_circle_by_cartesian_form(start_cords: QPoint, r):
-        result = []
-        x0 = start_cords.x()
-        y0 = start_cords.y()
+    def move_start(start: Node, actual_line):
+        while start != None and actual_line < start.get_n() - start.get_dy():
+            start = start.get_next()
 
-        for x in range(x0, round(x0 + r / (2 ** 0.5)) + 1):
-            y = round((r**2 - (x - x0)**2) ** 0.5) + y0
-            get_symmetrical_pixes(result, x, y, x0, y0, is_circle=True)
-
-        return result
+        return start
 
     @staticmethod
-    @analyzer
-    def paint_ellipse_by_cartesian_form(start_cords: QPoint, a, b):
-        result = []
-        x0 = start_cords.x()
-        y0 = start_cords.y()
+    def move_end(end: Node, actual_line):
+        while end != None and actual_line < end.get_n():
+            end = end.get_next()
 
-        sqr_ra = a * a
-        sqr_rb = b * b
+        return end
 
-        border_x = round(x0 + a / ((1 + sqr_rb / sqr_ra) ** 0.5))
-        border_y = round(y0 + b / ((1 + sqr_ra / sqr_rb) ** 0.5))
+    def get_edges_list(self):
+        return self._edges_list
 
-        for x in range(round(x0), border_x + 1):
-            y = round((sqr_ra * sqr_rb - (x - x0) ** 2 * sqr_rb) ** 0.5 / a) + y0
-            get_symmetrical_pixes(result, x, y, x0, y0)
+    def __del__(self):
+        while self._edges_list != None:
+            buffer_1 = self._edges_list.get_next()
+            del self._edges_list
+            self._edges_list = buffer_1
 
-        for y in range(border_y, round(y0) - 1, -1):
-            x = round((sqr_ra * sqr_rb - (y - y0) ** 2 * sqr_ra) ** 0.5 / b) + x0
-            get_symmetrical_pixes(result, x, y, x0, y0)
+    def __str__(self):
+        str_out = ""
 
-        return result
+        buffer: Node = self._edges_list
 
-    @staticmethod
-    @analyzer
-    def paint_circle_by_params_form(start_cords: QPoint, r):
-        result = []
-        x0 = start_cords.x()
-        y0 = start_cords.y()
+        while buffer != None:
+            str_out = f'{str_out} {buffer.__str__()}'
+            buffer = buffer.get_next()
 
-        t0 = 1 / r
-        t = pi / 4
+        return str_out
 
-        while t <= pi / 2:
-            x = x0 + round(r * cos(t))
-            y = y0 + round(r * sin(t))
-            get_symmetrical_pixes(result, x, y, x0, y0, is_circle=True)
+    def __len__(self):
+        return self._count
 
-            t += t0
 
-        return result
+class Figure:
+    def __init__(self, edges: Edges, start_point: QPoint):
+        self._edges = edges
+        self._start_point = start_point
+        self._actual_point = start_point
 
-    @staticmethod
-    @analyzer
-    def paint_ellipse_by_params_form(start_cords: QPoint, a, b):
-        result = []
-        x0 = start_cords.x()
-        y0 = start_cords.y()
+    def add_point(self, dot: QPoint):
+        n = max(dot.y(), self._actual_point.y())
+        dy = abs(dot.y() - self._actual_point.y())
+        x = dot.x() if dot.y() > self._actual_point.y() else self._actual_point.x()
+        deltax = dot.x() - self._actual_point.x() if dot.y() > self._actual_point.y() else self._actual_point.x() - dot.x()
 
-        if a > b:
-            t0 = 1 / a
-        else:
-            t0 = 1 / b
+        self._edges.insert(n, x, dy, deltax)
 
-        t = 0
+        self._actual_point = dot
 
-        while t <= pi / 2:
-            x = x0 + round(a * cos(t))
-            y = y0 + round(b * sin(t))
-            get_symmetrical_pixes(result, x, y, x0, y0)
+    def get_start_point(self):
+        return self._start_point
 
-            t += t0
+    def get_actual_point(self):
+        return self._actual_point
 
-        return result
-
-    @staticmethod
-    @analyzer
-    def paint_circle_by_middle_square(start_cords: QPoint, r):
-        result = []
-        x0 = round(start_cords.x())
-        y0 = round(start_cords.y())
-        x = round(r)
-        y = 0
-        step = 1 - r
-
-        get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0, is_circle=True)
-
-        while x >= y:
-            if step < 0:
-                y += 1
-                step += 2 * y + 1
-            else:
-                y += 1
-                x -= 1
-                step += 2 * y + 1 - 2 * x
-
-            get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0, is_circle=True)
-
-        return result
-
-    @staticmethod
-    @analyzer
-    def paint_ellipse_by_middle_square(start_cords: QPoint, a, b):
-        result = []
-        x0 = round(start_cords.x())
-        y0 = round(start_cords.y())
-        x = 0
-        y = round(b)
-        d = b ** 2 - a ** 2 * (b - 1/4)
-
-        get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
-
-        while 2 * (b ** 2) * x < 2 * (a ** 2) * y:
-            if d < 0:
-                x += 1
-                d += b ** 2 * 2 * x + b ** 2
-            else:
-                x += 1
-                y -= 1
-                d += b ** 2 * 2 * x - a ** 2 * 2 * y + b ** 2
-
-            get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
-
-        x = round(a)
-        y = 0
-
-        d = a ** 2 - b ** 2 * (a - 1/4)
-
-        get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
-
-        while 2 * (b ** 2) * x > 2 * (a ** 2) * y:
-            if d < 0:
-                y += 1
-                d += a ** 2 * 2 * y + a ** 2
-            else:
-                y += 1
-                x -= 1
-                d += a ** 2 * 2 * y - b ** 2 * 2 * x + a ** 2
-
-            get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
-
-        return result
-
-    @staticmethod
-    @analyzer
-    def paint_circle_by_brethenhem(start_cords: QPoint, r):
-        result = []
-        x0 = round(start_cords.x())
-        y0 = round(start_cords.y())
-        x = 0
-        y = round(r)
-        d = 2 * (1 - r)
-
-        get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0, is_circle=True)
-
-        while x <= y:
-            d1 = 2 * (d + y) - 1
-            x += 1
-
-            if d1 <= 0:
-                d += 2 * x + 1
-            else:
-                y -= 1
-                d += 2 * (x - y + 1)
-
-            get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0, is_circle=True)
-
-        return result
-
-    @staticmethod
-    @analyzer
-    def paint_ellipse_by_brethenhem(start_cords: QPoint, a, b):
-        result = []
-        x0 = round(start_cords.x())
-        y0 = round(start_cords.y())
-        x = 0
-        y = round(b)
-        sqr_ra = a * a
-        sqr_rb = b * b
-        d = sqr_rb - sqr_ra * (2 * b + 1)
-
-        get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
-
-        while y >= 0:
-
-            if d < 0:
-                d1 = 2 * d + sqr_ra * (2 * y + 2)
-
-                x += 1
-                if d1 < 0:
-                    d += sqr_rb * (2 * x + 1)
-                else:
-                    y -= 1
-                    d += sqr_rb * (2 * x + 1) + sqr_ra * (1 - 2 * y)
-            elif d > 0:
-                d2 = 2 * d + sqr_rb * (2 - 2 * x)
-
-                y -= 1
-                if d2 > 0:
-                    d += sqr_ra * (1 - 2 * y)
-                else:
-                    x += 1
-                    d += sqr_rb * (2 * x + 1) + sqr_ra * (1 - 2 * y)
-            else:
-                y -= 1
-                x += 1
-                d += sqr_rb * (2 * x + 1) + sqr_ra * (1 - 2 * y)
-
-            get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
-
-        return result
-    #
-    # @staticmethod
-    # @analyzer
-    # def paint_ellipse_by_brethenhem(start_cords: QPoint, a, b):
-    #     result = []
-    #     x0 = round(start_cords.x())
-    #     y0 = round(start_cords.y())
-    #     x = 0
-    #     y = round(b)
-    #     sqr_ra = a * a
-    #     sqr_rb = b * b
-    #     d = 4 * sqr_rb * ((x + 1) * (x + 1)) + sqr_ra * ((2 * y - 1) * (2 * y - 1)) - 4 * sqr_rb * sqr_ra
-    #
-    #     while sqr_ra * (2 * y - 1) >= 2 * sqr_rb * (x + 1):
-    #         get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
-    #          x += 1
-    #         if d >= 0:
-    #             d += 4 * sqr_rb * (2 * x + 3) - 8 * sqr_ra * (y - 1)
-    #             y -= 1
-    #         else:
-    #             d += 4 * sqr_rb * (2 * x + 3)
-    #
-    #     # d = sqr_rb * ((2 * x + 1) ** 2) + 4 * sqr_ra * ((y - 1) ** 2) - 4 * sqr_rb * sqr_ra
-    #
-    #     while (y >= 0):
-    #         y -= 1
-    #
-    #         if d < 0:
-    #             d += 4 * sqr_ra * (2 * y + 3)
-    #         else:
-    #             d += 4 * sqr_ra * (2 * y + 3) - 8 * sqr_rb * (1 + x)
-    #             x += 1
-    #
-    #         get_symmetrical_pixes(result, x0 + x, y0 + y, x0, y0)
-    #
-    #     return result
-
-    @staticmethod
-    @analyzer
-    def paint_circle_by_library_function(center: QPoint, r):
-        buffer = QGraphicsScene()
-        buffer.addEllipse(*(center.toTuple()), r * 2, r * 2)
-        del buffer
-
-        return [[*(center.toTuple()), r * 2, r * 2]]
-
-    @staticmethod
-    @analyzer
-    def paint_ellipse_by_library_function(center: QPoint, a, b):
-        buffer = QGraphicsScene()
-        buffer.addEllipse(*(center.toTuple()), a * 2, b * 2)
-        del buffer
-
-        return [[center.x() - a, center.y() - b, a * 2, b * 2]]
+# node_1 = Node(10, 13, 14)
+# node_2 = Node(3, 14, 19)
+#
+# print(node_1 <= node_2)
+#
+# edges = Edges()
+# edges.insert(10, 13, 14)
+# edges.insert(3, 14, 19)
+# edges.insert(50, 5, 6)
+# edges.insert(1, 1, 1)
+# print(edges)
+# value = edges.get_active_edges(11)
+# print(*value)
+# del edges

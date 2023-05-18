@@ -13,7 +13,7 @@ if __name__ == "__main__":
     }''')
 
     window = MainWindow()
-    window.setWindowTitle("ЛР №4, Конкина Алина, ИУ7-43Б")
+    window.setWindowTitle("ЛР №5, Конкина Алина, ИУ7-43Б")
     window.setStyleSheet("* {font-size: 14pt}")
 
     window.setWindowState(Qt.WindowMaximized)

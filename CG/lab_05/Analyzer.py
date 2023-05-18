@@ -3,20 +3,13 @@ from PySide6.QtCore import QPoint, QLine
 
 
 def analyzer(function):
-    def _wrapper(center, a, b=None, time_analyzer=False):
-        if time_analyzer:
-            start = time.time_ns()
+    def _wrapper(self, has_delay=False):
+        start = time.time_ns()
 
-        if b:
-            array = function(center, a, b)
-        else:
-            array = function(center, a)
+        result = function(self, has_delay)
 
-        if time_analyzer:
-            end = time.time_ns()
+        end = time.time_ns()
 
-            return end - start
-        else:
-            return array
+        return (end - start) // 1000000, result
 
     return _wrapper
