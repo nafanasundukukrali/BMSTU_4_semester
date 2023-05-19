@@ -159,7 +159,7 @@ T &Iterator<T>::operator *()
     this->_check_data_expairing(__LINE__);
 
     if (this->_index >= this->_size)
-        ExceptionIndex(__FILE__, __LINE__);
+        ExceptionOutOfIndex(__FILE__, __LINE__);
 
     std::shared_ptr<T[]> buffer = this->_data.lock();
 
@@ -172,7 +172,7 @@ T &Iterator<T>::operator *() const
     this->_check_data_expairing(__LINE__);
 
     if (this->_index >= this->_size)
-        ExceptionIndex(__FILE__, __LINE__);
+        ExceptionOutOfIndex(__FILE__, __LINE__);
 
     std::shared_ptr<T[]> buffer = this->_data.lock();
 
@@ -185,7 +185,7 @@ T *Iterator<T>::operator ->()
     this->_check_data_expairing(__LINE__);
 
     if (this->_index >= this->_size)
-        ExceptionIndex(__FILE__, __LINE__);
+        ExceptionOutOfIndex(__FILE__, __LINE__);
 
     std::shared_ptr<T[]> buffer = this->_data.lock();
 
@@ -198,7 +198,7 @@ T *Iterator<T>::operator ->() const
     this->_check_data_expairing(__LINE__);
 
     if (this->_index >= this->_size)
-        ExceptionIndex(__FILE__, __LINE__);
+        ExceptionOutOfIndex(__FILE__, __LINE__);
 
     std::shared_ptr<T[]> buffer = this->_data.lock();
 
@@ -213,7 +213,7 @@ T &Iterator<T>::operator[](const size_t index)
     size_t new_index = this->_index + index;
 
     if (new_index >= this->size)
-        ExceptionIndex(__FILE__, __LINE__);
+        ExceptionOutOfIndex(__FILE__, __LINE__);
 
     std::shared_ptr<T[]> buffer = this->_data.lock();
 
@@ -228,7 +228,7 @@ T &Iterator<T>::operator[](const size_t index) const
     size_t new_index = this->_index + index;
 
     if (new_index >= this->size)
-        ExceptionIndex(__FILE__, __LINE__);
+        ExceptionOutOfIndex(__FILE__, __LINE__);
 
     return *(this->_data.get() + index);
 }
@@ -239,7 +239,7 @@ void Iterator<T>::_check_valid_index(size_t line) const
     if (this->_index < this->_size)
         return;
 
-    throw ExceptionIndex(__FILE__, line);
+    throw ExceptionOutOfIndex(__FILE__, line);
 }
 
 template<MatrixType T>
@@ -260,7 +260,7 @@ void Iterator<T>::_increase(size_t count)
     size_t new_index = this->_index + count;
 
     if (new_index > this->_size)
-        throw ExceptionIndex(__FILE__, __LINE__);
+        throw ExceptionOutOfIndex(__FILE__, __LINE__);
 
     this->_index += count;
 }
@@ -274,7 +274,7 @@ void Iterator<T>::_dicrease(size_t count)
     size_t new_index = this->_index - count;
 
     if (new_index >= this->_size && new_index != size_t(0) - 1)
-        throw ExceptionIndex(__FILE__, __LINE__);
+        throw ExceptionOutOfIndex(__FILE__, __LINE__);
 
     this->_index -= count;
 }

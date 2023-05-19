@@ -36,12 +36,12 @@ public:
     };
 };
 
-class ExceptionIndex: public Exception
+class ExceptionOutOfIndex: public Exception
 {
 private:
     std::string _special_error_message = " (error type: index error)\n";
 public:
-    ExceptionIndex(std::string file, size_t line, std::string message = ""):
+    ExceptionOutOfIndex(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
         std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
@@ -76,12 +76,12 @@ public:
     }
 };
 
-class ExceptionEmptyObject: public Exception
+class ExceptionNowMatrixIsFree: public Exception
 {
 private:
-    std::string _special_error_message = " (error type: object (matrix ro row) free)\n";
+    std::string _special_error_message = " (error type: matrix is free)\n";
 public:
-    ExceptionEmptyObject(std::string file, size_t line, std::string message = ""):
+    ExceptionNowMatrixIsFree(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
         std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
@@ -89,12 +89,12 @@ public:
     }
 };
 
-class ExceptionIncorrectSrcParams: public Exception
+class ExceptionIncorrectSourceSizeParams: public Exception
 {
 private:
     std::string _special_error_message = " (error type: source object has incorrect params)\n";
 public:
-    ExceptionIncorrectSrcParams(std::string file, size_t line, std::string message = ""):
+    ExceptionIncorrectSourceSizeParams(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
         std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
@@ -108,32 +108,6 @@ private:
     std::string _special_error_message = " (error type: this operation is impossible for objects.)\n";
 public:
     ExceptionImpossibleOperation(std::string file, size_t line, std::string message = ""):
-        Exception(file, line)
-    {
-        std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
-        std::strncat(_error_message, _special_error_message.data(), sizeof(_error_message) - strlen(_error_message));
-    }
-};
-
-class ExceptionNullObjectPointer: public Exception
-{
-private:
-    std::string _special_error_message = " (error type: there was met null pointer)\n";
-public:
-    ExceptionNullObjectPointer(std::string file, size_t line, std::string message = ""):
-        Exception(file, line)
-    {
-        std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));
-        std::strncat(_error_message, _special_error_message.data(), sizeof(_error_message) - strlen(_error_message));
-    }
-};
-
-class ExceptionRowNotIterrable: public Exception
-{
-private:
-    std::string _special_error_message = " (error type: there was no iterable row)\n";
-public:
-    ExceptionRowNotIterrable(std::string file, size_t line, std::string message = ""):
         Exception(file, line)
     {
         std::strncat(_error_message, message.data(), sizeof(_error_message) - strlen(_error_message));

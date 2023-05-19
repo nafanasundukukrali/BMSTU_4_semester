@@ -15,20 +15,14 @@ public:
 protected:
     void _validate_empty(size_t line) const {
         if (this->_columns == 0 || this->_rows == 0)
-            throw ExceptionEmptyObject(__FILE__, line);
+            throw ExceptionNowMatrixIsFree(__FILE__, line);
     };
 
     void _validate_another_matrix_params(size_t rows, size_t columns, size_t line)
     {
         if (this->_rows != rows || this->_columns != columns)
-            throw ExceptionIncorrectSrcParams(__FILE__, line);
+            throw ExceptionIncorrectSourceSizeParams(__FILE__, line);
     };
-
-    void _validate_input_pointer(void *pointer, size_t line)
-    {
-        if (pointer == NULL)
-            throw ExceptionNullObjectPointer(__FILE__, line);
-    }
 
     size_t _rows = 0;
     size_t _columns = 0;

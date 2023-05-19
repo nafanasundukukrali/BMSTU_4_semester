@@ -59,46 +59,84 @@ public:
     bool operator == (const Matrix<U>& matrix) const;
     template <typename U> requires MatrixEqualityOperationRequires<U>
     bool operator != (const Matrix<U>& matrix) const;
+    template <typename U> requires MatrixEqualityOperationRequires<U>
+    bool equality(const Matrix<U>& matrix) const;
 
     template <typename U> requires MatrixSumOperationRequires<T, U>
     Matrix<T>& operator += (const Matrix<U>& matrix);
     template <typename U> requires MatrixSumOperationRequires<T, U>
-    Matrix<T> operator + (const Matrix<U>& matrix) const;
+    Matrix<T>& operator += (const U &value);
     template <typename U> requires MatrixSumOperationRequires<T, U>
-    void sum(const Matrix<U>& matrix);
+    Matrix<T> operator + (const Matrix<U> &value) const;
+    template <typename U> requires MatrixSumOperationRequires<T, U>
+    Matrix<T> operator + (const U &value) const;
+    template <typename U> requires MatrixSumOperationRequires<T, U>
+    friend Matrix<T> operator + (const U &value, const Matrix<T> &a);
+    template <typename U> requires MatrixSumOperationRequires<T, U>
+    Matrix<T> &sum_value(const U &number);
+    template <typename U> requires MatrixSumOperationRequires<T, U>
+    Matrix<T> sum_value(const U &number) const;
+    template <typename U> requires MatrixSumOperationRequires<T, U>
+    Matrix<T> &sum_matrix(const Matrix<U>& matrix);
+    template <typename U> requires MatrixSumOperationRequires<T, U>
+    Matrix<T> sum_matrix(const Matrix<U>& matrix) const;
 
     template <typename U> requires MatrixSubOperationRequires<T, U>
     Matrix<T>& operator -= (const Matrix<U>& matrix);
     template <typename U> requires MatrixSubOperationRequires<T, U>
+    Matrix<T>& operator -= (const U& value);
+    template <typename U> requires MatrixSubOperationRequires<T, U>
     Matrix<T> operator - (const Matrix<U>& matrix) const;
     template <typename U> requires MatrixSubOperationRequires<T, U>
-    void sub(const Matrix<U>& matrix);
+    Matrix<T> operator - (const U& value) const;
+    template <typename U> requires MatrixSubOperationRequires<T, U>
+    friend Matrix<T> operator - (const U &value, const Matrix<T> &a);
+    template <typename U> requires MatrixSubOperationRequires<T, U>
+    Matrix<T> &sub_value(const U& value);
+    template <typename U> requires MatrixSubOperationRequires<T, U>
+    Matrix<T> sub_value(const U& value) const;
+    template <typename U> requires MatrixSubOperationRequires<T, U>
+    Matrix<T> &sub_matrix(const Matrix<U>& matrix);
+    template <typename U> requires MatrixSubOperationRequires<T, U>
+    Matrix<T> sub_matrix(const Matrix<U>& matrix) const;
 
     template <typename U> requires MatrixMulOperationRequires<T, U>
     Matrix<T>& operator *= (const Matrix<U>& matrix);
     template <typename U> requires MatrixMulOperationRequires<T, U>
-    Matrix<T>& operator *= (const U value);
+    Matrix<T>& operator *= (const U &value);
     template <typename U> requires MatrixMulOperationRequires<T, U>
     Matrix<T> operator * (const Matrix<U>& matrix) const;
     template <typename U> requires MatrixMulOperationRequires<T, U>
-    Matrix<T> operator * (const U value) const;
+    Matrix<T> operator * (const U &value) const;
     template <typename U> requires MatrixMulOperationRequires<T, U>
-    void mul(const Matrix<U>& matrix);
+    friend Matrix<T> operator - (const U &value, const Matrix<T> &a);
     template <typename U> requires MatrixMulOperationRequires<T, U>
-    void mul(const U value);
+    Matrix<T> &mul_value(const U &value);
+    template <typename U> requires MatrixMulOperationRequires<T, U>
+    Matrix<T> mul_value(const U &value) const;
+    template <typename U> requires MatrixMulOperationRequires<T, U>
+    Matrix<T> &mul_matrix(const Matrix<U>& matrix);
+    template <typename U> requires MatrixMulOperationRequires<T, U>
+    Matrix<T> mul_matrix(const Matrix<U>& matrix) const;
 
     template <typename U> requires MatrixDivOperationRequires<T, U>
     Matrix<T>& operator /= (const Matrix<U>& matrix);
     template <typename U> requires MatrixDivOperationRequires<T, U>
-    Matrix<T>& operator /= (const U value);
+    Matrix<T>& operator /= (const U &value);
     template <typename U> requires MatrixDivOperationRequires<T, U>
     Matrix<T> operator / (const Matrix<U>& matrix) const;
     template <typename U> requires MatrixDivOperationRequires<T, U>
-    Matrix<T> operator / (const U value) const;
+    Matrix<T> operator / (const U &value) const;
     template <typename U> requires MatrixDivOperationRequires<T, U>
-    void div(const Matrix<U>& matrix);
+    friend Matrix<T> operator / (const U &value, const Matrix<T> &a);
     template <typename U> requires MatrixDivOperationRequires<T, U>
-    void div(const U value);
+    Matrix<T> &div_matrix(const Matrix<U>& matrix);
+    template <typename U> requires MatrixDivOperationRequires<T, U>
+    Matrix<T> div_matrix(const Matrix<U>& matrix) const;
+    template <typename U> requires MatrixDivOperationRequires<T, U>
+    Matrix<T> &div_value(const U &value);
+    template <typename U> requires MatrixDivOperationRequires<T, U>
+    Matrix<T> div_value(const U &value) const;
 
     class MatrixRow
     {
@@ -108,11 +146,17 @@ public:
 
         T& operator[](size_t column)
         {
+            if (column >= this->_columns)
+                ExceptionOutOfIndex(__FILE__, __LINE__);
+
             return this-> _parent._data.get()[column + this->_columns * this->_row_number];
         };
 
         const T& operator[](size_t column) const
         {
+            if (column >= this->_columns)
+                ExceptionOutOfIndex(__FILE__, __LINE__);
+
             return this->_parent._data.get()[column + this->_columns * this->_row_number];
         };
     private:
@@ -129,9 +173,11 @@ public:
     const T &operator()(size_t row, size_t col) const;
 
     bool is_square();
-    Matrix<T> transpose();
+    Matrix<T> &transpose();
     bool is_unit() requires MatrixOnlyFloatPointingRequires<T>;
-    Matrix<T> inverse() requires MatrixOnlyFloatPointingRequires<T>;
+    Matrix<T> &inverse() requires MatrixOnlyFloatPointingRequires<T>;
+    value_type get_det() requires MatrixOnlyFloatPointingRequires<T>;
+    Matrix<T> &make_unit() requires MatrixOnlyFloatPointingRequires<T>;
 
     iterator begin();
     iterator end();
@@ -160,13 +206,38 @@ public:
         }
     }
 
+    template <typename U> requires MatrixSumOperationRequires<T, U>
+    friend Matrix<T> operator + (const U &value, const Matrix<T> &a)
+    {
+        return a.sum_value(value);
+    }
+
+    template <typename U> requires MatrixSumOperationRequires<T, U>
+    friend Matrix<T> operator - (const U &value, const Matrix<T> &a)
+    {
+        return a.sub_value(value);
+    }
+
+    template <typename U> requires MatrixMulOperationRequires<T, U>
+    friend Matrix<T> operator * (const U &value, const Matrix<T> &a)
+    {
+        return a.mul_value(value);
+    }
+
+    template <typename U> requires MatrixMulOperationRequires<T, U>
+    friend Matrix<T> operator / (const U &value, const Matrix<T> &a)
+    {
+        Matrix<T> inv_matrix = a.inverse();
+
+        return inv_matrix.mul_value(value);
+    }
 private:
     std::shared_ptr<T[]> _data = nullptr;
-    void _reallocate_data();
-    void _check_input_matrix_size_params();
-    void _copy_data_from_another_range(auto &range);
+    Matrix<T> &_reallocate_data();
+    Matrix<T> &_check_input_matrix_size_params();
+    Matrix<T> &_copy_data_from_another_range(auto &range);
 
-    void _check_possibility_to_inverse();
+    Matrix<T> &_check_possibility_to_inverse();
 };
 
 #include "matrix.hpp"

@@ -86,6 +86,11 @@ int main(int argc, char *argv[])
 
  //   matrix[2][124];
 
+    cout << endl;
+    cout << matrix;
+    matrix = 5 + matrix;
+    cout << endl;
+    cout << matrix;
 
     return 0;
 }

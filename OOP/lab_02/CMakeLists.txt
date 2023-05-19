@@ -17,14 +17,10 @@ set(FILES matrix.h
     iterator.h
     iterator.hpp
     matrixbase.h
-#    matrixrow.h
-#    matrixrow.hpp
     const_iterator.h
     const_iterator.hpp
     exceptionmatrix.h
     concepts.h
-#    range.h
-#    range.cpp
 )
 
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UP)

@@ -9,26 +9,10 @@ template<MatrixType T>
 Matrix<T>::Matrix(const size_t rows, const size_t columns): MatrixBase(rows, columns)
 {
     if (rows == 0 || columns == 0)
-        throw ExceptionIndex(__FILE__,  __LINE__, "Matrix params incorrect.");
+        throw ExceptionOutOfIndex(__FILE__,  __LINE__, "Matrix params incorrect.");
 
     this->_reallocate_data();
 }
-
-//template<MatrixType T>
-//Matrix<T>::Matrix(const size_t rows, const size_t columns, const bool is_unit_matrix): MatrixBase(rows, columns)
-//{
-//    if (rows == 0 || columns == 0)
-//        throw ExceptionIndex(__FILE__,  __LINE__, "Matrix params incorrect.");
-
-//    if (rows != columns && is_unit_matrix)
-//        throw ExceptionImpossibleOperation(__FILE__,  __LINE__, "Not square matrix can't be unit.");
-
-//    this->_reallocate_data();
-
-//    std::ranges::for_each(*this, [] (auto &element) {element = 0;});
-
-//    if (is_unit_matrix) for (size_t i = 0; i < this->_columns; i++) (*this)[i][i] = 1;
-//}
 
 template<MatrixType T>
 Matrix<T>::Matrix(const Matrix<T> &matrix): MatrixBase(matrix._rows, matrix._columns)
@@ -57,7 +41,7 @@ Matrix<T>::Matrix(const Iter begin, const Iter_e end, const size_t column_size):
     for (auto iter = begin; iter != end; iter++, size_rows++);
 
     if (size_rows == 0 || size_rows % column_size != 0)
-        ExceptionIncorrectSrcParams(__FILE__, __LINE__, "Incorrect column_size param");
+        ExceptionIncorrectSourceSizeParams(__FILE__, __LINE__, "Incorrect column_size param");
 
     this->_columns = column_size;
     this->_rows = size_rows / column_size;
@@ -74,7 +58,7 @@ Matrix<T>::Matrix(FriendlyRange auto range, const size_t column_size): MatrixBas
     for (auto iter = std::begin(range); iter != std::end(range); iter++, size_rows++);
 
     if (size_rows == 0 || size_rows % column_size != 0)
-        ExceptionIncorrectSrcParams(__FILE__, __LINE__, "Incorrect column_size param");
+        ExceptionIncorrectSourceSizeParams(__FILE__, __LINE__, "Incorrect column_size param");
 
     this->_columns = column_size;
     this->_rows = size_rows / column_size;
@@ -186,6 +170,22 @@ Matrix<T>& Matrix<T>::operator = (const Container& matrix)
 }
 
 template<MatrixType T>
+Matrix<T> &Matrix<T>::make_unit() requires MatrixOnlyFloatPointingRequires<T>
+{
+    if (!this->is_square())
+        throw ExceptionImpossibleOperation(__FILE__, __LINE__,
+                                           "This matrix is not square, transposition is not availiable.");
+
+    Matrix<T> buffer(this->_rows, this->_columns);
+
+    std::ranges::for_each(*this, [] (auto &element) {element = 0;});
+
+    for (size_t i = 0; i < this->_columns; i++) (*this)[i][i] = 1;
+
+    return buffer;
+}
+
+template<MatrixType T>
 bool Matrix<T>::is_square()
 {
     return this->_columns == this->_rows && this->_rows != 0;
@@ -208,23 +208,54 @@ bool Matrix<T>::is_unit() requires MatrixOnlyFloatPointingRequires<T>
 }
 
 template<MatrixType T>
-Matrix<T> Matrix<T>::transpose()
+Matrix<T> &Matrix<T>::transpose()
 {
-    if (!this->is_square())
-        throw ExceptionImpossibleOperation(__FILE__, __LINE__,
-                                           "This matrix is not square, transposition is not availiable.");
-
-    Matrix<T> buffer(*this);
+    Matrix<T> buffer(this->_columns, this->_rows);
 
     for (size_t i = 0; i < this->_columns; i++)
-        for (size_t j = i + 1; j < this->_columns; j++)
-            std::swap(buffer[i][j], buffer[j][i]);
+        for (size_t j = i + 1; j < this->_rows; j++)
+            std::swap(buffer[i][j], (*this)[j][i]);
 
     return buffer;
 }
 
 template<MatrixType T>
-Matrix<T> Matrix<T>::inverse() requires MatrixOnlyFloatPointingRequires<T>
+T Matrix<T>::get_det() requires MatrixOnlyFloatPointingRequires<T>
+{
+    Matrix<T> U(*this);
+    Matrix<T> L(this->_rows, this->_columns);
+
+    for (size_t i = 0; i < this->_columns; i++)
+        for (size_t j = i; j < this->_columns; j++)
+            if (U[i][i] != 0)
+                L[j][i]=U[j][i]/U[i][i];
+            else
+                ExceptionImpossibleToDivide(__FILE__, __LINE__);
+
+    for(size_t k = 1; k < this->_columns; k++)
+    {
+        for(size_t i = k-1; i < this->_columns; i++)
+            for(size_t j = i; j < this->_columns; j++)
+                if (U[i][i] != 0)
+                    L[j][i]=U[j][i]/U[i][i];
+                else
+                    ExceptionImpossibleToDivide(__FILE__, __LINE__);
+
+        for(size_t i = k; i < this->_columns; i++)
+            for(size_t j = k-1; j < this->_columns; j++)
+                U[i][j]=U[i][j]-L[i][k-1]*U[k-1][j];
+    }
+
+    T prov = U[0][0];
+
+    for (size_t i = 1; i < this->_columns; i++)
+        prov *= U[i][i];
+
+    return prov;
+}
+
+template<MatrixType T>
+Matrix<T> &Matrix<T>::inverse() requires MatrixOnlyFloatPointingRequires<T>
 {
     this->_check_possibility_to_inverse();
 
@@ -236,10 +267,6 @@ Matrix<T> Matrix<T>::inverse() requires MatrixOnlyFloatPointingRequires<T>
             size_t k = j;
 
             for (; k < this->_columns && buffer[j][k] == 0; k++);
-
-            if (k == this->_columns)
-                throw ExceptionImpossibleOperation(__FILE__, __LINE__,
-                                                   "Inversion is not availiable, det is null.");
 
             std::swap_ranges(buffer.begin() + j * this->_columns, buffer.begin() + (j + 1) * this->_columns,
                              buffer.begin() + k * this->_columns);
@@ -286,6 +313,13 @@ bool Matrix<T>::operator == (const Matrix<U>& matrix) const
 
 template<MatrixType T>
 template <typename U> requires MatrixEqualityOperationRequires<U>
+    bool Matrix<T>::equality(const Matrix<U>& matrix) const
+{
+    return std::equal(this->begin(), this->end(), matrix.begin(), matrix.end());
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixEqualityOperationRequires<U>
 bool Matrix<T>::operator != (const Matrix<U>& matrix) const
 {
     return !std::ranges::equal(this->begin(), this->end(), matrix.begin(), matrix.end());
@@ -295,7 +329,7 @@ template<MatrixType T>
 Matrix<T>::MatrixRow Matrix<T>::operator [] (const size_t row)
 {
     if (this->_rows <= row)
-        throw ExceptionIndex(__FILE__,  __LINE__, "Icorrect row index.");
+        throw ExceptionOutOfIndex(__FILE__,  __LINE__, "Icorrect row index.");
 
     return MatrixRow(*this, row);
 }
@@ -304,7 +338,7 @@ template<MatrixType T>
 Matrix<T>::MatrixRow Matrix<T>::operator [] (const size_t row) const
 {
     if (this->_rows <= row)
-        throw ExceptionIndex(__FILE__, __LINE__, "Icorrect row index.");
+        throw ExceptionOutOfIndex(__FILE__, __LINE__, "Icorrect row index.");
 
     return MatrixRow(*this, row);
 }
@@ -323,27 +357,211 @@ const T &Matrix<T>::operator()(size_t row, size_t column) const
 
 template<MatrixType T>
 template <typename U> requires MatrixSumOperationRequires<T, U>
-void Matrix<T>::sum(const Matrix<U>& matrix)
+Matrix<T> &Matrix<T>::sum_matrix(const Matrix<U>& matrix)
+{
+    (*this) += matrix;
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSumOperationRequires<T, U>
+Matrix<T> Matrix<T>::sum_matrix(const Matrix<U>& matrix) const
+{
+    Matrix<T> buffer(*this);
+
+    buffer += matrix;
+
+    return buffer;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSumOperationRequires<T, U>
+Matrix<T> &Matrix<T>::sum_value(const U& value)
+{
+    (*this) += value;
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSumOperationRequires<T, U>
+    Matrix<T> Matrix<T>::sum_value(const U& value) const
+{
+    Matrix<T> buffer(*this);
+
+    buffer += value;
+
+    return buffer;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSubOperationRequires<T, U>
+Matrix<T> &Matrix<T>::sub_value(const U& value)
+{
+    (*this) -= value;
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSubOperationRequires<T, U>
+Matrix<T> Matrix<T>::sub_value(const U& value) const
+{
+    Matrix<T> buffer(*this);
+
+    buffer -= value;
+
+    return buffer;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSubOperationRequires<T, U>
+Matrix<T> &Matrix<T>::sub_matrix(const Matrix<U>& matrix)
+{
+    (*this) -= matrix;
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSubOperationRequires<T, U>
+Matrix<T> Matrix<T>::sub_matrix(const Matrix<U>& matrix) const
+{
+    Matrix<T> buffer(*this);
+
+    buffer -= matrix;
+
+    return buffer;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixMulOperationRequires<T, U>
+Matrix<T> &Matrix<T>::mul_matrix(const Matrix<U>& matrix)
+{
+    (*this) *= matrix;
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixMulOperationRequires<T, U>
+Matrix<T> Matrix<T>::mul_matrix(const Matrix<U>& matrix) const
+{
+    Matrix<T> buffer(*this);
+
+    buffer *= matrix;
+
+    return buffer;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixDivOperationRequires<T, U>
+Matrix<T> &Matrix<T>::div_value(const U &value)
+{
+    (*this) /= value;
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixDivOperationRequires<T, U>
+Matrix<T> Matrix<T>::div_value(const U &value) const
+{
+    Matrix<T> buffer(*this);
+
+    buffer /= value;
+
+    return buffer;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixDivOperationRequires<T, U>
+Matrix<T> &Matrix<T>::div_matrix(const Matrix<U>& matrix)
+{
+    (*this) /= matrix;
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixDivOperationRequires<T, U>
+Matrix<T> Matrix<T>::div_matrix(const Matrix<U>& matrix) const
+{
+    Matrix<T> buffer(*this);
+
+    buffer /= matrix;
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixMulOperationRequires<T, U>
+Matrix<T> &Matrix<T>::mul_value(const U &value)
+{
+    (*this) *= value;
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixMulOperationRequires<T, U>
+Matrix<T> Matrix<T>::mul_value(const U &value) const
+{
+    Matrix<T> buffer(*this);
+
+    buffer *= value;
+
+    return buffer;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSumOperationRequires<T, U>
+Matrix<T>& Matrix<T>::operator += (const Matrix<U>& matrix)
 {
     this->_validate_another_matrix_params(matrix._rows, matrix._columns, __LINE__);
 
     std::transform(this->begin(), this->end(), matrix.begin(), this->begin(),
                    [](auto &left, auto &right) { return left + right; });
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSumOperationRequires<T, U>
+Matrix<T>& Matrix<T>::operator += (const U& value)
+{
+    std::transform(this->begin(), this->end(), this->begin(),
+                   [value] (auto &left) { return left + value; });
+
+    return *this;
 }
 
 template<MatrixType T>
 template <typename U> requires MatrixSubOperationRequires<T, U>
-void Matrix<T>::sub(const Matrix<U>& matrix)
+Matrix<T>& Matrix<T>::operator -= (const Matrix<U>& matrix)
 {
     this->_validate_another_matrix_params(matrix._rows, matrix._columns, __LINE__);
 
     std::transform(this->begin(), this->end(), matrix.begin(), this->begin(),
                    [](auto &left, auto &right) { return left - right; });
+
+    return *this;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSubOperationRequires<T, U>
+Matrix<T>& Matrix<T>::operator -= (const U& value)
+{
+    std::transform(this->begin(), this->end(), this->begin(),
+                   [value](auto &left) { return left - value; });
+
+    return *this;
 }
 
 template<MatrixType T>
 template <typename U> requires MatrixMulOperationRequires<T, U>
-void  Matrix<T>::mul(const Matrix<U>& matrix)
+Matrix<T>& Matrix<T>::operator *= (const Matrix<U>& matrix)
 {
     if (this->_columns != matrix._rows)
         throw ExceptionImpossibleOperation(__FILE__,  __LINE__, "Incorrect count of rows vs columns for mul.");
@@ -362,32 +580,25 @@ void  Matrix<T>::mul(const Matrix<U>& matrix)
     }
 
     *this = buffer;
-}
 
-template<MatrixType T>
-template <typename U> requires MatrixDivOperationRequires<T, U>
-void Matrix<T>::div(const Matrix<U>& matrix)
-{
-    if (this->_columns != matrix._rows)
-        throw ExceptionImpossibleOperation(__FILE__,  __LINE__, "Incorrect count of rows vs columns for div.");
-
-    Matrix<T> buffer = matrix.inverse();
-    this->mul(buffer);
+    return *this;
 }
 
 template<MatrixType T>
 template <typename U> requires MatrixMulOperationRequires<T, U>
-void Matrix<T>::mul(const U value)
+Matrix<T>& Matrix<T>::operator *= (const U &value)
 {
     this->_validate_empty(__LINE__);
 
     std::transform(this->begin(), this->end(), this->begin(),
                    [value](auto &left, auto &right) { return left * value; });
+
+    return *this;
 }
 
 template<MatrixType T>
 template <typename U> requires MatrixDivOperationRequires<T, U>
-void Matrix<T>::div(const U value)
+Matrix<T>& Matrix<T>::operator /= (const U &value)
 {
     if (value == 0)
         ExceptionImpossibleToDivide(__FILE__, __LINE__);
@@ -395,49 +606,6 @@ void Matrix<T>::div(const U value)
     this->_validate_empty(__LINE__);
 
     for (auto &x: *this) x /= value;
-}
-
-template<MatrixType T>
-template <typename U> requires MatrixSumOperationRequires<T, U>
-Matrix<T>& Matrix<T>::operator += (const Matrix<U>& matrix)
-{
-    this->sum(matrix);
-
-    return *this;
-}
-
-template<MatrixType T>
-template <typename U> requires MatrixSubOperationRequires<T, U>
-Matrix<T>& Matrix<T>::operator -= (const Matrix<U>& matrix)
-{
-    this->sub(matrix);
-
-    return *this;
-}
-
-template<MatrixType T>
-template <typename U> requires MatrixMulOperationRequires<T, U>
-Matrix<T>& Matrix<T>::operator *= (const Matrix<U>& matrix)
-{
-    this->mul(matrix);
-
-    return *this;
-}
-
-template<MatrixType T>
-template <typename U> requires MatrixMulOperationRequires<T, U>
-Matrix<T>& Matrix<T>::operator *= (const U value)
-{
-    this->mul(value);
-
-    return *this;
-}
-
-template<MatrixType T>
-template <typename U> requires MatrixDivOperationRequires<T, U>
-Matrix<T>& Matrix<T>::operator /= (const U value)
-{
-    this->div(value);
 
     return *this;
 }
@@ -446,9 +614,12 @@ template<MatrixType T>
 template <typename U> requires MatrixDivOperationRequires<T, U>
     Matrix<T>& Matrix<T>::operator /= (const Matrix<U> &matrix)
 {
-    this->div(matrix);
+    if (this->_columns != matrix._rows)
+        throw ExceptionImpossibleOperation(__FILE__,  __LINE__, "Incorrect count of rows vs columns for div.");
 
-    return *this;
+    Matrix<T> buffer = matrix.inverse();
+
+    return this->mul(buffer);
 }
 
 template<MatrixType T>
@@ -457,7 +628,18 @@ Matrix<T> Matrix<T>::operator + (const Matrix<U>& matrix) const
 {
     Matrix<T> buffer (*this);
 
-    buffer.sum(matrix);
+    buffer += matrix;
+
+    return buffer;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSumOperationRequires<T, U>
+Matrix<T> Matrix<T>::operator + (const U& value) const
+{
+    Matrix<T> buffer (*this);
+
+    buffer += value;
 
     return buffer;
 }
@@ -468,7 +650,18 @@ Matrix<T> Matrix<T>::operator - (const Matrix<U>& matrix) const
 {
     Matrix<T> buffer (*this);
 
-    buffer.sub(matrix);
+    buffer -= matrix;
+
+    return buffer;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixSubOperationRequires<T, U>
+    Matrix<T> Matrix<T>::operator - (const U& value) const
+{
+    Matrix<T> buffer (*this);
+
+    buffer -= value;
 
     return buffer;
 }
@@ -479,7 +672,18 @@ Matrix<T> Matrix<T>::operator * (const Matrix<U>& matrix) const
 {
     Matrix<T> buffer (*this);
 
-    buffer.mul(matrix);
+    buffer *= matrix;
+
+    return buffer;
+}
+
+template<MatrixType T>
+template <typename U> requires MatrixMulOperationRequires<T, U>
+    Matrix<T> Matrix<T>::operator * (const U &value) const
+{
+    Matrix<T> buffer (*this);
+
+    buffer *= value;
 
     return buffer;
 }
@@ -490,18 +694,18 @@ Matrix<T> Matrix<T>::operator / (const Matrix<U>& matrix) const
 {
     Matrix<T> buffer(this);
 
-    buffer.div(matrix);
+    buffer /= matrix;
 
     return buffer;
 }
 
 template<MatrixType T>
 template <typename U> requires MatrixDivOperationRequires<T, U>
-Matrix<T> Matrix<T>::operator / (const U value) const
+Matrix<T> Matrix<T>::operator / (const U &value) const
 {
     Matrix<T> buffer(this);
 
-    buffer.div(value);
+    buffer /= value;
 
     return buffer;
 }
@@ -510,13 +714,6 @@ template<MatrixType T>
 size_t Matrix<T>::get_rows_count() const
 {
     return this->_rows;
-}
-
-template<MatrixType T>
-template <typename U> requires MatrixMulOperationRequires<T, U>
-Matrix<T> Matrix<T>::operator * (const U value) const
-{
-    return this->mul(value);
 }
 
 template<MatrixType T>
@@ -598,7 +795,7 @@ size_t Matrix<T>::size() const
 }
 
 template<MatrixType T>
-void Matrix<T>::_reallocate_data()
+Matrix<T> &Matrix<T>::_reallocate_data()
 {
     try
     {
@@ -608,27 +805,31 @@ void Matrix<T>::_reallocate_data()
     {
         throw ExceptionBadAllocate(__FILE__, __LINE__);
     }
+
+    return *this;
 }
 
 template<MatrixType T>
-void Matrix<T>::_copy_data_from_another_range(auto &range)
+Matrix<T> &Matrix<T>::_copy_data_from_another_range(auto &range)
 {
     auto iter_1 = this->begin();
 
     for (auto &iter: range)
         if (this->_columns != iter.size())
         {
-            throw ExceptionIndex(__FILE__, __LINE__, "Error of list element.");
+            throw ExceptionOutOfIndex(__FILE__, __LINE__, "Error of list element.");
         }
         else
         {
             std::ranges::copy(iter, iter_1);
             iter_1 += this->_columns;
         }
+
+    return *this;
 }
 
 template<MatrixType T>
-void Matrix<T>::_check_possibility_to_inverse()
+Matrix<T> &Matrix<T>::_check_possibility_to_inverse()
 {
     if (!this->is_square())
         throw ExceptionImpossibleOperation(__FILE__, __LINE__,
@@ -639,4 +840,10 @@ void Matrix<T>::_check_possibility_to_inverse()
     if (buffer_1.is_unit())
         throw ExceptionImpossibleOperation(__FILE__, __LINE__,
                                            "Inversion is not availiable.");
+
+    if (this->get_det() == 0)
+        throw ExceptionImpossibleOperation(__FILE__, __LINE__,
+                                           "Inversion is not availiable.");
+
+    return *this;
 }
