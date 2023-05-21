@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-05-21T20:10:37.085Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36" etag="i4xyNgunmrx4oK7k5oHH" version="21.3.2" type="github">
+<mxfile host="app.diagrams.net" modified="2023-05-21T20:11:38.705Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36" etag="YATnb3oFy0Ro5qu1o-_h" version="21.3.2" type="github">
   <diagram name="Страница 1" id="2MGMtZlh2h4HA8_L39vP">
     <mxGraphModel dx="3841" dy="775" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -46,17 +46,6 @@
         </mxCell>
         <mxCell id="clHbF1uwZo1WC1rtEak4-17" value="+ execute()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;labelBackgroundColor=none;rounded=1;" parent="clHbF1uwZo1WC1rtEak4-14" vertex="1">
           <mxGeometry y="60" width="160" height="26" as="geometry" />
-        </mxCell>
-        <mxCell id="AC55zJXRTk2Af3ENXTTx-234" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;endSize=14;endArrow=diamond;endFill=1;startArrow=open;startFill=0;startSize=14;" edge="1" parent="1" source="clHbF1uwZo1WC1rtEak4-18" target="AC55zJXRTk2Af3ENXTTx-188">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="-1600" y="280" as="targetPoint" />
-            <Array as="points">
-              <mxPoint x="454" y="410" />
-              <mxPoint x="551" y="410" />
-              <mxPoint x="551" y="270" />
-              <mxPoint x="-1480" y="270" />
-            </Array>
-          </mxGeometry>
         </mxCell>
         <mxCell id="clHbF1uwZo1WC1rtEak4-18" value="CameraCommand" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;rounded=1;" parent="1" vertex="1">
           <mxGeometry x="334" y="480" width="160" height="86" as="geometry" />
