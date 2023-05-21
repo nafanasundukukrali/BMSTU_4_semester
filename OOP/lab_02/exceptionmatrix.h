@@ -128,6 +128,4 @@ public:
     }
 };
 
-#include "exceptionmatrix.hpp"
-
 #endif // EXCEPTION_H

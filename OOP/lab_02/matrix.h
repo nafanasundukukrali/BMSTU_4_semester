@@ -46,9 +46,8 @@ public:
     Matrix(std::initializer_list<std::initializer_list<T>> list);
     ~Matrix() noexcept = default;
 
-    Matrix<T>& operator = (const Matrix<T>& matrix);
-    Matrix<T>& operator = (Matrix<T>& matrix);
-    Matrix<T>& operator = (Matrix<T>&& matrix);
+    Matrix<T>& operator = (const Matrix<T>& matrix)es
+    Matrix<T>& operator = (Matrix<T>&& matrix) noexcept;
     Matrix<T>& operator = (std::initializer_list<std::initializer_list<T>> list);
     template <MatrixType U>
     Matrix<T>& operator = (const Matrix<U>& matrix);
@@ -241,6 +240,5 @@ private:
 };
 
 #include "matrix.hpp"
-#include "matrixrow.hpp"
 
 #endif // MATRIX_H

@@ -2,7 +2,7 @@
 #define MATRIXBASE_H
 
 #include <cstddef>
-#include <exceptionmatrix.h>
+#include "exceptionmatrix.h"
 #include <typeinfo>
 
 class MatrixBase
@@ -27,7 +27,5 @@ protected:
     size_t _rows = 0;
     size_t _columns = 0;
 };
-
-#include "matrixbase.hpp"
 
 #endif // MATRIXBASE_H

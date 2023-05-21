@@ -119,24 +119,11 @@ Matrix<T>& Matrix<T>::operator = (const Matrix<T>& matrix)
 }
 
 template<MatrixType T>
-Matrix<T>& Matrix<T>::operator = (Matrix<T>&& matrix)
+Matrix<T>& Matrix<T>::operator = (Matrix<T>&& matrix) noexcept
 {
     this->_rows = matrix._rows;
     this->_columns = matrix._columns;
     this->_data = matrix._data;
-
-    return *this;
-}
-
-template<MatrixType T>
-Matrix<T>& Matrix<T>::operator = (Matrix<T>& matrix)
-{
-    this->_rows = matrix._rows;
-    this->_columns = matrix._columns;
-
-    this->_reallocate_data();
-
-    std::ranges::copy(matrix.begin(), matrix.end(), this->begin());
 
     return *this;
 }
