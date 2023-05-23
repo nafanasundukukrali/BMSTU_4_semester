@@ -22,8 +22,7 @@ edit_id     equ    2
 text_id     equ    0        
 
 .data?
-hinstance        HINSTANCE ?     
-command_line     LPSTR ?         
+hinstance        HINSTANCE ?            
 hwnd_button      HWND ?           
 hwnd_text        HWND ?         
 hwnd_edit1       HWND ?           
@@ -56,6 +55,7 @@ main_window    proc    hinst:HINSTANCE, hPrevInst:HINSTANCE, CmdLine:DWORD, CmdS
     invoke    CreateWindowEx, WS_EX_CLIENTEDGE, addr class_name,\
         addr win_name, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,\
         CW_USEDEFAULT, 300, 300, NULL, NULL, hinst, NULL
+
     mov    hwnd, eax 
 
     invoke    ShowWindow, hwnd, SW_SHOWNORMAL 
@@ -78,26 +78,35 @@ numbers_sum    proc  hwnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM
 .ELSEIF uMsg == WM_CREATE
     invoke    CreateWindowEx,WS_EX_CLIENTEDGE,addr edit_name,\
         NULL, WS_CHILD or WS_VISIBLE or WS_BORDER or ES_LEFT or\
-        ES_AUTOHSCROLL, 50, 35, 200, 25, hwnd, 8, hinstance, NULL
+        ES_AUTOHSCROLL, 50, 35, 200, 25, hwnd, edit_id, hinstance, NULL
+
     mov    hwnd_edit1, eax
     
     invoke    CreateWindowEx, WS_EX_CLIENTEDGE, addr edit_name,\
         NULL, WS_CHILD or WS_VISIBLE or WS_BORDER or ES_LEFT or\
-        ES_AUTOHSCROLL, 50, 105, 200, 25, hwnd, 8, hinstance, NULL
+        ES_AUTOHSCROLL, 50, 105, 200, 25, hwnd, edit_id, hinstance, NULL
     mov    hwnd_edit2, eax
 
-    invoke    CreateWindowEx, NULL, addr button_name, addr button_text,\
-        WS_CHILD or WS_VISIBLE or BS_DEFPUSHBUTTON,
-        75, 140, 140, 25, hwnd, button_id, hinstance, NULL
-    mov    hwnd_button, eax
+    ;invoke    CreateWindowEx, NULL, addr button_name, addr button_text,\
+    ;    WS_CHILD or WS_VISIBLE or BS_DEFPUSHBUTTON,
+    ;    75, 140, 140, 25, hwnd, button_id, hinstance, NULL
+    ;mov    hwnd_button, eax
+
 
     invoke CreateWindowEx, 0,
             addr text_name, addr text_text,
             WS_CHILD or WS_VISIBLE or ES_LEFT,
             75,70,140,25, hwnd, text_id,
             hinstance, NULL
-            
+
     mov    hwnd_text, eax
+    
+    invoke    CreateWindowEx, NULL, addr button_name, addr button_text,\
+        WS_CHILD or WS_VISIBLE or BS_DEFPUSHBUTTON,
+        75, 140, 140, 25, hwnd, button_id, hwnd_text, NULL
+        
+    mov    hwnd_button, eax
+
 
 
 .ELSEIF uMsg == WM_COMMAND
@@ -127,7 +136,8 @@ numbers_sum    proc  hwnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM
             mul    cx
             add    eax, ebx
             pop    ebx
-            add eax, ebx
+            sub ebx, eax
+            mov eax, ebx
             invoke wsprintf, addr buf, addr format_result, eax
             invoke MessageBox, hwnd, addr buf, addr win_name, MB_OK
 
