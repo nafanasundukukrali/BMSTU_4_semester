@@ -1,7 +1,12 @@
 from PySide6.QtWidgets import QMessageBox
+from PySide6.QtGui import QColor
 
-TASK = ("Реализовать и исследовать  один из алгоритмов (по заданию преподавателя)  растрового заполнения области.\n"
-        "Вариант №9: Алгоритм с упорядоченным списком ребер (лучший вариант).")
+TASK = ("Реализовать и исследовать  алгоритм построчного затравочного заполнения.")
+
+class BASE_COLORS:
+    fill_color = QColor(255, 0, 0)
+    edges_color = QColor(0, 255, 0)
+    background_color = QColor(255, 255, 255)
 
 class ERRORS:
     ERROR_MODIFICATION_PARAMS = 1

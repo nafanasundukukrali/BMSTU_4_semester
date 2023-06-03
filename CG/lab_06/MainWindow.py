@@ -20,6 +20,8 @@ class MainWindow(QMainWindow):
                                      self._draw_data,
                                      self._paintField.close_figure,
                                      self._paintField.add_point,
+                                     self._paintField.draw_ellipse,
+                                     self._paintField.change_point_select_status,
                                      self._paintField.change_background_color,
                                      self._paintField.change_pen_color,
                                      self._paintField.change_fill_color,

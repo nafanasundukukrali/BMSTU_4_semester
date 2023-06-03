@@ -1,10 +1,11 @@
 from PySide6.QtWidgets import QFrame
-from PySide6.QtGui import QFont, QPainter, QPen, QColor, QPixmap
+from PySide6.QtGui import QFont, QPainter, QPen, QColor, QPixmap, QImage
 from PySide6.QtCore import QPoint, Qt, QTimer, QThread, QEventLoop
-from AlgorithmFunctions import Edges, Figure
+from AlgorithmFunctions import Figure
 from Analyzer import analyzer
 import time
-from config import MessageDisplay
+from config import MessageDisplay, BASE_COLORS
+from copy import deepcopy
 
 
 class PaintField(QFrame):
@@ -14,20 +15,22 @@ class PaintField(QFrame):
         self.setFont(QFont("Times", 15, QFont.Bold))
         self.setFixedSize(*params)
         self._background = QPixmap(self.size())
-        self._image = QPixmap(self.size())
-        self._pen_color = QColor(0, 0, 0)
-        self._fill_color = QColor(0, 0, 0)
-        self._background_color = QColor(255, 255, 255)
+        pixmap = QPixmap(self.size())
+        self._image = pixmap.toImage()
+        self._pen_color = BASE_COLORS.edges_color
+        self._fill_color = BASE_COLORS.fill_color
+        self._background_color = BASE_COLORS.background_color
         self._background.fill(self._background_color)
         self._image.fill(Qt.transparent)
-        self._edges = Edges()
         self._actual_figure = None
+        self._actual_draw_point_status = False
+        self._actual_start = None
 
     def paintEvent(self, event):
         super().paintEvent(event)
         painter = QPainter(self)
         painter.drawPixmap(QPoint(), self._background)
-        painter.drawPixmap(QPoint(), self._image)
+        painter.drawImage(QPoint(), self._image)
 
     def close_figure(self):
         if self._actual_figure == None:
@@ -48,92 +51,96 @@ class PaintField(QFrame):
 
     @analyzer
     def draw_data(self, has_delay=False):
-        if self._actual_figure != None:
-            return MessageDisplay(self, "Присутствует незамкнутый многоугольник.")
+        if self._actual_start is None:
+            return MessageDisplay(self, "Не был введён начальный затравочный пиксель.")
 
-        if self._edges.get_edges_list() is None:
-            return MessageDisplay(self, "Список рёбер пуст.")
+        color = self._image.pixelColor(self._actual_start)
 
-        start, end = self._edges.get_active_edges(self._edges.get_edges_list().get_n())
+        if color == self._pen_color:
+            return MessageDisplay(self, "Выбран в качестве затравочного пикселя пиксель на границе..")
 
-        y_groups = []
+        stack = [deepcopy(self._actual_start)]
 
-        CAP = []
+        while len(stack):
+            actual_dot: QPoint = stack.pop()
+            color = self._image.pixelColor(actual_dot)
+            self._draw_point(actual_dot)
 
-        buffer_start = start
+            start_dot = deepcopy(actual_dot)
+            actual_dot.setX(actual_dot.x() - 1)
+            color = self._image.pixelColor(actual_dot)
 
-        while buffer_start != end:
-            CAP.append(buffer_start.copy())
-            buffer_start = buffer_start.get_next()
+            while actual_dot.x() != 0 and color != self._pen_color:
+                self._draw_point(actual_dot)
+                actual_dot.setX(actual_dot.x() - 1)
+                color = self._image.pixelColor(actual_dot)
 
-        actual_line = start.get_n()
-        real_start = start.get_n()
+            x_left = actual_dot.x() + 1
+            actual_dot = start_dot
+            actual_dot.setX(actual_dot.x() + 1)
 
-        while start != None:
-            start = Edges.move_start(start, actual_line)
+            color = self._image.pixelColor(actual_dot)
 
-            while end != None and actual_line <= end.get_n():
-                CAP.append(end.copy())
-                end = end.get_next()
+            while actual_dot.x() < self._image.width() - 1 and color != self._pen_color:
+                self._draw_point(actual_dot)
+                actual_dot.setX(actual_dot.x() + 1)
+                color = self._image.pixelColor(actual_dot)
 
-            y_groups.append([])
-            delete_list = []
-            CAP.sort(key=lambda value: value.get_x())
+            x_right = actual_dot.x() - 1
 
-            for k in range(len(CAP)):
-                i = 0
+            def add_to_stack_new_start_dot():
+                while actual_dot.x() <= x_right:
+                    flag = False
+                    color = self._image.pixelColor(actual_dot)
 
-                while i < len(y_groups[-1]) and round(CAP[k].get_x()) != y_groups[-1][i]:
-                    i += 1
+                    while actual_dot.x() <= x_right and color != self._pen_color and color != self._fill_color:
+                        if flag == False:
+                            flag = True
 
-                if i != len(y_groups[-1]) and y_groups[-1][i] == round(CAP[k].get_x()):
-                    if (actual_line == CAP[k].get_n() and CAP[i].get_dy() < 0
-                            or CAP[k].get_dy() == 0 and actual_line == CAP[i].get_n()):
-                        delete_list.append(i)
+                        actual_dot.setX(actual_dot.x() + 1)
+                        color = self._image.pixelColor(actual_dot)
 
-                y_groups[-1].append(round(CAP[k].get_x()))
+                    if flag == True:
+                        color = self._image.pixelColor(actual_dot)
 
-                CAP[k].minusY()
-                CAP[k].minusX()
+                        if actual_dot.x() == x_right and color != self._pen_color and color != self._fill_color:
+                            stack.append(deepcopy(actual_dot))
+                        else:
+                            buffer = deepcopy(actual_dot)
+                            buffer.setX(actual_dot.x() - 1)
+                            stack.append(deepcopy(buffer))
 
-            for i in delete_list:
-                y_groups[-1].pop(i)
+                    x_in = actual_dot.x()
+                    color = self._image.pixelColor(actual_dot)
 
-            i = len(CAP) - 1
+                    while color == self._pen_color or self._pen_color == self._fill_color and actual_dot.x() < x_right:
+                        actual_dot.setX(actual_dot.x() + 1)
+                        color = self._image.pixelColor(actual_dot)
 
-            while i > -1:
-                if CAP[i].get_dy() < 1:
-                    CAP.pop(i)
+                    if actual_dot.x() == x_in:
+                        actual_dot.setX(actual_dot.x() + 1)
 
-                i -= 1
+            actual_dot.setX(x_left)
 
-            y_groups[-1].sort()
+            if actual_dot.y() - 1 >= 1:
+                actual_dot.setY(actual_dot.y() - 1)
+                add_to_stack_new_start_dot()
 
-            actual_line -= 1
+            actual_dot.setX(x_left)
 
-        for i in range(0, len(y_groups)):
-            for j in range(0, len(y_groups[i]) - len(y_groups[i]) % 2, 2):
-                self._draw_line(y_groups[i][j], y_groups[i][j + 1], real_start)
+            if actual_dot.y() + 2 < self._image.height():
+                actual_dot.setY(actual_dot.y() + 2)
+                add_to_stack_new_start_dot()
 
             if has_delay:
-                loop = QEventLoop()
-                QTimer.singleShot(50, loop.quit)
-                loop.exec()
+                if has_delay:
+                    loop = QEventLoop()
+                    QTimer.singleShot(50, loop.quit)
+                    loop.exec()
 
-            real_start -= 1
 
-    def _draw_line(self, start_x, end_x, actual_line):
-        painter = QPainter(self._image)
-
-        pen = QPen()
-        pen.setColor(self._fill_color)
-        painter.setPen(pen)
-
-        while start_x < end_x:
-            painter.drawPoint(start_x, actual_line)
-            start_x += 1
-
-        painter.end()
+    def _draw_point(self, dot: QPoint):
+        self._image.setPixelColor(dot, self._fill_color)
 
         self.update()
 
@@ -144,29 +151,46 @@ class PaintField(QFrame):
             return 1
         return 0
 
+    def change_point_select_status(self):
+        self._actual_draw_point_status = not self._actual_draw_point_status
+
     def add_point(self, dot: QPoint):
         painter = QPainter(self._image)
-
         pen = QPen()
-        pen.setColor(self._pen_color)
+
+        if not self._actual_draw_point_status:
+            pen.setColor(self._pen_color)
+
         painter.setPen(pen)
 
-        if self._actual_figure is None:
-            self._actual_figure = Figure(self._edges, dot)
-        else:
+        if not self._actual_draw_point_status and self._actual_figure is None:
+            self._actual_figure = Figure(dot)
+        elif not self._actual_draw_point_status:
             painter.drawLine(self._actual_figure.get_actual_point(), dot)
             self._actual_figure.add_point(dot)
 
             if self._actual_figure.get_start_point() == dot:
                 del self._actual_figure
                 self._actual_figure = None
+        if self._actual_draw_point_status:
+            self._actual_start = dot
 
-        pen.setWidth(3)
         painter.setPen(pen)
-        painter.drawPoint(dot)
+
+        if not self._actual_draw_point_status:
+            painter.drawPoint(dot)
 
         painter.end()
 
+        self.update()
+
+    def draw_ellipse(self, dot: QPoint, a: float, b: float):
+        painter = QPainter(self._image)
+        pen = QPen()
+        pen.setColor(self._pen_color)
+        painter.setPen(pen)
+        painter.drawEllipse(dot, a, b)
+        painter.end()
         self.update()
 
     def mousePressEvent(self, ev):
@@ -177,6 +201,7 @@ class PaintField(QFrame):
 
     def clean(self):
         self._image.fill(Qt.transparent)
-        self._edges = Edges()
         self._actual_figure = None
+        self._actual_draw_point_status = False
+        self._actual_start = None
         self.update()
