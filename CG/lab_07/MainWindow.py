@@ -33,12 +33,8 @@ class MainWindow(QMainWindow):
         self.center()
         self.show()
 
-    def _draw_data(self, has_delay):
-        delay, result = self._paintField.draw_data(has_delay)
-
-        if not has_delay and result is None:
-            return MessageDisplay(self, f'Время закраски: {delay}ms',
-                                  messageHeader="Время закраски", messageType=None)
+    def _draw_data(self):
+        self._paintField.draw_data()
 
     def center(self):
         qr = self.frameGeometry()

@@ -89,7 +89,7 @@ class ControlField(QWidget):
         self._layout.addWidget(self._add_point_button)
 
         self._fill_button = QPushButton("Выполнить отсечение")
-        self._fill_button.clicked.connect(self._fill)
+        self._fill_button.clicked.connect(self._cut)
         self._layout.addWidget(self._fill_button)
 
         self._clear = QPushButton("Очистить экран")
@@ -138,8 +138,5 @@ class ControlField(QWidget):
 
         self._draw_splitter_action(first, second)
 
-    def _fill(self):
-        pass
-        # delay_status = self._radio_button_1.isChecked()
-        #
-        # self._fill_action(delay_status)
+    def _cut(self):
+        self._cut_action()

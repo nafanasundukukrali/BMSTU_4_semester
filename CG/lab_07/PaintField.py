@@ -54,96 +54,23 @@ class PaintField(QFrame):
         self._background.fill(self._background_color)
         self.update()
 
-    @analyzer
-    def draw_data(self, has_delay=False):
-        pass
-        # if self._actual_start is None:
-        #     return MessageDisplay(self, "Не был введён начальный затравочный пиксель.")
-        #
-        # color = self._image.pixelColor(self._actual_start)
-        #
-        # if color == self._splitter_color:
-        #     return MessageDisplay(self, "Выбран в качестве затравочного пикселя пиксель на границе..")
-        #
-        # stack = [deepcopy(self._actual_start)]
-        #
-        # while len(stack):
-        #     actual_dot: QPoint = stack.pop()
-        #     color = self._image.pixelColor(actual_dot)
-        #     self._draw_point(actual_dot)
-        #
-        #     start_dot = deepcopy(actual_dot)
-        #     actual_dot.setX(actual_dot.x() - 1)
-        #     color = self._image.pixelColor(actual_dot)
-        #
-        #     while actual_dot.x() != 0 and color != self._splitter_color:
-        #         self._draw_point(actual_dot)
-        #         actual_dot.setX(actual_dot.x() - 1)
-        #         color = self._image.pixelColor(actual_dot)
-        #
-        #     x_left = actual_dot.x() + 1
-        #     actual_dot = start_dot
-        #     actual_dot.setX(actual_dot.x() + 1)
-        #
-        #     color = self._image.pixelColor(actual_dot)
-        #
-        #     while actual_dot.x() < self._image.width() - 1 and color != self._splitter_color:
-        #         self._draw_point(actual_dot)
-        #         actual_dot.setX(actual_dot.x() + 1)
-        #         color = self._image.pixelColor(actual_dot)
-        #
-        #     x_right = actual_dot.x() - 1
-        #
-        #     def add_to_stack_new_start_dot():
-        #         while actual_dot.x() <= x_right:
-        #             flag = False
-        #             color = self._image.pixelColor(actual_dot)
-        #
-        #             while actual_dot.x() <= x_right and color != self._splitter_color and color != self._lines_color:
-        #                 if flag == False:
-        #                     flag = True
-        #
-        #                 actual_dot.setX(actual_dot.x() + 1)
-        #                 color = self._image.pixelColor(actual_dot)
-        #
-        #             if flag == True:
-        #                 color = self._image.pixelColor(actual_dot)
-        #
-        #                 if actual_dot.x() == x_right and color != self._splitter_color and color != self._lines_color:
-        #                     stack.append(deepcopy(actual_dot))
-        #                 else:
-        #                     buffer = deepcopy(actual_dot)
-        #                     buffer.setX(actual_dot.x() - 1)
-        #                     stack.append(deepcopy(buffer))
-        #
-        #             x_in = actual_dot.x()
-        #             color = self._image.pixelColor(actual_dot)
-        #
-        #             while color == self._splitter_color or self._splitter_color == self._lines_color and actual_dot.x() < x_right:
-        #                 actual_dot.setX(actual_dot.x() + 1)
-        #                 color = self._image.pixelColor(actual_dot)
-        #
-        #             if actual_dot.x() == x_in:
-        #                 actual_dot.setX(actual_dot.x() + 1)
-        #
-        #     actual_dot.setX(x_left)
-        #
-        #     if actual_dot.y() - 1 >= 1:
-        #         actual_dot.setY(actual_dot.y() - 1)
-        #         add_to_stack_new_start_dot()
-        #
-        #     actual_dot.setX(x_left)
-        #
-        #     if actual_dot.y() + 2 < self._image.height():
-        #         actual_dot.setY(actual_dot.y() + 2)
-        #         add_to_stack_new_start_dot()
-        #
-        #     if has_delay:
-        #         if has_delay:
-        #             loop = QEventLoop()
-        #             QTimer.singleShot(50, loop.quit)
-        #             loop.exec()
+    def draw_data(self):
+        self._draw_figure_data()
+        result = self._actual_figure.get_splitted_data()
 
+        if type(result) != list:
+            return
+
+        painter = QPainter(self._image)
+        pen = QPen()
+        pen.setColor(self._result_color)
+        painter.setPen(pen)
+
+        for cut in result:
+            painter.drawLine(cut[0], cut[1])
+
+        painter.end()
+        self.update()
 
     def _draw_point(self, dot: QPoint):
         self._image.setPixelColor(dot, self._lines_color)
@@ -212,6 +139,7 @@ class PaintField(QFrame):
         self._actual_figure.add_point(secondPoint, DrawMode.splitter)
 
         self._draw_figure_data()
+        self.update()
 
     def mousePressEvent(self, ev):
         if self._check_event(ev) == 1:
