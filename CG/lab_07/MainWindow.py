@@ -18,13 +18,13 @@ class MainWindow(QMainWindow):
         self._paintField = PaintField([self._ps.geometry().width() * 0.6, self._ps.geometry().height() * 0.85])
         control_field = ControlField(self,
                                      self._draw_data,
-                                     self._paintField.close_figure,
                                      self._paintField.add_point,
-                                     self._paintField.draw_ellipse,
+                                     self._paintField.draw_splitter,
                                      self._paintField.change_point_select_status,
                                      self._paintField.change_background_color,
-                                     self._paintField.change_pen_color,
-                                     self._paintField.change_fill_color,
+                                     self._paintField.change_lines_color,
+                                     self._paintField.change_splitter_color,
+                                     self._paintField.change_result_color,
                                      self._paintField.clean)
         self._layout.addWidget(control_field)
         self._layout.addWidget(self._paintField)

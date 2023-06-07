@@ -15,84 +15,72 @@ class ControlField(QWidget):
     start_of_last_action_status = "Отмена последнего преобразования"
 
     def __init__(self, parent,
-                 fill_action,
-                 close_figure_action,
+                 cut_action,
                  add_point_action,
-                 draw_ellipse_action,
+                 add_splitter_action,
                  change_point_select_status,
                  change_background_color_action,
-                 change_pen_color_action,
-                 change_fill_color,
+                 change_line_color_action,
+                 change_splitter_color,
+                 change_result_color,
                  clean_action):
         super().__init__(parent)
-        self._draw_ellipse_action = draw_ellipse_action
+        self._add_splitter_action = add_splitter_action
         self._add_point_action = add_point_action
-        self._fill_action = fill_action
+        self._draw_splitter_action = add_splitter_action
+        self._cut_action = cut_action
         self._parent = parent
         self.setStyleSheet('QPushButton {background-color: rgb(0,153,51)}')
         self.setMinimumWidth(self.MINWIDTH)
         self._layout = QVBoxLayout()
         self._layout.setStretch(0, 4)
 
-        self._fill_color_widget = ColorSelectionField(self, "  Выбрать цвет заливки  ",
-                                                      self.width(), change_fill_color,
-                                                      BASE_COLORS.fill_color)
-        self._layout.addWidget(self._fill_color_widget)
+        self._splitter_color_widget = ColorSelectionField(self, "  Выбрать цвет отсекателя  ",
+                                                          self.width(), change_splitter_color,
+                                                          BASE_COLORS.splitter_color)
+        self._layout.addWidget(self._splitter_color_widget)
 
-        self._edges_color_widget = ColorSelectionField(self, "  Выбрать цвет границы  ",
-                                                       self.width(), change_pen_color_action,
-                                                       BASE_COLORS.edges_color)
-        self._layout.addWidget(self._edges_color_widget)
+        self._line_color_widget = ColorSelectionField(self, "  Выбрать цвет отрезка  ",
+                                                      self.width(), change_line_color_action,
+                                                      BASE_COLORS.line_color)
+        self._layout.addWidget(self._line_color_widget)
+
+        self._result_color_widget = ColorSelectionField(self, "  Выбрать цвет результата  ",
+                                                        self.width(), change_result_color,
+                                                        BASE_COLORS.result_color)
+        self._layout.addWidget(self._result_color_widget)
 
         self._background_color_widget = ColorSelectionField(self, "  Выбрать цвет фона  ",
                                                             self.width(), change_background_color_action,
                                                             BASE_COLORS.background_color)
         self._layout.addWidget(self._background_color_widget)
 
-        self._edge_draw_button = QRadioButton('Ввод произвольной точки')
-        self._edge_draw_button.setChecked(True)
-        self._edge_draw_button.clicked.connect(change_point_select_status)
+        self._splitter_selector_button = QRadioButton('Ввод координаты отсекателя')
+        self._splitter_selector_button.setChecked(True)
+        self._splitter_selector_button.clicked.connect(change_point_select_status)
 
-        self._start_dot_button = QRadioButton('Ввод затравочного пикселя')
-        self._start_dot_button.clicked.connect(change_point_select_status)
+        self._line_selector_button = QRadioButton('Ввод данных отрезков')
+        self._line_selector_button.clicked.connect(change_point_select_status)
 
         self._button_group_1 = QButtonGroup()
-        self._button_group_1.addButton(self._edge_draw_button)
-        self._button_group_1.addButton(self._start_dot_button)
+        self._button_group_1.addButton(self._splitter_selector_button)
+        self._button_group_1.addButton(self._line_selector_button)
 
-        self._layout.addWidget(self._edge_draw_button)
-        self._layout.addWidget(self._start_dot_button)
+        self._layout.addWidget(self._splitter_selector_button)
+        self._layout.addWidget(self._line_selector_button)
 
-        # self._draw_circle_button.clicked.connect(self._draw_circle)
-        # self._layout.addWidget(self._draw_circle_button)
+        self._label_splitter = self._generate_block_label("Границы отсекателя:")
+        self._layout.addWidget(self._label_splitter)
 
-        self._label_circle = self._generate_block_label("Нарисовать эллипс:")
-        self._layout.addWidget(self._label_circle)
+        self._first_xy_co_ords = InputTwoParams(self, name_1="X левый", name_2="Y верхний")
+        self._layout.addWidget(self._first_xy_co_ords)
 
-        self._ellipse_center = InputTwoParams(self, "Координаты центра: ")
-        self._layout.addWidget(self._ellipse_center)
+        self._second_xy_co_ords = InputTwoParams(self, name_1="X правый", name_2="Y нижний")
+        self._layout.addWidget(self._second_xy_co_ords)
 
-        self._ellipse_data = InputTwoParams(self, name_1="Большая полуось", name_2="Малая полуось")
-        self._layout.addWidget(self._ellipse_data)
-
-        self._draw_ellipse_button = QPushButton("Нарисовать Эллипс")
-        self._draw_ellipse_button.clicked.connect(self._draw_ellipse)
-        self._layout.addWidget(self._draw_ellipse_button)
-
-        self._label_circle = self._generate_block_label("Режим закраски:")
-        self._layout.addWidget(self._label_circle)
-
-        self._radio_button_1 = QRadioButton('С задержкой')
-
-        self._radio_button_2 = QRadioButton('Без задержки')
-        self._radio_button_2.setChecked(True)
-
-        self._button_group = QButtonGroup()
-        self._button_group.addButton(self._radio_button_1)
-        self._button_group.addButton(self._radio_button_2)
-
-        self._layout.addWidget(self._radio_button_1)
-        self._layout.addWidget(self._radio_button_2)
+        self._draw_splitter_button = QPushButton("Нарисовать отскатель")
+        self._draw_splitter_button.clicked.connect(self._draw_splitter)
+        self._layout.addWidget(self._draw_splitter_button)
 
         self._dot_co_ords = InputTwoParams(self, "Координаты точки: ")
         self._layout.addWidget(self._dot_co_ords)
@@ -100,11 +88,7 @@ class ControlField(QWidget):
         self._add_point_button.clicked.connect(self._add_point)
         self._layout.addWidget(self._add_point_button)
 
-        self._concatate_button = QPushButton("Замкнуть многоугольник")
-        self._concatate_button.clicked.connect(close_figure_action)
-        self._layout.addWidget(self._concatate_button)
-
-        self._fill_button = QPushButton("Выполнить заполнение сплошной области")
+        self._fill_button = QPushButton("Выполнить отсечение")
         self._fill_button.clicked.connect(self._fill)
         self._layout.addWidget(self._fill_button)
 
@@ -141,20 +125,21 @@ class ControlField(QWidget):
 
         self._add_point_action(data)
 
-    def _draw_ellipse(self):
-        center = self._ellipse_center.get_data()
+    def _draw_splitter(self):
+        first = self._first_xy_co_ords.get_data()
 
-        if center == None:
-            return MessageDisplay(self, "Некорректно указаны или отсуствуют данные о центре эллипса.")
+        if first == None:
+            return MessageDisplay(self, "Некорректно указаны или отсуствуют данные о левой верхней вершине отсекателя.")
 
-        a, b = self._ellipse_data.get_data().toTuple()
+        second = self._second_xy_co_ords.get_data()
 
-        if a == None or b == None:
-            return MessageDisplay(self, "Некорректно указаны или отсуствуют данные о полуосях эллипса.")
+        if second == None:
+            return MessageDisplay(self, "Некорректно указаны или отсуствуют данные о правой нижней вершине отсекателя.")
 
-        self._draw_ellipse_action(center, a, b)
+        self._draw_splitter_action(first, second)
 
     def _fill(self):
-        delay_status = self._radio_button_1.isChecked()
-
-        self._fill_action(delay_status)
+        pass
+        # delay_status = self._radio_button_1.isChecked()
+        #
+        # self._fill_action(delay_status)

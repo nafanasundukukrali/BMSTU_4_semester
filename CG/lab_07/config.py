@@ -1,11 +1,12 @@
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtGui import QColor
 
-TASK = ("Реализовать и исследовать  алгоритм построчного затравочного заполнения.")
+TASK = ("Реализация алгоритма отсечения отрезка регулярным отсекателем. Вариант №9: Алгоритм разбиения отрезка средней точкой.")
 
 class BASE_COLORS:
-    fill_color = QColor(255, 0, 0)
-    edges_color = QColor(0, 255, 0)
+    splitter_color = QColor(255, 0, 0)
+    line_color = QColor(0, 255, 0)
+    result_color = QColor(0, 0, 255)
     background_color = QColor(255, 255, 255)
 
 class ERRORS:

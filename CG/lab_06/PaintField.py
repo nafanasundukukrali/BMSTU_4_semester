@@ -57,7 +57,7 @@ class PaintField(QFrame):
         color = self._image.pixelColor(self._actual_start)
 
         if color == self._pen_color:
-            return MessageDisplay(self, "Выбран в качестве затравочного пикселя пиксель на границе..")
+            return MessageDisplay(self, "Выбран в качестве затравочного пикселя пиксель на границе зполняемой области.")
 
         stack = [deepcopy(self._actual_start)]
 
@@ -113,7 +113,7 @@ class PaintField(QFrame):
                     x_in = actual_dot.x()
                     color = self._image.pixelColor(actual_dot)
 
-                    while color == self._pen_color or self._pen_color == self._fill_color and actual_dot.x() < x_right:
+                    while color == self._pen_color or color == self._fill_color and actual_dot.x() < x_right:
                         actual_dot.setX(actual_dot.x() + 1)
                         color = self._image.pixelColor(actual_dot)
 
@@ -202,6 +202,5 @@ class PaintField(QFrame):
     def clean(self):
         self._image.fill(Qt.transparent)
         self._actual_figure = None
-        self._actual_draw_point_status = False
         self._actual_start = None
         self.update()
