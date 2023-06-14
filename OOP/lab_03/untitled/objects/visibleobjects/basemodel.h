@@ -3,6 +3,6 @@
 
 #include "visibleobject.h"
 
-class BaseModel: public VisibleObject { };
+class BaseModel: public VisibleObject {};
 
 #endif // BASEMODEL_H

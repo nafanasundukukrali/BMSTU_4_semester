@@ -13,7 +13,7 @@ class Object {
 public:
     using value_type = Object;
     using size_type = size_t;
-    using iterator = PtrObject::const_iterator;
+    using iterator = PtrObject::iterator;
     using const_iterator = PtrObject::const_iterator;
 
     Object() = default;
