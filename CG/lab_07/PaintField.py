@@ -64,6 +64,7 @@ class PaintField(QFrame):
         painter = QPainter(self._image)
         pen = QPen()
         pen.setColor(self._result_color)
+        pen.setWidth(2)
         painter.setPen(pen)
 
         for cut in result:
@@ -130,6 +131,19 @@ class PaintField(QFrame):
         while i < len(data):
             painter.drawLine(data[i][1][0], data[i][1][1])
             i += 1
+
+        buffer = self._actual_figure.get_was_status()
+
+        if buffer is not None:
+            pen.setColor(self._result_color)
+            pen.setWidth(2)
+            painter.setPen(pen)
+
+            i = 0
+
+            while i < len(buffer):
+                painter.drawLine(buffer[i][0], buffer[i][1])
+                i += 1
 
         painter.end()
 

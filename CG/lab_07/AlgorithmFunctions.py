@@ -20,6 +20,7 @@ class DrawingData:
         self._last_point = None
         self._start_point = None
         self._parent = parent
+        self._was_result = None
 
     def add_point(self, dot: QPoint, type: DrawMode):
         if type == DrawMode.splitter:
@@ -54,6 +55,10 @@ class DrawingData:
         self._cuts = []
         self._last_point = None
         self._start_point = None
+        self._was_result = None
+
+    def get_was_status(self):
+        return self._was_result
 
     def get_data(self):
         buffer = [[DrawMode.line, value] for value in self._cuts[:self._splitter_index]]
@@ -80,91 +85,72 @@ class DrawingData:
         result = []
 
         for cut in self._cuts:
-            def test(point: QPoint):
+            def get_points_codes_sum(point: QPoint, x_left, x_right, y_top, y_bottom):
                 value = 0
 
-                if point.x() < x_left:
+                if point.x() <= x_left:
                     value += 1
-                if point.x() > x_right:
+                if point.x() >= x_right:
                     value += 2
-                if point.y() > y_bottom:
+                if point.y() >= y_bottom:
                     value += 4
-                if point.y() < y_top:
+                if point.y() <= y_top:
                     value += 8
 
                 return value
 
-            def get_ends_of_cut_result(p1: QPoint, p2: QPoint):
-                test_first = test(p1)
-                test_second = test(p2)
+            first_sum = get_points_codes_sum(cut[0], x_left, x_right, y_top, y_bottom)
+            second_sum = get_points_codes_sum(cut[1], x_left, x_right, y_top, y_bottom)
 
-                if test_first & test_second != 0:
-                    return 0
+            P1_x, P1_y = float(cut[0].x()), float(cut[0].y())
+            P2_x, P2_y = float(cut[1].x()), float(cut[1].y())
 
-                if (test_first == 2 and test_second == 6 or
-                        test_first == 6 and test_second == 2 or
-                        test_first == 8 and test_second == 2 or
-                        test_first == 2 and test_second == 8):
-                    return 0
-
-                if test_first == 0 and test_second == 0:
-                    return 1
-
-                return 3
-
-            cuts_reuslt = get_ends_of_cut_result(cut[0], cut[1])
-
-            if cuts_reuslt == 1:
-                result.append([cut[0], cut[1]])
-                continue
-
-            if cuts_reuslt == 0:
-                continue
-
-            P1_x = cut[0].x()
-            P1_y = cut[0].y()
-            P2_x = cut[1].x()
-            P2_y = cut[1].y()
-
-            while fabs(P1_x - P2_x) > self.EPSILON or fabs(P1_y - P2_y) > self.EPSILON:
-                    Pm_x = (P1_x + P2_x) / 2
-                    Pm_y = (P1_y + P2_y) / 2
-
-                    if get_ends_of_cut_result(QPoint(P1_x, P1_y), QPoint(Pm_x, Pm_y)) == 0:
-                        P1_x = Pm_x
-                        P1_y = Pm_y
-                    else:
-                        P2_x = Pm_x
-                        P2_y = Pm_y
-
-            if test(QPoint(P1_x, P1_y)) != 0 and test(QPoint(P2_x, P2_y)) == 0:
-                R1 = QPoint(P2_x, P2_y)
+            if second_sum == 0:
+                R_x = P2_x
+                R_y = P2_y
             else:
-                R1 = QPoint(P1_x, P1_y)
+                R_x = P1_x
+                R_y = P1_y
 
-            P1_x = cut[0].x()
-            P1_y = cut[0].y()
-            P2_x = cut[1].x()
-            P2_y = cut[1].y()
+            i = 0
 
-            while fabs(P1_x - P2_x) > self.EPSILON or fabs(P1_y - P2_y) > self.EPSILON:
-                Pm_x = (P1_x + P2_x) / 2
-                Pm_y = (P1_y + P2_y) / 2
+            while i < 2 and not (first_sum == 0 and second_sum == 0) and first_sum & second_sum == 0:
+                P_m_x = (P1_x + P2_x) / 2
+                P_m_y = (P1_y + P2_y) / 2
 
-                if get_ends_of_cut_result(QPoint(P2_x, P2_y), QPoint(Pm_x, Pm_y)) == 0:
-                    P2_x = Pm_x
-                    P2_y = Pm_y
+                middle_sum = get_points_codes_sum(QPoint(P_m_x, P_m_y), x_left, x_right, y_top, y_bottom)
+
+                if middle_sum & second_sum != 0 or middle_sum == 0 and second_sum == 0:
+                    P2_x = P_m_x
+                    P2_y = P_m_y
                 else:
-                    P1_x = Pm_x
-                    P1_y = Pm_y
+                    P1_x = P_m_x
+                    P1_y = P_m_y
 
-            if test(QPoint(P2_x, P2_y)) != 0 and test(QPoint(P1_x, P1_y)) == 0:
-                R2 = QPoint(P1_x, P1_y)
-            else:
-                R2 = QPoint(P2_x, P2_y)
+                if (P1_x - P2_x) ** 2 + (P1_y - P2_y) ** 2 < self.EPSILON ** 2:
+                    if (get_points_codes_sum(QPoint(P1_x, P1_y), x_left, x_right, y_top, y_bottom) != 0 and
+                            get_points_codes_sum(QPoint(P2_x, P2_y), x_left, x_right, y_top, y_bottom) == 0):
+                        R_x, R_y, P2_x, P2_y, P1_x, P1_y = P2_x, P2_y, R_x, R_y, P2_x, P2_y
+                    else:
+                        P1_x, P1_y, P2_x, P2_y, R_x, R_y = P2_x, P2_y, R_x, R_y, P1_x, P1_y
 
-            if get_ends_of_cut_result(R1, R2) == 1:
-                result.append([R1, R2])
+                    i += 1
+
+                first_sum = get_points_codes_sum(QPoint(P1_x, P1_y), x_left, x_right, y_top, y_bottom)
+                second_sum = get_points_codes_sum(QPoint(P2_x, P2_y), x_left, x_right, y_top, y_bottom)
+
+                if i == 1 and first_sum == 0 and second_sum == 0:
+                    i += 1
+
+            first_sum = get_points_codes_sum(QPoint(R_x, R_y), x_left, x_right, y_top, y_bottom)
+
+            if first_sum & second_sum != 0:
+                continue
+
+            if first_sum == 0 and second_sum == 0:
+                result.append([QPoint(R_x, R_y), QPoint(P2_x, P2_y)])
+
+        self._was_result = result
 
         return result
 

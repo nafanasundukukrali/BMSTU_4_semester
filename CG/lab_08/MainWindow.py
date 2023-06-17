@@ -19,7 +19,7 @@ class MainWindow(QMainWindow):
         control_field = ControlField(self,
                                      self._draw_data,
                                      self._paintField.add_point,
-                                     self._paintField.draw_splitter,
+                                     self._paintField.close_figure,
                                      self._paintField.change_point_select_status,
                                      self._paintField.change_background_color,
                                      self._paintField.change_lines_color,

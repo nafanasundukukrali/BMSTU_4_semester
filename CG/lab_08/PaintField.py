@@ -56,13 +56,15 @@ class PaintField(QFrame):
 
     def draw_data(self):
         self._draw_figure_data()
+
         result = self._actual_figure.get_splitted_data()
 
-        if type(result) != list:
+        if type(result) == MessageDisplay:
             return
 
         painter = QPainter(self._image)
         pen = QPen()
+        pen.setWidth(2)
         pen.setColor(self._result_color)
         painter.setPen(pen)
 
@@ -92,13 +94,17 @@ class PaintField(QFrame):
 
         self._actual_figure.reset_actual_point_data()
 
-    def add_point(self, dot: QPoint):
-        if not (self._actual_figure.add_point(dot, self._actual_draw_point_status) is None):
-            return
+    def add_point(self, dot: QPoint = None):
+        if dot is None:
+            self._actual_figure.close()
+        else:
+            self._actual_figure.add_point(dot, self._actual_draw_point_status)
 
         self._draw_figure_data()
-
         self.update()
+
+    def close_figure(self):
+        self.add_point()
 
     def _draw_figure_data(self):
         self._image.fill(Qt.transparent)
@@ -110,36 +116,31 @@ class PaintField(QFrame):
         data: list[[DrawMode, [QPoint, QPoint]]] = self._actual_figure.get_data()
         i = 0
 
-        while i < len(data) and data[i][0] == DrawMode.line:
-            painter.drawLine(data[i][1][0], data[i][1][1])
-            i += 1
+        while i < len(data):
+            if data[i][0] == DrawMode.line and pen.color() != self._lines_color:
+                pen.setColor(self._lines_color)
+                painter.setPen(pen)
 
-        if i < len(data):
-            pen.setColor(self._splitter_color)
+            if data[i][0] == DrawMode.splitter and pen.color() != self._splitter_color:
+                pen.setColor(self._splitter_color)
+                painter.setPen(pen)
+
+            if data[i][0] == DrawMode.result and pen.color() != self._result_color:
+                pen.setColor(self._result_color)
+                pen.setWidth(2)
+                painter.setPen(pen)
+
+            painter.drawLine(data[i][1][0], data[i][1][1])
+            pen.setWidth(3)
+            painter.setPen(pen)
+            painter.drawPoint(data[i][1][0])
+            painter.drawPoint(data[i][1][1])
+            pen.setWidth(1)
             painter.setPen(pen)
 
-            w = data[i][1][1].x() - data[i][1][0].x()
-            h = data[i][1][1].y() - data[i][1][0].y()
-            painter.drawRect(data[i][1][0].x(), data[i][1][0].y(), w, h)
-
-            i += 1
-
-        pen.setColor(self._lines_color)
-        painter.setPen(pen)
-
-        while i < len(data):
-            painter.drawLine(data[i][1][0], data[i][1][1])
             i += 1
 
         painter.end()
-
-    def draw_splitter(self, firstPoint: QPoint, secondPoint: QPoint):
-        self._actual_figure.reset_actual_point_data()
-        self._actual_figure.add_point(firstPoint, DrawMode.splitter)
-        self._actual_figure.add_point(secondPoint, DrawMode.splitter)
-
-        self._draw_figure_data()
-        self.update()
 
     def mousePressEvent(self, ev):
         if self._check_event(ev) == 1:

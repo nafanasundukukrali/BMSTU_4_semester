@@ -17,7 +17,7 @@ class ControlField(QWidget):
     def __init__(self, parent,
                  cut_action,
                  add_point_action,
-                 add_splitter_action,
+                 close_action,
                  change_point_select_status,
                  change_background_color_action,
                  change_line_color_action,
@@ -25,9 +25,7 @@ class ControlField(QWidget):
                  change_result_color,
                  clean_action):
         super().__init__(parent)
-        self._add_splitter_action = add_splitter_action
         self._add_point_action = add_point_action
-        self._draw_splitter_action = add_splitter_action
         self._cut_action = cut_action
         self._parent = parent
         self.setStyleSheet('QPushButton {background-color: rgb(0,153,51)}')
@@ -69,18 +67,9 @@ class ControlField(QWidget):
         self._layout.addWidget(self._splitter_selector_button)
         self._layout.addWidget(self._line_selector_button)
 
-        self._label_splitter = self._generate_block_label("Границы отсекателя:")
-        self._layout.addWidget(self._label_splitter)
-
-        self._first_xy_co_ords = InputTwoParams(self, name_1="X левый", name_2="Y верхний")
-        self._layout.addWidget(self._first_xy_co_ords)
-
-        self._second_xy_co_ords = InputTwoParams(self, name_1="X правый", name_2="Y нижний")
-        self._layout.addWidget(self._second_xy_co_ords)
-
-        self._draw_splitter_button = QPushButton("Нарисовать отскатель")
-        self._draw_splitter_button.clicked.connect(self._draw_splitter)
-        self._layout.addWidget(self._draw_splitter_button)
+        self._close_button = QPushButton("Замкнуть отсекатель")
+        self._close_button.clicked.connect(close_action)
+        self._layout.addWidget(self._close_button)
 
         self._dot_co_ords = InputTwoParams(self, "Координаты точки: ")
         self._layout.addWidget(self._dot_co_ords)
@@ -124,19 +113,6 @@ class ControlField(QWidget):
             return MessageDisplay(self, "Некорректно указаны или отсуствуют данные о координатах новой точки.")
 
         self._add_point_action(data)
-
-    def _draw_splitter(self):
-        first = self._first_xy_co_ords.get_data()
-
-        if first == None:
-            return MessageDisplay(self, "Некорректно указаны или отсуствуют данные о левой верхней вершине отсекателя.")
-
-        second = self._second_xy_co_ords.get_data()
-
-        if second == None:
-            return MessageDisplay(self, "Некорректно указаны или отсуствуют данные о правой нижней вершине отсекателя.")
-
-        self._draw_splitter_action(first, second)
 
     def _cut(self):
         self._cut_action()

@@ -1,45 +1,161 @@
 from PySide6.QtCore import QPoint
 from config import MessageDisplay
 from enum import Enum
-from math import fabs
+from math import fabs, copysign
 
 class DrawMode(Enum):
     splitter = 1
     line = 2
+    result = 3
+
+class Vector:
+    def __init__(self, start, end, vector_coords = True):
+        if vector_coords:
+            self._x = end.x() - start.x()
+            self._y = end.y() - start.y()
+        else:
+            self._x = start
+            self._y = end
+
+    def get_x(self):
+        return self._x
+
+    def get_y(self):
+        return self._y
+
+    def set_x(self, x: float):
+        self._x = x
+
+    def set_y(self, y: float):
+        self._y = y
+
+    def get_vertex_mul(self, base) -> float:
+        return base.get_x() * self._y - base.get_y() * self._x
+
+    def get_scal_mul(self, vector):
+        return vector.get_x() * self._x + vector.get_y() * self._y
+
+    def get_normal(self, test):
+        if self._x != 0:
+            Nvn = Vector(-self._y / self._x, 1, False)
+        else:
+            Nvn = Vector(1, -self._x / self._y, False)
+
+        if Nvn.get_scal_mul(test) < 0:
+            Nvn.set_x(Nvn.get_x() * (-1))
+            Nvn.set_y(Nvn.get_y() * (-1))
+
+        return Nvn
 
 # Отсекатель
+class Figure:
+    def __init__(self, start_point: QPoint, parent):
+        self._vectors = []
+        self._edges = []
+        self._start_point = start_point
+        self._actual_point = start_point
+        self._parent = parent
+
+    def add_point(self, dot: QPoint):
+        self._edges.append([self._actual_point, dot])
+        vector = Vector(self._actual_point, dot)
+        self._vectors.append(vector)
+        self._actual_point = dot
+
+    def get_start_point(self):
+        return self._start_point
+
+    def get_actual_point(self):
+        return self._actual_point
+
+    def check_figure_is_finished(self):
+        return self._start_point == self._actual_point
+
+    def check_figure_is_convex_polygon(self):
+        if len(self._edges) < 3:
+            return MessageDisplay(self._parent, "Ошибка: меньше 3-х вершин, не является многоугольником.")
+
+        sign = copysign(1, self._vectors[0].get_vertex_mul(self._vectors[-1]))
+
+        sign_1 = sign
+
+        i = 1
+
+        while sign_1 == sign and i < len(self._edges):
+            sign_1 = copysign(1, self._vectors[i].get_vertex_mul(self._vectors[i - 1]))
+            i += 1
+
+        return sign == sign_1
+
+    def split_cut(self, P1: QPoint, P2: QPoint):
+        tn = 0
+        tk = 1
+
+        D = Vector(P1, P2)
+
+        added = []
+
+        for i in range(len(self._vectors)):
+            Nvn = self._vectors[i].get_normal(self._vectors[(i + 1) % len(self._vectors)])
+
+            fi = self._edges[i][0]
+
+            Wi = Vector(fi, P1)
+
+            Dsk = D.get_scal_mul(Nvn)
+            Wsk = Wi.get_scal_mul(Nvn)
+
+            if Dsk == 0 and Wsk < 0:
+                return
+            elif Dsk != 0:
+                t = - Wsk / Dsk
+
+                if Dsk > 0:
+                    if t > 1:
+                        return
+
+                    tn = max(tn, t)
+                elif Dsk < 0:
+                    if t < 0:
+                        return
+
+                    tk = min(tk, t)
+
+        if tn <= tk:
+            return [QPoint(P1.x() + (P2.x() - P1.x()) * tn,
+                           P1.y() + (P2.y() - P1.y()) * tn),
+                    QPoint(P1.x() + (P2.x() - P1.x()) * tk,
+                           P1.y() + (P2.y() - P1.y()) * tk)]
+
+    def __len__(self):
+        return len(self._edges)
+
 
 class DrawingData:
-    MAX_CUTS_COUNT=10
-    EPSILON=1e-1
-
     def __init__(self, parent):
         self._splitter = None
         self._splitter_index = 0
         self._cuts = []
+        self._last_result = None
         self._last_point = None
         self._start_point = None
         self._parent = parent
 
     def add_point(self, dot: QPoint, type: DrawMode):
         if type == DrawMode.splitter:
-            if self._last_point is None and not (self._start_point is None):
-                if self._start_point == dot:
-                    return MessageDisplay(self._parent, "Невозможно создать отсекатель, поскольку введённые координаты вершин совпадают.")
-
-                self._last_point = dot
-                self._splitter = [self._start_point, self._last_point]
-                self._splitter_index = len(self._cuts)
+            if self._splitter is None:
+                self._splitter = Figure(dot, self._parent)
             else:
-                self._last_point = None
-                self._start_point = dot
+                if self._splitter.get_actual_point() == self._splitter.get_start_point() and len(self._splitter) > 1:
+                    self._splitter = Figure(dot, self._parent)
+                    self._cuts = list(filter(lambda x: x[0] != DrawMode.splitter, self._cuts))
+                else:
+                    self._cuts.append([DrawMode.splitter, [self._splitter.get_actual_point(), dot]])
+                    self._splitter.add_point(dot)
         else:
             if self._last_point is None and not(self._start_point is None):
-                if len(self._cuts) == self.MAX_CUTS_COUNT:
-                    return MessageDisplay(self._parent, f'Невозможно добавить отрезок, достигнуто максимальное количество: {self.MAX_CUTS_COUNT}')
-
                 self._last_point = dot
-                self._cuts.append([self._start_point, self._last_point])
+                self._cuts.append([DrawMode.line, [self._start_point, self._last_point]])
             else:
                 self._start_point = dot
                 self._last_point = None
@@ -54,119 +170,53 @@ class DrawingData:
         self._cuts = []
         self._last_point = None
         self._start_point = None
+        self._last_result = None
 
     def get_data(self):
-        buffer = [[DrawMode.line, value] for value in self._cuts[:self._splitter_index]]
+        return self._cuts
 
-        if not (self._splitter is None):
-            buffer.append([DrawMode.splitter, self._splitter])
+    def close(self):
+        if self._splitter is None:
+            return MessageDisplay(self._parent, "Многоугольник пока не существует")
 
-        buffer = buffer + [[DrawMode.line, value] for value in self._cuts[self._splitter_index: len(self._cuts)]]
-
-        return buffer
+        return self.add_point(self._splitter.get_start_point(), DrawMode.splitter)
 
     def get_splitted_data(self):
+        self._cuts = list(filter(lambda x: x[0] != DrawMode.result, self._cuts))
+        cuts = list(filter(lambda x: x[0] == DrawMode.line, self._cuts))
+
         if self._splitter is None:
-            return MessageDisplay(self._parent, "Невозможно показать результат, поскольку не были введены данные отсекателя.")
+            return MessageDisplay(self._parent, "Многоугольник не существует")
 
-        if len(self._cuts) == 0:
-            MessageDisplay(self._parent, "Невозможно показать результат, поскольку не были введены данные ни по одному отрезку.")
+        if self._splitter.get_actual_point() != self._splitter.get_start_point():
+            return MessageDisplay(self._parent, "Многоугольник не замкнут")
 
-        x_left = min(self._splitter[0].x(), self._splitter[1].x())
-        x_right = max(self._splitter[0].x(), self._splitter[1].x())
-        y_top = min(self._splitter[0].y(), self._splitter[1].y())
-        y_bottom = max(self._splitter[0].y(), self._splitter[1].y())
+        check_result = self._splitter.check_figure_is_convex_polygon()
+
+        if not check_result:
+            return MessageDisplay(self._parent, "Многоугольник не выпуклый")
+
+        if type(check_result) == MessageDisplay:
+            return
 
         result = []
 
-        for cut in self._cuts:
-            def test(point: QPoint):
-                value = 0
+        for cut in cuts:
+            buffer_result = self._splitter.split_cut(cut[1][0], cut[1][1])
 
-                if point.x() < x_left:
-                    value += 1
-                if point.x() > x_right:
-                    value += 2
-                if point.y() > y_bottom:
-                    value += 4
-                if point.y() < y_top:
-                    value += 8
-
-                return value
-
-            def get_ends_of_cut_result(p1: QPoint, p2: QPoint):
-                test_first = test(p1)
-                test_second = test(p2)
-
-                if test_first & test_second != 0:
-                    return 0
-
-                if (test_first == 2 and test_second == 6 or
-                        test_first == 6 and test_second == 2 or
-                        test_first == 8 and test_second == 2 or
-                        test_first == 2 and test_second == 8):
-                    return 0
-
-                if test_first == 0 and test_second == 0:
-                    return 1
-
-                return 3
-
-            cuts_reuslt = get_ends_of_cut_result(cut[0], cut[1])
-
-            if cuts_reuslt == 1:
-                result.append([cut[0], cut[1]])
-                continue
-
-            if cuts_reuslt == 0:
-                continue
-
-            P1_x = cut[0].x()
-            P1_y = cut[0].y()
-            P2_x = cut[1].x()
-            P2_y = cut[1].y()
-
-            while fabs(P1_x - P2_x) > self.EPSILON or fabs(P1_y - P2_y) > self.EPSILON:
-                    Pm_x = (P1_x + P2_x) / 2
-                    Pm_y = (P1_y + P2_y) / 2
-
-                    if get_ends_of_cut_result(QPoint(P1_x, P1_y), QPoint(Pm_x, Pm_y)) == 0:
-                        P1_x = Pm_x
-                        P1_y = Pm_y
-                    else:
-                        P2_x = Pm_x
-                        P2_y = Pm_y
-
-            if test(QPoint(P1_x, P1_y)) != 0 and test(QPoint(P2_x, P2_y)) == 0:
-                R1 = QPoint(P2_x, P2_y)
-            else:
-                R1 = QPoint(P1_x, P1_y)
-
-            P1_x = cut[0].x()
-            P1_y = cut[0].y()
-            P2_x = cut[1].x()
-            P2_y = cut[1].y()
-
-            while fabs(P1_x - P2_x) > self.EPSILON or fabs(P1_y - P2_y) > self.EPSILON:
-                Pm_x = (P1_x + P2_x) / 2
-                Pm_y = (P1_y + P2_y) / 2
-
-                if get_ends_of_cut_result(QPoint(P2_x, P2_y), QPoint(Pm_x, Pm_y)) == 0:
-                    P2_x = Pm_x
-                    P2_y = Pm_y
-                else:
-                    P1_x = Pm_x
-                    P1_y = Pm_y
-
-            if test(QPoint(P2_x, P2_y)) != 0 and test(QPoint(P1_x, P1_y)) == 0:
-                R2 = QPoint(P1_x, P1_y)
-            else:
-                R2 = QPoint(P2_x, P2_y)
-
-            if get_ends_of_cut_result(R1, R2) == 1:
-                result.append([R1, R2])
+            if buffer_result is not None:
+                self._cuts.append([DrawMode.result, buffer_result])
+                result.append(buffer_result)
 
         return result
+
+
+
+
+
+
+
+
 
 
 
