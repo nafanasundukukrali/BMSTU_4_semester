@@ -38,13 +38,11 @@ class PaintField(QFrame):
 
     def change_splitter_color(self, color: QColor):
         self._splitter_color = color
-        self._draw_figure_data()
-        self.update()
+        self.draw_figure_data()
 
     def change_lines_color(self, color: QColor):
         self._lines_color = color
-        self._draw_figure_data()
-        self.update()
+        self.draw_figure_data()
 
     def change_result_color(self, color: QColor):
         self._result_color = color
@@ -60,8 +58,7 @@ class PaintField(QFrame):
         if type(result) == MessageDisplay:
             return
 
-        self._draw_figure_data()
-        self.update()
+        self.draw_figure_data()
 
     def _draw_point(self, dot: QPoint):
         self._image.setPixelColor(dot, self._lines_color)
@@ -89,13 +86,12 @@ class PaintField(QFrame):
         else:
             self._actual_figure.add_point(dot, self._actual_draw_point_status)
 
-        self._draw_figure_data()
-        self.update()
+        self.draw_figure_data()
 
     def close_figure(self):
         self.add_point()
 
-    def _draw_figure_data(self):
+    def draw_figure_data(self):
         self._image.fill(Qt.transparent)
         painter = QPainter(self._image)
         pen = QPen()
@@ -130,6 +126,8 @@ class PaintField(QFrame):
             i += 1
 
         painter.end()
+
+        self.update()
 
     def mousePressEvent(self, ev):
         if self._check_event(ev) == 1:

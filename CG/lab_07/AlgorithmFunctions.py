@@ -88,13 +88,13 @@ class DrawingData:
             def get_points_codes_sum(point: QPoint, x_left, x_right, y_top, y_bottom):
                 value = 0
 
-                if point.x() <= x_left:
+                if point.x() < x_left:
                     value += 1
-                if point.x() >= x_right:
+                if point.x() > x_right:
                     value += 2
-                if point.y() >= y_bottom:
+                if point.y() > y_bottom:
                     value += 4
-                if point.y() <= y_top:
+                if point.y() < y_top:
                     value += 8
 
                 return value

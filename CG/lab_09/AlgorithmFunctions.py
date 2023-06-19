@@ -1,5 +1,5 @@
 import numpy
-from PySide6.QtCore import QPoint
+from PySide6.QtCore import QPoint, QTimer, QThread, QEventLoop
 from config import MessageDisplay
 from enum import Enum
 from math import fabs, copysign
@@ -61,6 +61,15 @@ class Figure:
 
     def get_edges(self):
         buffer = deepcopy(self._edges)
+
+        vector_2 = Vector(buffer[0][0], buffer[0][1])
+        vector_1 = Vector(buffer[1][0], buffer[1][1])
+
+        if vector_1.get_vertex_mul(vector_2) >= 0:
+            for i in range(len(buffer)):
+                buffer[i].reverse()
+
+            buffer.reverse()
 
         return buffer
 
@@ -183,23 +192,23 @@ class DrawingData:
 
         splitter = self._splitter.get_edges()
 
-        vector_2 = Vector(splitter[0][0], splitter[0][1])
-        vector_1 = Vector(splitter[1][0], splitter[1][1])
+        # vector_2 = Vector(splitter[0][0], splitter[0][1])
+        # vector_1 = Vector(splitter[1][0], splitter[1][1])
+        #
+        # if vector_2.get_vertex_mul(vector_1):
+        #     for i in range(len(splitter)):
+        #         splitter[i].reverse()
+        #
+        #     splitter.reverse()
+        #
+        # vector_2 = Vector(figure[0][0], figure[0][1])
+        # vector_1 = Vector(figure[1][0], figure[1][1])
 
-        if vector_2.get_vertex_mul(vector_1):
-            for i in range(len(splitter)):
-                splitter[i].reverse()
-
-            splitter.reverse()
-
-        vector_2 = Vector(figure[0][0], figure[0][1])
-        vector_1 = Vector(figure[1][0], figure[1][1])
-
-        if vector_2.get_vertex_mul(vector_1):
-            for i in range(len(figure)):
-                figure[i].reverse()
-
-            figure.reverse()
+        # if vector_2.get_vertex_mul(vector_1):
+        #     for i in range(len(figure)):
+        #         figure[i].reverse()
+        #
+        #     figure.reverse()
 
             # for i in range(len(figure)):
             #     figure[i].reverse()
@@ -208,6 +217,7 @@ class DrawingData:
 
         for i in range(len(splitter)):
             edge = Vector(splitter[i][0], splitter[i][1])
+
             last_point = None
             buffer_result = []
 
@@ -215,8 +225,8 @@ class DrawingData:
                 start_vector = Vector(splitter[i][0], figure[j][0])
                 end_vector = Vector(splitter[i][0], figure[j][1])
 
-                vector_mul_start = start_vector.get_vertex_mul(edge)
-                vector_mul_end = end_vector.get_vertex_mul(edge)
+                vector_mul_start = edge.get_vertex_mul(start_vector)
+                vector_mul_end = edge.get_vertex_mul(end_vector)
 
                 if vector_mul_end > 0 and vector_mul_start > 0:
                     if last_point is not None and last_point != figure[j][0]:
@@ -233,17 +243,20 @@ class DrawingData:
                               splitter[i][0].y() - figure[j][0].y()]
 
                     t = np.linalg.solve(system, result)[0]
-                    point = figure[j][0] + (figure[j][1] - figure[j][0]) * t
+                    point = QPoint(figure[j][0].x() + (figure[j][1].x() - figure[j][0].x()) * t,
+                                   figure[j][0].y() + (figure[j][1].y() - figure[j][0].y()) * t)
 
                     if last_point is not None:
                         buffer_result.append([last_point, point])
 
-                    if vector_mul_start > 0:
+                    if vector_mul_start > 0 and last_point != figure[j][0]:
                         buffer_result.append([figure[j][0], point])
                         last_point = point
-                    else:
+                    elif vector_mul_start <= 0:
                         buffer_result.append([point, figure[j][1]])
                         last_point = figure[j][1]
+                    elif vector_mul_start > 0:
+                        last_point = point
                 elif vector_mul_start == 0 and vector_mul_end > 0:
                     if last_point is not None and last_point != figure[j][0]:
                         buffer_result.append([last_point, figure[j][0]])
@@ -268,7 +281,7 @@ class DrawingData:
                     last_point = figure[j][0]
 
             if len(buffer_result) > 2 and buffer_result[0][0] != buffer_result[-1][1]:
-                buffer_result.append([buffer_result[0][0], buffer_result[-1][1]])
+                buffer_result.append([buffer_result[-1][1], buffer_result[0][0]])
 
             figure = buffer_result
 
