@@ -192,29 +192,6 @@ class DrawingData:
 
         splitter = self._splitter.get_edges()
 
-        # vector_2 = Vector(splitter[0][0], splitter[0][1])
-        # vector_1 = Vector(splitter[1][0], splitter[1][1])
-        #
-        # if vector_2.get_vertex_mul(vector_1):
-        #     for i in range(len(splitter)):
-        #         splitter[i].reverse()
-        #
-        #     splitter.reverse()
-        #
-        # vector_2 = Vector(figure[0][0], figure[0][1])
-        # vector_1 = Vector(figure[1][0], figure[1][1])
-
-        # if vector_2.get_vertex_mul(vector_1):
-        #     for i in range(len(figure)):
-        #         figure[i].reverse()
-        #
-        #     figure.reverse()
-
-            # for i in range(len(figure)):
-            #     figure[i].reverse()
-            #
-            # figure.reverse()
-
         for i in range(len(splitter)):
             edge = Vector(splitter[i][0], splitter[i][1])
 
